@@ -2,15 +2,16 @@ from flask import Flask, render_template, request, redirect, session, g, jsonify
 import mysql.connector
 import hashlib
 import uuid
+import os
 
 app = Flask(__name__)
 app.secret_key = "secret_key_123"
 
 # ---------------- DATABASE CONFIG ----------------
-DB_NAME = "sumedh"
-DB_USER = "root"
-DB_PASS = "sumedh2004"
-DB_HOST = "localhost"
+DB_NAME = os.getenv("DB_NAME", "sumedh")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASS = os.getenv("DB_PASS", "sumedh2004")
+DB_HOST = os.getenv("DB_HOST", "localhost")
 
 # ---------------- DATABASE CONNECTION ----------------
 def get_db():
@@ -46,21 +47,24 @@ def signup():
             return "Database error"
 
         cursor = db.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO users (first_name,last_name,email,mobile,gender,username,password)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                request.form["first_name"],
+                request.form["last_name"],
+                request.form["email"],
+                request.form["mobile"],
+                request.form["gender"],
+                request.form["username"],
+                hash_password(request.form["password"])
+            ))
+            db.commit()
+        except Exception as e:
+            print("Signup Error:", e)
+            return "Signup failed"
 
-        cursor.execute("""
-            INSERT INTO users (first_name,last_name,email,mobile,gender,username,password)
-            VALUES (%s,%s,%s,%s,%s,%s,%s)
-        """, (
-            request.form["first_name"],
-            request.form["last_name"],
-            request.form["email"],
-            request.form["mobile"],
-            request.form["gender"],
-            request.form["username"],
-            hash_password(request.form["password"])
-        ))
-
-        db.commit()
         cursor.close()
         return redirect("/")
 
@@ -104,7 +108,6 @@ def home():
     cursor.execute("SELECT * FROM packages")
     packages = cursor.fetchall()
 
-    # FIXED REVIEWS
     cursor.execute("""
         SELECT 
             p.package_name,
@@ -120,7 +123,6 @@ def home():
     package_reviews = cursor.fetchall()
 
     cursor.close()
-
     return render_template("home.html", packages=packages, package_reviews=package_reviews)
 
 # ---------------- CART ----------------
@@ -152,7 +154,7 @@ def cart():
     return render_template("cart.html", cart_items=cart_items, total=total)
 
 # ---------------- ADD TO CART ----------------
-@app.route("/add_package/<int:package_id>")
+@app.route("/add_package/<int:package_id>", methods=["POST"])
 def add_package(package_id):
     if "user_id" not in session:
         return jsonify({"status": "error"})
