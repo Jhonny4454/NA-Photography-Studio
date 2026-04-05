@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Your Shopping Cart</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+ul.cart-items {
+    list-style: none;
+    padding: 0;
+}
+ul.cart-items li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 10px;
+    border-bottom: 1px solid #eee;
+}
+ul.cart-items li img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 15px;
+}
+.item-info {
+    display: flex;
+    align-items: center;
+}
+.item-details {
+    display: flex;
+    flex-direction: column;
+}
+.item-details span {
+    margin-bottom: 4px;
+    font-size: 16px;
+    color: #555;
+}
+.actions {
+    display: flex;
+    gap: 10px;
+}
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+.remove-btn {
+    background: #e74c3c;
+    color: #fff;
+}
+.remove-btn:hover {
+    background: #c0392b;
+}
+.checkout-btn {
+    background: #27ae60;
+    color: #fff;
+}
+.checkout-btn:hover {
+    background: #219150;
+}
+.total {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+}
+.empty-cart {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 18px;
+    color: #777;
+}
+a.btn {
+    text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Your Shopping Cart</h1>
+
+{% if user_packages %}
+    <ul class="cart-items">
+        {% set total = 0 %}
+        {% for item in user_packages %}
+            {% set subtotal = item.package_price or 0 %}
+            {% set total = total + subtotal %}
+            <li>
+                <div class="item-info">
+                    <img src="{{ url_for('static', filename=item.image_filename) }}" alt="{{ item.package_name }}">
+                    <div class="item-details">
+                        <span><strong>{{ item.package_name }}</strong></span>
+                        <span>Price: ₹{{ "%.2f"|format(subtotal) }}</span>
+                    </div>
+                </div>
+                <div class="actions">
+                    <form method="POST" action="{{ url_for('remove_package', package_id=item.package_id) }}" style="margin:0;">
+                        <button class="btn remove-btn" type="submit">Remove</button>
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p class="total">Total: ₹{{ "%.2f"|format(total) }}</p>
+
+    <div style="text-align: right; margin-top: 20px;">
+        <form method="POST" action="{{ url_for('clear_cart') }}" style="display:inline;">
+            <button class="btn remove-btn" type="submit" onclick="return confirm('Are you sure you want to clear the cart?');">Clear Cart</button>
+        </form>
+        <a href="{{ url_for('home') }}" style="margin-left: 10px;">
+            <button class="btn checkout-btn" type="button">Add Packages</button>
+        </a>
+    </div>
+{% else %}
+    <p class="empty-cart">Your cart is empty.</p>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('home') }}">
+            <button class="btn checkout-btn" type="button">Add Packages</button>
+        </a>
+    </div>
+{% endif %}
+</div>
+</body>
+</html>

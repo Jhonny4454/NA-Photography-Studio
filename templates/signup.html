@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Sign Up - NA Photography Studio</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #ff7f50, #ff9966);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.signup-container {
+  background: white;
+  padding: 35px;
+  border-radius: 15px;
+  width: 380px;
+  max-width: 90%;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  animation: slideUp 0.6s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-group i {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 12px 12px 38px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+input:focus, select:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 10px rgba(255,127,80,0.3);
+}
+
+.helper {
+  font-size: 12px;
+  color: #888;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  padding-left: 5px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+}
+
+button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(255,127,80,0.6);
+}
+
+.error {
+  margin-top: 12px;
+  text-align: center;
+  color: red;
+  font-size: 14px;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.login-link a {
+  text-decoration: none;
+  color: #ff7f50;
+  font-weight: bold;
+}
+
+.login-link a:hover {
+  color: #ff6347;
+}
+</style>
+</head>
+
+<body>
+
+<div class="signup-container">
+  <h2>Create Account</h2>
+
+  <form method="POST" action="/signup">
+
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="first_name" placeholder="First Name" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="last_name" placeholder="Last Name" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" name="email" placeholder="Email" required>
+    </div>
+
+    <!-- ✅ MOBILE NUMBER -->
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input 
+        type="text" 
+        name="mobile" 
+        placeholder="Mobile Number" 
+        pattern="[0-9]{10}" 
+        title="Enter 10 digit mobile number"
+        required>
+    </div>
+    <div class="helper">Mobile: Must be exactly 10 digits</div>
+
+    <div class="input-group">
+      <i class="fas fa-venus-mars"></i>
+      <select name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-user-circle"></i>
+      <input 
+        type="text" 
+        name="username" 
+        placeholder="Username" 
+        pattern="[a-zA-Z0-9]{4,20}" 
+        title="Username must be 4-20 letters or numbers"
+        required>
+    </div>
+    <div class="helper">Username: 4–20 letters or numbers</div>
+
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="password" placeholder="Password" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+    </div>
+
+    <button type="submit">
+      <i class="fas fa-user-plus"></i> Sign Up
+    </button>
+
+  </form>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
+  <div class="login-link">
+    <a href="/"><i class="fas fa-sign-in-alt"></i> Already have an account? Login</a>
+  </div>
+
+</div>
+
+</body>
+</html>

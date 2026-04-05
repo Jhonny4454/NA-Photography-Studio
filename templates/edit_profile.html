@@ -1,54 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Profile</title>
-    <style>
-        html, body { height: 100%; margin:0; display:flex; justify-content:center; align-items:center; font-family:Arial; background:#f0f0f0; }
-        .container { background:white; padding:30px; border-radius:8px; text-align:center; box-shadow:0 0 10px rgba(0,0,0,0.1); width:300px; }
-        input, select, button { width:100%; padding:10px; margin:8px 0; border-radius:4px; }
-        button { background:#ffc107; color:white; border:none; cursor:pointer; }
-        button:hover { background:#e0a800; }
-        a { display:block; margin-top:10px; color:#007bff; text-decoration:none; }
-        a:hover { text-decoration:underline; }
-        p.error { color:red; font-size:14px; }
-        .btn-home { background:#007bff; color:white; padding:10px; border-radius:4px; display:inline-block; margin-top:10px; text-decoration:none; }
-        .btn-home:hover { background:#0056b3; }
-    </style>
+<meta charset="UTF-8" />
+<title>Edit Profile - NA Photography Studio</title>
+
+<style>
+html, body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* HEADER */
+header {
+  background: #111;
+  color: white;
+  padding: 12px 25px;
+  display: flex;
+  justify-content: space-between;
+}
+
+header h1 {
+  color: #ff7f50;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 420px;
+  margin: 50px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus, select:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(255,127,80,0.4);
+}
+
+/* HELPER TEXT */
+.helper {
+  font-size: 12px;
+  color: #777;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  text-decoration: none;
+  background: #222;
+  color: white;
+  padding: 10px;
+  border-radius: 25px;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background: #ff7f50;
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Edit Profile</h2>
 
-        <form method="POST">
-            <!-- Name -->
-            <input type="text" name="name" value="{{ user.name }}" placeholder="Full Name" required>
+<header>
+  <h1>NA Photography Studio</h1>
+</header>
 
-            <!-- Email -->
-            <input type="email" name="email" value="{{ user.email }}" placeholder="Email" required>
+<div class="container">
+  <h2>Edit Profile</h2>
 
-            <!-- Gender -->
-            <select name="gender" required>
-                <option value="">Select Gender</option>
-                <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
-                <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
-                <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
-            </select>
+  <form method="POST">
 
-            <!-- Username -->
-            <input type="text" name="username" value="{{ user.username }}" placeholder="Username (8-9 letters/numbers)" required>
+    <!-- NAME -->
+    <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="First Name" required>
+    <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Last Name" required>
 
-            <!-- Password -->
-            <input type="password" name="password" placeholder="New Password (8 digits/hex)" required>
+    <!-- EMAIL -->
+    <input type="email" name="email" value="{{ user.email }}" placeholder="Email" required>
 
-            <button type="submit">Update Profile</button>
+    <!-- MOBILE -->
+    <input 
+      type="text" 
+      name="mobile" 
+      value="{{ user.mobile }}" 
+      placeholder="Mobile Number"
+      pattern="[0-9]{10}"
+      title="Enter 10 digit mobile number"
+      required
+    >
 
-            {% if error %}
-                <p class="error">{{ error }}</p>
-            {% endif %}
-        </form>
+    <!-- GENDER -->
+    <select name="gender">
+      <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+      <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+      <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+    </select>
 
-        <a href="/summary">Back to Summary</a>
-        <a href="/" class="btn-home">Back to Login/Home Page</a>
-    </div>
+    <!-- USERNAME -->
+    <input 
+      type="text" 
+      name="username" 
+      value="{{ user.username }}" 
+      placeholder="Username"
+      pattern="[a-zA-Z0-9]{4,20}"
+      title="4-20 letters or numbers"
+      required
+    >
+    <div class="helper">Username: 4–20 letters or numbers</div>
+
+    <!-- PASSWORD (OPTIONAL) -->
+    <input 
+      type="password" 
+      name="password" 
+      placeholder="New Password (leave blank to keep old)"
+    >
+    <div class="helper">Leave blank if you don’t want to change password</div>
+
+    <button type="submit">Update Profile</button>
+
+  </form>
+
+  <a href="/home" class="back-btn">⬅ Back to Home</a>
+
+</div>
+
 </body>
 </html>

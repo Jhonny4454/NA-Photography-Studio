@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>About Us - NA Photography Studio</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  background: #f4f4f4;
+  animation: fadeIn 0.8s ease-in;
+}
+
+/* GLOBAL */
+* {
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* HEADER */
+header {
+  background: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 22px;
+  color: #ff7f50;
+}
+
+/* MAIN CONTAINER */
+.about-container {
+  max-width: 950px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  animation: slideUp 0.6s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* HEADINGS */
+h1 {
+  text-align: center;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-top: 25px;
+  color: #444;
+}
+
+/* TEXT */
+p {
+  color: #555;
+  line-height: 1.6;
+}
+
+/* TEAM */
+.team {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.member {
+  flex: 1 1 200px;
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.member:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+}
+
+.member img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+/* LIST */
+ul {
+  margin-top: 10px;
+}
+
+li {
+  margin: 8px 0;
+}
+
+/* BUTTON STYLE (same as home) */
+.btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  padding: 12px 25px;
+  color: white;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+}
+
+.btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(255,127,80,0.6);
+}
+
+/* SOCIAL */
+.social-media {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* BACK BUTTON */
+.btn-home {
+  display: block;
+  margin: 30px auto 0;
+  width: fit-content;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <div class="logo">NA Studio Photography</div>
+</header>
+
+<h1>📸 About NA Photography Studio</h1>
+
+<div class="about-container">
+
+  <p>
+    NA Photography Studio is dedicated to capturing your most cherished moments with professionalism, creativity, and passion.
+    Established in 2024, we proudly serve clients across Thane and nearby areas with high-quality photography services.
+  </p>
+
+  <h2>🎯 Our Mission</h2>
+  <p>
+    Our mission is to create timeless images that tell your unique story.
+    We aim to provide home and personalized services that go beyond expectations and create memories for a lifetime.
+  </p>
+
+  <h2>🌟 Our Vision</h2>
+  <p>
+    To become one of the most trusted and creative photography studios in Maharashtra,
+    known for our artistic approach and customer satisfaction.
+  </p>
+
+  <h2>👨‍💼 Meet Our Team</h2>
+
+  <div class="team">
+
+  <div class="member">
+<img src="{{ url_for('static', filename='images/sumedh.jpeg') }}"#" />
+    <h3>Sumedh</h3>
+    <p>Developer & Creative Support bringing ideas to life.</p>
+  </div>
+
+    <div class="member">
+   <img src="{{ url_for('static', filename='images/nargis.jpeg') }}"#" />
+      <h3>Nargis</h3>
+      <p>Founder & Lead Photographer capturing real emotions and stories.</p>
+    </div>
+
+  </div>
+
+  <h2>💡 Why Choose Us?</h2>
+  <ul>
+    <li>✔ Professional & Experienced Team</li>
+    <li>✔ Affordable & Custom Packages</li>
+    <li>✔ High-Quality Editing</li>
+    <li>✔ Friendly Service</li>
+    <li>✔ Fast Delivery</li>
+  </ul>
+
+  <div class="social-media">
+    <h2>📲 Follow Us on Instagram</h2>
+
+    <div class="social-links">
+      <a href="https://www.instagram.com/sum_11_1995" target="_blank" class="btn">
+        <i class="fab fa-instagram"></i> Sumedh
+      </a>
+
+      <a href="https://www.instagram.com/n_shaikh_n" class="btn">
+        <i class="fab fa-instagram"></i> Nargis
+      </a>
+    </div>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <a href="/home" class="btn btn-home">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+
+</div>
+
+</body>
+</html>

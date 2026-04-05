@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Shopping Cart</title>
+
+<style>
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #f0f2f5;
+  margin: 0;
+  color: #333;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* HEADER */
+header {
+  background: #fff;
+  padding: 16px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 24px;
+  color: #ff7f50;
+}
+
+/* RIGHT SIDE BUTTON GROUP */
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+/* BUTTON BASE */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  font-size: 14px;
+}
+
+.btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* SPECIFIC BUTTONS */
+.back-btn {
+  text-decoration: none;
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: #fff;
+}
+
+.orders-btn {
+  text-decoration: none;
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  color: #fff;
+}
+
+/* CONTAINER */
+.container {
+  width: 90%;
+  max-width: 950px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 35px 30px;
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+/* CART ITEMS */
+ul.cart-items {
+  list-style: none;
+  padding: 0;
+}
+
+ul.cart-items li {
+  padding: 24px;
+  margin-bottom: 25px;
+  border-radius: 14px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  transition: all 0.25s ease;
+}
+
+ul.cart-items li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+}
+
+.item-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+  background: #e74c3c;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 12px;
+}
+
+/* LOCATION BOX */
+.location-box {
+  background: #e0f7fa;
+  padding: 18px;
+  border-radius: 14px;
+  margin-top: 15px;
+}
+
+.location-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* ✅ ONLY CHANGE */
+input[type="date"] {
+  width: 180px;
+}
+
+input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+}
+
+.date-label {
+  font-weight: 600;
+}
+
+.save-btn {
+  background: #3498db;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+/* BOTTOM BUTTONS */
+.checkout-btn {
+  background: linear-gradient(45deg, #2ecc71, #27ae60);
+  color: #fff;
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+}
+
+.empty-btn {
+  background: #555;
+  color: #fff;
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px;
+}
+
+.total {
+  text-align: right;
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.empty {
+  text-align: center;
+  margin-top: 60px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">NA Studio Photography</div>
+
+  <div class="header-buttons">
+    <a href="/orders" class="btn orders-btn">📦 Orders</a>
+    <a href="/home" class="btn back-btn">← Back</a>
+  </div>
+</header>
+
+<div class="container">
+
+<h1>Your Cart</h1>
+
+{% if cart_items %}
+<ul class="cart-items">
+
+{% for item in cart_items %}
+<li>
+
+  <div class="item-details">
+    <span><strong>{{ item.package_name }}</strong></span>
+
+    <form method="POST" action="/remove/{{ item.cart_id }}" style="display:inline;">
+      <button type="submit" class="remove-btn">Remove</button>
+    </form>
+
+  </div>
+
+  <div class="item-details">
+    <span>Price: ₹{{ item.package_price }}</span>
+    <span>Duration: {{ item.duration }}</span>
+  </div>
+
+  <div class="item-details">
+    <span><b>Qty:</b> {{ item.quantity }}</span>
+    <span><b>Total:</b> ₹{{ item.package_price * item.quantity }}</span>
+  </div>
+
+  <div class="location-box">
+    <form method="POST" action="/update_location/{{ item.cart_id }}">
+      
+      <input type="text" name="location"
+        placeholder="Enter Your Shoot location"
+        value="{{ item.location or '' }}" required>
+
+      <label class="date-label">Pick a Date:</label>
+
+      <input type="date" name="scheduled_date"
+        value="{{ item.scheduled_date or '' }}" required>
+
+      <button class="btn save-btn">Save</button>
+    </form>
+  </div>
+
+</li>
+{% endfor %}
+
+<p class="total">Grand Total: ₹{{ total }}</p>
+
+<a href="/checkout">
+  <button class="btn checkout-btn">Proceed to Checkout</button>
+</a>
+
+<form method="POST" action="/empty_cart">
+  <button type="submit" class="btn empty-btn">Empty Cart</button>
+</form>
+
+{% else %}
+<div class="empty">
+  <p>🛒 Your cart is empty</p>
+</div>
+{% endif %}
+
+</div>
+
+</body>
+</html>

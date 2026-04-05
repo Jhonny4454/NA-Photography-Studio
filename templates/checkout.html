@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Checkout</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+}
+
+.container {
+  max-width: 720px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+  transition: all 0.3s ease;
+}
+
+.item:hover {
+  background: #fafafa;
+  transform: translateY(-2px);
+}
+
+.item p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.total {
+  text-align: right;
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 25px;
+  color: #222;
+}
+
+.payment {
+  margin-top: 25px;
+}
+
+.payment label {
+  display: block;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(45deg,#2ecc71,#27ae60);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 25px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.date-box {
+  margin-top: 8px;
+}
+
+input[type="date"] {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+  width: 200px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Checkout</h1>
+
+  <form method="POST">
+
+  {% for item in items %}
+  <div class="item">
+
+    <p><strong>{{ item.package_name }}</strong></p>
+
+    <p>💰 Price: ₹{{ item.package_price }}</p>
+
+    <p>📦 Quantity: {{ item.quantity }}</p>
+
+    <!-- ✅ FIXED LOCATION DISPLAY -->
+    <p>📍 Location: 
+      <strong>{{ item.location if item.location else "Not set" }}</strong>
+    </p>
+
+    <!-- ✅ FIXED DATE DISPLAY -->
+    <div class="date-box">
+      <label>📅 Scheduled Date:</label><br>
+      <input 
+        type="date" 
+        name="scheduled_date_{{ item.cart_id }}" 
+        value="{{ item.scheduled_date if item.scheduled_date else '' }}"
+        required>
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <p class="total">Total: ₹{{ total }}</p>
+
+  <div class="payment">
+    <h3>Select Payment Method</h3>
+
+    <label>
+      <input type="radio" name="payment" value="UPI" required> UPI
+    </label>
+
+    <label>
+      <input type="radio" name="payment" value="Card"> Debit/Credit Card
+    </label>
+
+    <label>
+      <input type="radio" name="payment" value="Cash"> Cash on Service
+    </label>
+  </div>
+
+  <button type="submit">Confirm Booking</button>
+
+  </form>
+</div>
+
+</body>
+</html>
