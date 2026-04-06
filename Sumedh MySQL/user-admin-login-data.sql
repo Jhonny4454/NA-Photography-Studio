@@ -1,33 +1,7 @@
-INSERT INTO users (email, gender, created_at, username, password, role, first_name, last_name, mobile) VALUES
-('rahul.shinde@gmail.com','male',NOW(),'rahul_sh','pass123','user','Rahul','Shinde','9000003001'),
-('pooja.kadam@gmail.com','female',NOW(),'pooja_ka','pass123','user','Pooja','Kadam','9000003002'),
-('nikhil.pawar@gmail.com','male',NOW(),'nikhil_pa','pass123','user','Nikhil','Pawar','9000003003'),
-('shruti.sawant@gmail.com','female',NOW(),'shruti_sa','pass123','user','Shruti','Sawant','9000003004'),
-('sachin.jadhav@gmail.com','male',NOW(),'sachin_ja','pass123','user','Sachin','Jadhav','9000003005'),
-('komal.patil@gmail.com','female',NOW(),'komal_pa','pass123','user','Komal','Patil','9000003006'),
-('omkar.more@gmail.com','male',NOW(),'omkar_mo','pass123','user','Omkar','More','9000003007'),
-('vaishnavi.shinde@gmail.com','female',NOW(),'vaishnavi_sh','pass123','user','Vaishnavi','Shinde','9000003008'),
-('rohan.patil@gmail.com','male',NOW(),'rohan_pa','pass123','user','Rohan','Patil','9000003009'),
-('deepali.chavan@gmail.com','female',NOW(),'deepali_ch','pass123','user','Deepali','Chavan','9000003010'),
+ALTER TABLE package_reviews
+DROP FOREIGN KEY package_reviews_ibfk_2;
 
-('amit.thakur@gmail.com','male',NOW(),'amit_th','pass123','user','Amit','Thakur','9000003011'),
-('neha.sharma2@gmail.com','female',NOW(),'neha_sh2','pass123','user','Neha','Sharma','9000003012'),
-('vishal.yadav@gmail.com','male',NOW(),'vishal_ya','pass123','user','Vishal','Yadav','9000003013'),
-('sakshi.tiwari@gmail.com','female',NOW(),'sakshi_ti','pass123','user','Sakshi','Tiwari','9000003014'),
-('ankit.singh2@gmail.com','male',NOW(),'ankit_si2','pass123','user','Ankit','Singh','9000003015'),
-('rutuja.patil@gmail.com','female',NOW(),'rutuja_pa','pass123','user','Rutuja','Patil','9000003016'),
-('ganesh.kamble@gmail.com','male',NOW(),'ganesh_ka','pass123','user','Ganesh','Kamble','9000003017'),
-('pallavi.more@gmail.com','female',NOW(),'pallavi_mo','pass123','user','Pallavi','More','9000003018'),
-('tejas.shinde@gmail.com','male',NOW(),'tejas_sh','pass123','user','Tejas','Shinde','9000003019'),
-('mansi.joshi@gmail.com','female',NOW(),'mansi_jo','pass123','user','Mansi','Joshi','9000003020'),
-
-('sagar.pawar@gmail.com','male',NOW(),'sagar_pa','pass123','user','Sagar','Pawar','9000003021'),
-('prajakta.kale@gmail.com','female',NOW(),'prajakta_ka','pass123','user','Prajakta','Kale','9000003022'),
-('rohit.shinde2@gmail.com','male',NOW(),'rohit_sh2','pass123','user','Rohit','Shinde','9000003023'),
-('sonali.deshmukh@gmail.com','female',NOW(),'sonali_de','pass123','user','Sonali','Deshmukh','9000003024'),
-('swapnil.jadhav@gmail.com','male',NOW(),'swapnil_ja','pass123','user','Swapnil','Jadhav','9000003025'),
-('kiran.patil@gmail.com','female',NOW(),'kiran_pa','pass123','user','Kiran','Patil','9000003026'),
-('mahesh.more@gmail.com','male',NOW(),'mahesh_mo','pass123','user','Mahesh','More','9000003027'),
-('archana.shinde@gmail.com','female',NOW(),'archana_sh','pass123','user','Archana','Shinde','9000003028'),
-('sunil.kadam@gmail.com','male',NOW(),'sunil_ka','pass123','user','Sunil','Kadam','9000003029'),
-('rekha.pawar@gmail.com','female',NOW(),'rekha_pa','pass123','user','Rekha','Pawar','9000003030');
+ALTER TABLE package_reviews
+ADD CONSTRAINT package_reviews_ibfk_2
+FOREIGN KEY (user_id) REFERENCES users(id)
+ON DELETE CASCADE;

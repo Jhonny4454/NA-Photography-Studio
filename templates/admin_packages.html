@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Packages - Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  background: #f4f6f9;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  background: #2c3e50;
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #ff7f50;
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.sidebar a:hover {
+  background: #ff7f50;
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* SEARCH */
+.search-box input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* FORM */
+form {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+form input {
+  padding: 10px;
+  margin: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background: #ff7f50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #ff6347;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #ff7f50;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+/* IMAGE */
+.pkg-img {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* BUTTONS */
+.edit-btn {
+  color: #3498db;
+  text-decoration: none;
+  margin-right: 8px;
+}
+
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* EMPTY */
+.no-data {
+  padding: 20px;
+  text-align: center;
+  color: gray;
+}
+</style>
+
+<script>
+function searchPackage() {
+  let input = document.getElementById("search").value.toLowerCase();
+  let rows = document.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
+}
+</script>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>Admin</h2>
+  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+  <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
+  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
+  <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+  <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="top-bar">
+  <h1>Manage Packages</h1>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search packages..." onkeyup="searchPackage()">
+  </div>
+</div>
+
+<!-- ADD FORM -->
+<form method="POST">
+  <input type="text" name="package_name" placeholder="Package Name" required>
+  <input type="number" name="package_price" placeholder="Price" required>
+  <input type="text" name="duration" placeholder="Duration (e.g. 2 Hours)" required>
+  <input type="text" name="image_filename" placeholder="Image filename (e.g. wedding.jpg)" required>
+  <button type="submit"><i class="fas fa-plus"></i> Add Package</button>
+</form>
+
+<!-- PACKAGE LIST -->
+<table>
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Image</th>
+  <th>Name</th>
+  <th>Price</th>
+  <th>Duration</th>
+  <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% if packages %}
+  {% for p in packages %}
+  <tr>
+    <td>{{ p.package_id }}</td>
+    <td>
+      <img src="/static/images/{{ p.image_filename }}" class="pkg-img" alt="package">
+    </td>
+    <td>{{ p.package_name }}</td>
+    <td>₹{{ p.package_price }}</td>
+    <td>{{ p.duration }}</td>
+    <td>
+      <a href="/admin/edit_package/{{ p.package_id }}" class="edit-btn">Edit</a>
+      <a href="/admin/delete_package/{{ p.package_id }}" 
+         class="delete-btn"
+         onclick="return confirm('Delete this package?')">
+         Delete
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="6" class="no-data">No packages found</td>
+  </tr>
+{% endif %}
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

@@ -343,25 +343,6 @@ def orders():
 
     return render_template("orders.html", orders=orders)
 
-# ---------------- STATIC PAGES ----------------
-@app.route("/terms")
-def terms():
-    return render_template("terms.html")
-
-@app.route("/privacy")
-def privacy():
-    return render_template("privacy.html")
-
-@app.route("/about")
-def about():
-    return render_template("about-us.html")
-
-# ---------------- LOGOUT ----------------
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
 # ---------------- EDIT PROFILE ----------------
 @app.route("/edit-profile", methods=["GET", "POST"])
 def edit_profile():
@@ -398,6 +379,244 @@ def edit_profile():
 
     cursor.close()
     return render_template("edit_profile.html", user=user)
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Total Orders
+    cursor.execute("SELECT COUNT(*) AS total_orders FROM orders")
+    total_orders = cursor.fetchone()["total_orders"]
+
+    # Total Revenue
+    cursor.execute("SELECT SUM(total_price) AS revenue FROM orders")
+    revenue = cursor.fetchone()["revenue"] or 0
+
+    # Total Users
+    cursor.execute("SELECT COUNT(*) AS total_users FROM users")
+    total_users = cursor.fetchone()["total_users"]
+
+    # Recent Orders
+    cursor.execute("""
+        SELECT o.order_id, o.total_price, o.status, u.first_name, u.last_name
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        ORDER BY o.created_at DESC
+        LIMIT 5
+    """)
+    recent_orders = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_orders=total_orders,
+        revenue=revenue,
+        total_users=total_users,
+        recent_orders=recent_orders
+    )
+
+# ---------------- ADMIN PACKAGES ----------------
+@app.route('/admin/packages', methods=["GET", "POST"])
+def admin_packages():
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # ADD PACKAGE
+    if request.method == "POST":
+        cursor.execute("""
+            INSERT INTO packages (package_name, package_price, duration, image_filename)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            request.form["package_name"],
+            request.form["package_price"],
+            request.form["duration"],
+            request.form["image_filename"]
+        ))
+        db.commit()
+        return redirect("/admin/packages")
+
+    # GET ALL PACKAGES
+    cursor.execute("SELECT * FROM packages ORDER BY package_id DESC")
+    packages = cursor.fetchall()
+
+    cursor.close()
+    return render_template("admin_packages.html", packages=packages)
+
+
+# DELETE PACKAGE
+@app.route('/admin/delete_package/<int:id>')
+def delete_package(id):
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM packages WHERE package_id=%s", (id,))
+    db.commit()
+
+    cursor.close()
+    return redirect('/admin/packages')
+
+# ---------------- USERS ----------------
+@app.route('/admin/users')
+def admin_users():
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM users ORDER BY id DESC")
+    users = cursor.fetchall()
+
+    cursor.close()
+    return render_template("admin_users.html", users=users)
+
+
+# DELETE USER
+@app.route('/admin/delete_user/<int:id>')
+def delete_user(id):
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("DELETE FROM users WHERE id=%s", (id,))
+    db.commit()
+
+    cursor.close()
+    return redirect('/admin/users')
+
+# ---------------- EDIT PACKAGE ----------------
+@app.route('/admin/edit_package/<int:id>', methods=["GET", "POST"])
+def edit_package(id):
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    if request.method == "POST":
+        cursor.execute("""
+            UPDATE packages
+            SET package_name=%s,
+                package_price=%s,
+                duration=%s,
+                image_filename=%s
+            WHERE package_id=%s
+        """, (
+            request.form["package_name"],
+            request.form["package_price"],
+            request.form["duration"],
+            request.form["image_filename"],
+            id
+        ))
+        db.commit()
+        cursor.close()
+        return redirect("/admin/packages")
+
+    cursor.execute("SELECT * FROM packages WHERE package_id=%s", (id,))
+    package = cursor.fetchone()
+    cursor.close()
+
+    return render_template("edit_package.html", package=package)
+
+# ✅ USER ORDER DETAILS
+@app.route("/order_details/<order_id>")
+def user_order_details(order_id):
+    if "user_id" not in session:
+        return redirect("/")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM order_items WHERE order_id=%s
+    """, (order_id,))
+
+    items = cursor.fetchall()
+    cursor.close()
+
+    return render_template("order_details.html", items=items)
+
+# ---------------- STATIC ----------------
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+@app.route("/about")
+def about():
+    return render_template("about-us.html")
+
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+# ---------------- ADMIN ----------------
+@app.route('/admin/orders')
+def admin_orders():
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT o.*, u.first_name, u.last_name
+        FROM orders o
+        JOIN users u ON o.user_id = u.id
+        ORDER BY o.id DESC
+    """)
+
+    orders = cursor.fetchall()
+    return render_template('admin_orders.html', orders=orders)
+
+@app.route('/admin/order_details/<order_id>')
+def order_details(order_id):
+    if 'admin' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM order_items WHERE order_id=%s
+    """, (order_id,))
+
+    items = cursor.fetchall()
+    return render_template('admin_order_details.html', items=items)
+
+# ---------------- ADMIN LOGIN ----------------
+@app.route('/admin/login', methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        # simple static admin login (you can change later)
+        if username == "admin" and password == "admin123":
+            session["admin"] = True
+            return redirect("/admin/dashboard")
+
+        return render_template("admin_login.html", error="Invalid admin login")
+
+    return render_template("admin_login.html")
 
 # ---------------- RUN ----------------
 if __name__ == "__main__":

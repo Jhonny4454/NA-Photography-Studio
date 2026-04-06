@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Details - Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  margin: 0;
+}
+
+/* HEADER */
+header {
+  background: #2c3e50;
+  color: white;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.back-btn {
+  background: #ff7f50;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.back-btn:hover {
+  background: #ff6347;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 950px;
+  margin: 40px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* TITLE */
+h2 {
+  margin-bottom: 20px;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #ff7f50;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+/* SUMMARY */
+.summary {
+  margin-top: 20px;
+  text-align: right;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* EMPTY */
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: gray;
+}
+
+/* BUTTON */
+.btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #ff7f50;
+  color: white;
+  border-radius: 25px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #ff6347;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Admin Panel</div>
+  <a href="/admin/orders" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+</header>
+
+<div class="container">
+
+  <h2><i class="fas fa-box"></i> Order Details</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Package</th>
+        <th>Price</th>
+        <th>Duration</th>
+        <th>Location</th>
+        <th>Quantity</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% if items %}
+        {% set grand_total = 0 %}
+        {% for item in items %}
+        {% set total = item.price * item.quantity %}
+        {% set grand_total = grand_total + total %}
+        <tr>
+          <td>{{ item.package_name }}</td>
+          <td>₹{{ item.price }}</td>
+          <td>{{ item.duration }}</td>
+          <td>{{ item.location }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>₹{{ total }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" class="no-data">No items found</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  <!-- TOTAL -->
+  {% if items %}
+  <div class="summary">
+    Grand Total: ₹{{ grand_total }}
+  </div>
+  {% endif %}
+
+  <a href="/admin/orders" class="btn">
+    <i class="fas fa-arrow-left"></i> Back to Orders
+  </a>
+
+</div>
+
+</body>
+</html>

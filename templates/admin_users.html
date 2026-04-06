@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manage Users - Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  background: #f4f6f9;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 230px;
+  background: #2c3e50;
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #ff7f50;
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.sidebar a:hover {
+  background: #ff7f50;
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* SEARCH */
+.search-box input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #ff7f50;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+/* BUTTON */
+.delete-btn {
+  background: #e74c3c;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.delete-btn:hover {
+  background: #c0392b;
+}
+
+/* EMPTY */
+.no-data {
+  padding: 20px;
+  text-align: center;
+  color: gray;
+}
+</style>
+
+<script>
+function searchUsers() {
+  let input = document.getElementById("search").value.toLowerCase();
+  let rows = document.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
+}
+</script>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>Admin</h2>
+  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+  <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
+  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
+  <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+  <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="top-bar">
+  <h1>Manage Users</h1>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search users..." onkeyup="searchUsers()">
+  </div>
+</div>
+
+<!-- USERS TABLE -->
+<table>
+<thead>
+<tr>
+  <th>ID</th>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Username</th>
+  <th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% if users %}
+  {% for u in users %}
+  <tr>
+    <td>{{ u.id }}</td>
+    <td>{{ u.first_name }} {{ u.last_name }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.username }}</td>
+    <td>
+      <a href="/admin/delete_user/{{ u.id }}" 
+         class="delete-btn"
+         onclick="return confirm('Delete this user? This will also remove related data.')">
+         Delete
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="5" class="no-data">No users found</td>
+  </tr>
+{% endif %}
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

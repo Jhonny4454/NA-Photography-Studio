@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Package</title>
+<style>
+body {
+  font-family: Arial;
+  background: #f4f6f9;
+  padding: 40px;
+}
+
+form {
+  max-width: 400px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 10px;
+  width: 100%;
+  background: #ff7f50;
+  color: white;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Edit Package</h2>
+
+<form method="POST">
+  <input type="text" name="package_name" value="{{ package.package_name }}" required>
+  <input type="number" name="package_price" value="{{ package.package_price }}" required>
+  <input type="text" name="duration" value="{{ package.duration }}" required>
+  <input type="text" name="image_filename" value="{{ package.image_filename }}" required>
+
+  <button type="submit">Update Package</button>
+</form>
+
+</body>
+</html>
