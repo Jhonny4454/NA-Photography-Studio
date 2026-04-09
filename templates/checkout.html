@@ -115,12 +115,11 @@ input[type="date"] {
 
     <p>📦 Quantity: {{ item.quantity }}</p>
 
-    <!-- ✅ FIXED LOCATION DISPLAY -->
-    <p>📍 Location: 
-      <strong>{{ item.location if item.location else "Not set" }}</strong>
-    </p>
+    <p>📍 Location: <strong>{{ item.location if item.location else "Not set" }}</strong></p>
 
-    <!-- ✅ FIXED DATE DISPLAY -->
+    <!-- ✅ Photographer Display -->
+    <p>📸 Photographer: <strong>{{ item.photographer_name if item.photographer_name else "Not assigned" }}</strong></p>
+
     <div class="date-box">
       <label>📅 Scheduled Date:</label><br>
       <input 

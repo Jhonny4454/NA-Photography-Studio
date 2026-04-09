@@ -10,20 +10,23 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6f9;
+  background: linear-gradient(135deg, #1f2937, #4b5563);
   margin: 0;
+  color: white;
 }
 
 /* NAVBAR */
 .navbar {
-  background: #2c3e50;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
   padding: 15px 20px;
 }
 
 .navbar a {
-  color: white;
+  color: #ccc;
   margin-right: 15px;
   text-decoration: none;
+  transition: 0.3s;
 }
 
 .navbar a:hover {
@@ -37,24 +40,24 @@ body {
 
 /* HEADER */
 header {
-  background: white;
-  padding: 15px 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  padding: 20px;
 }
 
 .logo {
   font-weight: bold;
+  font-size: 18px;
   color: #ff7f50;
 }
 
 /* CONTAINER */
 .container {
   max-width: 1100px;
-  margin: 40px auto;
+  margin: 30px auto;
   background: white;
+  color: black;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
 }
 
 /* TOP BAR */
@@ -66,10 +69,32 @@ header {
 }
 
 /* SEARCH */
-.search-box input {
-  padding: 8px;
-  border-radius: 6px;
+input {
+  padding: 8px 12px;
+  border-radius: 20px;
   border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.4);
+}
+
+/* BUTTON */
+.refresh-btn {
+  background: #3498db;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.refresh-btn:hover {
+  background: #2980b9;
 }
 
 /* TABLE */
@@ -96,25 +121,17 @@ tr:hover {
   background: #f1f1f1;
 }
 
-/* STATUS BADGES */
+/* STATUS */
 .status {
-  padding: 5px 10px;
-  border-radius: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
   color: white;
   font-size: 12px;
 }
 
-.pending {
-  background: #f39c12;
-}
-
-.completed {
-  background: #27ae60;
-}
-
-.cancelled {
-  background: #e74c3c;
-}
+.pending { background: #f39c12; }
+.completed { background: #27ae60; }
+.cancelled { background: #e74c3c; }
 
 /* BUTTON */
 .btn {
@@ -123,7 +140,7 @@ tr:hover {
   color: white;
   border-radius: 20px;
   text-decoration: none;
-  font-size: 14px;
+  transition: 0.3s;
 }
 
 .btn:hover {
@@ -157,9 +174,10 @@ function searchOrders() {
 <!-- NAVBAR -->
 <div class="navbar">
   <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
   <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
+  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
   <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+  <a href="/admin/photographers"><i class="fas fa-user-tie"></i> Photographers</a>
   <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
@@ -173,8 +191,12 @@ function searchOrders() {
 
   <div class="top-bar">
     <h2><i class="fas fa-box"></i> All Orders</h2>
-    <div class="search-box">
+
+    <div>
       <input type="text" id="search" placeholder="Search orders..." onkeyup="searchOrders()">
+      <a href="/admin/orders" class="refresh-btn">
+        <i class="fas fa-sync"></i> Refresh
+      </a>
     </div>
   </div>
 
@@ -190,7 +212,7 @@ function searchOrders() {
     </thead>
 
     <tbody>
-      {% if orders %}
+      {% if orders and orders|length > 0 %}
         {% for o in orders %}
         <tr>
           <td>{{ o.order_id }}</td>
@@ -205,7 +227,9 @@ function searchOrders() {
             </span>
           </td>
           <td>
-            <a href="/admin/order_details/{{ o.order_id }}" class="btn">View</a>
+            <a href="/admin/order_details/{{ o.order_id }}" class="btn">
+              <i class="fas fa-eye"></i> View
+            </a>
           </td>
         </tr>
         {% endfor %}

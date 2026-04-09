@@ -10,14 +10,15 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6f9;
+  background: linear-gradient(135deg, #1f2937, #4b5563);
   margin: 0;
+  color: white;
 }
 
 /* HEADER */
 header {
-  background: #2c3e50;
-  color: white;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
   padding: 15px 25px;
   display: flex;
   justify-content: space-between;
@@ -27,14 +28,16 @@ header {
 .logo {
   font-size: 18px;
   font-weight: bold;
+  color: #ff7f50;
 }
 
 .back-btn {
   background: #ff7f50;
   color: white;
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 20px;
   text-decoration: none;
+  transition: 0.3s;
 }
 
 .back-btn:hover {
@@ -46,9 +49,16 @@ header {
   max-width: 950px;
   margin: 40px auto;
   background: white;
+  color: black;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* TITLE */
@@ -84,8 +94,9 @@ tr:hover {
 .summary {
   margin-top: 20px;
   text-align: right;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
+  color: #2c3e50;
 }
 
 /* EMPTY */
@@ -98,12 +109,13 @@ tr:hover {
 /* BUTTON */
 .btn {
   display: inline-block;
-  margin-top: 20px;
+  margin-top: 25px;
   padding: 10px 20px;
   background: #ff7f50;
   color: white;
   border-radius: 25px;
   text-decoration: none;
+  transition: 0.3s;
 }
 
 .btn:hover {
@@ -116,7 +128,7 @@ tr:hover {
 <body>
 
 <header>
-  <div class="logo">Admin Panel</div>
+  <div class="logo"><i class="fas fa-user-shield"></i> Admin Panel</div>
   <a href="/admin/orders" class="back-btn">
     <i class="fas fa-arrow-left"></i> Back
   </a>
@@ -150,7 +162,7 @@ tr:hover {
           <td>{{ item.duration }}</td>
           <td>{{ item.location }}</td>
           <td>{{ item.quantity }}</td>
-          <td>₹{{ total }}</td>
+          <td><strong>₹{{ total }}</strong></td>
         </tr>
         {% endfor %}
       {% else %}

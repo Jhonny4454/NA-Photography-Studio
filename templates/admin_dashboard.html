@@ -12,21 +12,22 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   display: flex;
-  background: #f4f6f9;
+  background: linear-gradient(135deg, #1f2937, #4b5563);
+  color: #fff;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 230px;
-  background: #2c3e50;
-  color: white;
+  width: 240px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
   height: 100vh;
   padding: 20px;
 }
 
 .sidebar h2 {
   color: #ff7f50;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .sidebar a {
@@ -34,13 +35,15 @@ body {
   color: #ccc;
   text-decoration: none;
   margin: 10px 0;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  transition: 0.3s;
 }
 
 .sidebar a:hover {
   background: #ff7f50;
   color: white;
+  transform: translateX(5px);
 }
 
 /* MAIN */
@@ -54,19 +57,37 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+}
+
+.btn-group a {
+  margin-left: 10px;
+}
+
+/* BUTTONS */
+.refresh-btn, .add-btn {
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  transition: 0.3s;
 }
 
 .refresh-btn {
   background: #3498db;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  text-decoration: none;
+}
+
+.add-btn {
+  background: #2ecc71;
 }
 
 .refresh-btn:hover {
   background: #2980b9;
+}
+
+.add-btn:hover {
+  background: #27ae60;
 }
 
 /* CARDS */
@@ -79,17 +100,18 @@ body {
 
 .card {
   flex: 1;
-  min-width: 200px;
+  min-width: 220px;
   background: white;
+  color: black;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  transition: 0.3s;
 }
 
-.card h3 {
-  margin-bottom: 10px;
-  color: #555;
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
 }
 
 .card h1 {
@@ -101,9 +123,11 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 12px;
+  color: black;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
 }
 
 th, td {
@@ -129,12 +153,45 @@ a.btn {
   background: #ff7f50;
   color: white;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 20px;
   text-decoration: none;
+  transition: 0.3s;
 }
 
 a.btn:hover {
   background: #ff6347;
+}
+
+/* ACTION BUTTONS */
+.action-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.approve {
+  background: #2ecc71;
+}
+
+.reject {
+  background: #e74c3c;
+}
+
+.approve:hover {
+  background: #27ae60;
+}
+
+.reject:hover {
+  background: #c0392b;
+}
+
+/* HEADINGS */
+h1, h2 {
+  margin-top: 0;
 }
 
 /* EMPTY */
@@ -151,48 +208,53 @@ a.btn:hover {
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h2>Admin</h2>
-
-  <a href="/admin/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
   <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
   <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
   <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+  <a href="/admin/photographers"><i class="fas fa-user-tie"></i> Photographers</a>
   <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
 </div>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div class="main">
 
-  <!-- TOP -->
+  <!-- TOP BAR -->
   <div class="top-bar">
     <h1>Dashboard</h1>
-    <a href="/admin/dashboard" class="refresh-btn"><i class="fas fa-sync"></i> Refresh</a>
+
+    <div class="btn-group">
+      <a href="/admin/dashboard" class="refresh-btn"><i class="fas fa-sync"></i> Refresh</a>
+      <a href="/admin/packages" class="add-btn"><i class="fas fa-plus"></i> Package</a>
+      <a href="/admin/users" class="refresh-btn"><i class="fas fa-users"></i> Users</a>
+      <a href="/admin/photographers" class="add-btn"><i class="fas fa-camera"></i> Photographers</a>
+    </div>
   </div>
 
-  <!-- STATS -->
+  <!-- CARDS -->
   <div class="cards">
     <div class="card">
-      <h3><i class="fas fa-box"></i> Total Orders</h3>
+      <h3>Total Orders</h3>
       <h1>{{ total_orders }}</h1>
     </div>
 
     <div class="card">
-      <h3><i class="fas fa-rupee-sign"></i> Revenue</h3>
+      <h3>Revenue</h3>
       <h1>₹{{ revenue }}</h1>
     </div>
 
     <div class="card">
-      <h3><i class="fas fa-users"></i> Users</h3>
+      <h3>Users</h3>
       <h1>{{ total_users }}</h1>
     </div>
   </div>
 
   <!-- RECENT ORDERS -->
   <h2>Recent Orders</h2>
-
   <table>
     <thead>
       <tr>
-        <th>Order ID</th>
+        <th>ID</th>
         <th>User</th>
         <th>Total</th>
         <th>Status</th>
@@ -201,23 +263,54 @@ a.btn:hover {
     </thead>
 
     <tbody>
-      {% if recent_orders %}
-        {% for o in recent_orders %}
-        <tr>
-          <td>{{ o.order_id }}</td>
-          <td>{{ o.first_name }} {{ o.last_name }}</td>
-          <td>₹{{ o.total_price }}</td>
-          <td>{{ o.status }}</td>
-          <td>
-            <a href="/admin/order_details/{{ o.order_id }}" class="btn">View</a>
-          </td>
-        </tr>
-        {% endfor %}
-      {% else %}
-        <tr>
-          <td colspan="5" class="no-data">No recent orders</td>
-        </tr>
-      {% endif %}
+      {% for o in recent_orders %}
+      <tr>
+        <td>{{ o.order_id }}</td>
+        <td>{{ o.first_name }} {{ o.last_name }}</td>
+        <td>₹{{ o.total_price }}</td>
+        <td>{{ o.status }}</td>
+        <td>
+          <a href="/admin/order_details/{{ o.order_id }}" class="btn">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- APPLICATIONS -->
+  <h2>Photographer Applications</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Experience</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>{{ app.id }}</td>
+        <td>{{ app.first_name }} {{ app.last_name }}</td>
+        <td>{{ app.email }}</td>
+        <td>{{ app.phone }}</td>
+        <td>{{ app.years_exp }}y {{ app.months_exp }}m</td>
+        <td>
+          <form action="/admin/approve/{{ app.id }}" method="POST" style="display:inline;">
+            <button class="action-btn approve">Approve</button>
+          </form>
+
+          <form action="/admin/reject/{{ app.id }}" method="POST" style="display:inline;">
+            <button class="action-btn reject">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
   </table>
 

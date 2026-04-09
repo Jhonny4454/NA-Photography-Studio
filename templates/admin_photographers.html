@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Manage Users - Admin</title>
+<title>Manage Photographers - Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -12,7 +12,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   display: flex;
-  background: linear-gradient(135deg, #f4f6f9, #e0eafc);
+  background: #f4f6f9;
 }
 
 /* SIDEBAR */
@@ -36,7 +36,6 @@ body {
   margin: 10px 0;
   padding: 10px;
   border-radius: 8px;
-  transition: 0.3s;
 }
 
 .sidebar a:hover {
@@ -55,26 +54,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-.top-bar h1 {
-  margin: 0;
-}
-
-/* SEARCH + BUTTONS */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.actions input {
+/* SEARCH */
+.search-box input {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
 }
 
+/* REFRESH */
 .refresh-btn {
   background: #3498db;
   color: white;
@@ -88,16 +78,13 @@ body {
 }
 
 /* TABLE */
-.table-container {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
 th, td {
@@ -118,22 +105,6 @@ tr:hover {
   background: #f1f1f1;
 }
 
-/* DELETE BUTTON */
-.delete-btn {
-  background: #e74c3c;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.delete-btn:hover {
-  background: #c0392b;
-  transform: scale(1.05);
-}
-
 /* EMPTY */
 .no-data {
   padding: 20px;
@@ -143,7 +114,7 @@ tr:hover {
 </style>
 
 <script>
-function searchUsers() {
+function searchPhotographers() {
   let input = document.getElementById("search").value.toLowerCase();
   let rows = document.querySelectorAll("tbody tr");
 
@@ -172,58 +143,44 @@ function searchUsers() {
 <!-- MAIN -->
 <div class="main">
 
-<!-- TOP BAR -->
 <div class="top-bar">
-  <h1><i class="fas fa-users"></i> Manage Users</h1>
+  <h1>Manage Photographers</h1>
 
-  <div class="actions">
-    <input type="text" id="search" placeholder="Search users..." onkeyup="searchUsers()">
-    <a href="/admin/users" class="refresh-btn">
+  <div>
+    <input type="text" id="search" placeholder="Search photographers..." onkeyup="searchPhotographers()">
+    <a href="/admin/photographers" class="refresh-btn">
       <i class="fas fa-sync"></i> Refresh
     </a>
   </div>
 </div>
 
-<!-- USERS TABLE -->
-<div class="table-container">
+<!-- TABLE -->
 <table>
 <thead>
 <tr>
   <th>ID</th>
   <th>Name</th>
   <th>Email</th>
-  <th>Username</th>
-  <th>Action</th>
 </tr>
 </thead>
 
 <tbody>
-{% if users and users|length > 0 %}
-  {% for u in users %}
+{% if photographers and photographers|length > 0 %}
+  {% for p in photographers %}
   <tr>
-    <td>{{ u.id }}</td>
-    <td>{{ u.first_name }} {{ u.last_name }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ u.username }}</td>
-    <td>
-      <form action="/admin/delete_user/{{ u.id }}" method="POST" style="display:inline;">
-        <button type="submit" class="delete-btn"
-        onclick="return confirm('Delete this user? This will also remove related data.')">
-        <i class="fas fa-trash"></i> Delete
-        </button>
-      </form>
-    </td>
+    <td>{{ p.id }}</td>
+    <td>{{ p.first_name }} {{ p.last_name }}</td>
+    <td>{{ p.email }}</td>
   </tr>
   {% endfor %}
 {% else %}
   <tr>
-    <td colspan="5" class="no-data">No users found</td>
+    <td colspan="3" class="no-data">No photographers found</td>
   </tr>
 {% endif %}
 </tbody>
 
 </table>
-</div>
 
 </div>
 

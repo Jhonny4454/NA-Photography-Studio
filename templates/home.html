@@ -187,20 +187,55 @@ section { padding: 50px 20px; }
 footer {
   background: #111;
   color: white;
-  padding: 12px 20px;
+  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  border-top: 3px solid #ff7f50;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s ease;
 }
-.footer-left, .footer-right { display: flex; gap: 15px; align-items: center; }
-footer a { color: #ccc; text-decoration: none; font-size: 14px; }
-footer a:hover { color: #ff7f50; }
-
-.footer-btn { background: #222; padding: 6px 14px; border-radius: 20px; }
-.footer-btn:hover { background: linear-gradient(45deg, #ff7f50, #ff6347); transform: translateY(-2px); }
-
-.footer-right span { color: #ff7f50; font-size: 14px; font-weight: bold; }
-
+footer:hover {
+  background: #222;
+}
+.footer-container {
+  display: flex;
+  flex-direction: row; /* row-wise layout */
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+.footer-left, .footer-right {
+  display: flex;
+  gap: 15px;
+}
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 25px;
+  background: #222;
+  transition: background 0.3s, transform 0.2s;
+}
+footer a:hover {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.footer-btn {
+  font-weight: 600;
+  display: inline-block;
+}
+.work-with-us {
+  font-weight: bold;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: #fff;
+}
+.dev-link {
+  font-weight: 600;
+}
 </style>
 </head>
 
@@ -283,16 +318,20 @@ footer a:hover { color: #ff7f50; }
   </div>
 </section>
 
+<!-- Updated Footer with row layout -->
 <footer>
-  <div class="footer-left">
-    <a href="/about" class="footer-btn">About Us</a>
-    <a href="/privacy" class="footer-btn">Privacy Policy</a>
-    <a href="/terms" class="footer-btn">Terms & Conditions</a>
-  </div>
-  <div class="footer-right">
-    <span>Developers</span>
-    <a href="https://www.instagram.com/sum_11_1995" target="_blank">@Sumedh</a>
-    <a href="https://www.instagram.com/n_shaikh_n" target="_blank">@Nargis</a>
+  <div class="footer-container">
+    <div class="footer-left">
+      <a href="/about" class="footer-btn">About Us</a>
+      <a href="/privacy" class="footer-btn">Privacy Policy</a>
+      <a href="/terms" class="footer-btn">Terms & Conditions</a>
+      <a href="/get-hired" class="footer-btn">Work With Us</a>
+    </div>
+    <div class="footer-right">
+      <span>Developers</span>
+      <a href="https://www.instagram.com/sum_11_1995" target="_blank" class="dev-link">@Sumedh</a>
+      <a href="https://www.instagram.com/n_shaikh_n" target="_blank" class="dev-link">@Nargis</a>
+    </div>
   </div>
 </footer>
 
@@ -330,7 +369,7 @@ document.addEventListener("DOMContentLoaded", function() {
     btn.addEventListener("click", () => {
       const packageId = btn.getAttribute("data-id");
       fetch(`/add_package/${packageId}`, {
-        method: "POST",          // <-- Important: POST method
+        method: "POST",
         headers: { "Content-Type": "application/json" },
       })
         .then(res => res.json())
