@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, g, jsonify
+from flask import Flask, render_template, request, redirect, session, g, jsonify, flash
 import mysql.connector
 import hashlib
 import uuid
@@ -352,15 +352,13 @@ def order_details(order_id):
     
     return render_template("order_details.html", items=items)
 
-# ---------------------------Application Submit Page Route--------
-from flask import flash, render_template, redirect, request
 
+# ---------------- PHOTOGRAPHER APPLY ----------------
 @app.route("/photographer/apply", methods=["POST"])
 def apply_photographer():
     db = get_db()
     cursor = db.cursor()
-    
-    # Save the submitted application to the DB
+
     cursor.execute("""
         INSERT INTO photographers_applications 
         (first_name, last_name, email, phone, address, years_exp, months_exp)
@@ -374,31 +372,25 @@ def apply_photographer():
         request.form["years"],
         request.form["months"]
     ))
+
     db.commit()
     cursor.close()
 
-    # Flash a success message
-    flash("Your application has been submitted successfully!", "success")
-    
-    # Redirect to a dedicated confirmation page route
+    flash("🎉 Your application has been submitted successfully!", "success")
+
     return redirect("/photographer/submitted")
 
-# ---------------------------Application Submitted Page Route--------
-@app.route("/photographer/submitted")
-def photographer_submitted():
-    return render_template("photographer_submitted.html")
-
-#----------------------------Checkout------------------
+#---------------Check Out Router---
 
 @app.route("/checkout", methods=["GET", "POST"])
 def checkout():
     if "user_id" not in session:
-        return redirect("/login")
+        return redirect("/")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
-    # Fetch cart items from user_packages
+    # Fetch cart items
     cursor.execute("""
         SELECT up.id AS cart_id, p.package_name, p.package_price, up.quantity,
                up.location, up.scheduled_date,
@@ -411,7 +403,7 @@ def checkout():
     
     cart_items = cursor.fetchall()
 
-    # Construct photographer_name
+    # Add photographer name
     for item in cart_items:
         if item["first_name"] and item["last_name"]:
             item["photographer_name"] = f"{item['first_name']} {item['last_name']}"
@@ -421,94 +413,40 @@ def checkout():
     # Calculate total
     total = sum(item["package_price"] * item["quantity"] for item in cart_items)
 
+
+    # ---------------- POST ----------------
     if request.method == "POST":
-        payment_method = request.form.get("payment")
+
+        order_id = str(uuid.uuid4())[:8]
+
+        # Update scheduled dates
         for item in cart_items:
             scheduled_date = request.form.get(f"scheduled_date_{item['cart_id']}")
-            cursor.execute("UPDATE user_packages SET scheduled_date=%s WHERE id=%s",
-                           (scheduled_date, item["cart_id"]))
+            cursor.execute(
+                "UPDATE user_packages SET scheduled_date=%s WHERE id=%s",
+                (scheduled_date, item["cart_id"])
+            )
+
         db.commit()
-        return redirect("/confirm_booking")  # or /orders
+
+        # Clear cart
+        cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
+        db.commit()
+
+        cursor.close()
+
+        return redirect(f"/order-success?order_id={order_id}&total={total}")
 
     cursor.close()
     return render_template("checkout.html", items=cart_items, total=total)
-from flask import flash
 
-# ---------------- ADMIN LOGIN ----------------
-@app.route("/admin-login", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST":
-        db = get_db()
-        cursor = db.cursor(dictionary=True)
-
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        cursor.execute("SELECT * FROM admin WHERE username=%s", (username,))
-        admin = cursor.fetchone()
-        cursor.close()
-
-        if admin and admin["password"] == hash_password(password):
-            session["admin_id"] = admin["id"]
-            return redirect("/admin/dashboard")
-
-        return render_template("admin_login.html", error="Invalid username or password")
-
-    return render_template("admin_login.html")
-
-
-# ---------------- ADMIN DASHBOARD ----------------
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    if "admin_id" not in session:
-        return redirect("/admin-login")
-
-    db = get_db()
-    cursor = db.cursor(dictionary=True)
-
-    cursor.execute("SELECT COUNT(*) AS total_orders FROM user_packages")
-    total_orders = cursor.fetchone()["total_orders"]
-
-    cursor.execute("""
-        SELECT SUM(package_price * quantity) AS revenue 
-        FROM user_packages 
-        JOIN packages ON user_packages.package_id = packages.package_id
-    """)
-    revenue = cursor.fetchone()["revenue"] or 0
-
-    cursor.execute("SELECT COUNT(*) AS total_users FROM users")
-    total_users = cursor.fetchone()["total_users"]
-
-    cursor.execute("""
-        SELECT up.id AS order_id, u.first_name, u.last_name,
-               (p.package_price * up.quantity) AS total_price,
-               'Pending' AS status
-        FROM user_packages up
-        JOIN users u ON up.user_id = u.id
-        JOIN packages p ON up.package_id = p.package_id
-        ORDER BY up.id DESC LIMIT 5
-    """)
-    recent_orders = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM photographers_applications ORDER BY id DESC")
-    applications = cursor.fetchall()
-
-    cursor.close()
-
-    return render_template("admin_dashboard.html",
-        total_orders=total_orders,
-        revenue=revenue,
-        total_users=total_users,
-        recent_orders=recent_orders,
-        applications=applications
-    )
 
 
 # ---------------- ADMIN PHOTOGRAPHERS (NEW) ----------------
 @app.route("/admin/photographers")
 def admin_photographers():
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -524,7 +462,7 @@ def admin_photographers():
 @app.route("/admin/approve/<int:id>", methods=["POST"])
 def approve_photographer(id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor()
@@ -546,7 +484,7 @@ def approve_photographer(id):
 @app.route("/admin/reject/<int:id>", methods=["POST"])
 def reject_photographer(id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor()
@@ -562,7 +500,7 @@ def reject_photographer(id):
 @app.route("/admin/orders")
 def admin_orders():
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -586,7 +524,7 @@ def admin_orders():
 @app.route("/admin/packages", methods=["GET", "POST"])
 def admin_packages():
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -623,7 +561,7 @@ def admin_packages():
 @app.route("/admin/delete_package/<int:id>", methods=["POST"])
 def delete_package(id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor()
@@ -647,7 +585,7 @@ def delete_package(id):
 @app.route("/admin/edit_package/<int:id>", methods=["GET", "POST"])
 def edit_package(id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -685,7 +623,7 @@ def edit_package(id):
 @app.route("/admin/users")
 def admin_users():
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -701,7 +639,7 @@ def admin_users():
 @app.route("/admin/order_details/<int:order_id>")
 def admin_order_details(order_id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -728,7 +666,7 @@ def admin_order_details(order_id):
 @app.route("/admin/delete_user/<int:id>", methods=["POST"])
 def delete_user(id):
     if "admin_id" not in session:
-        return redirect("/admin-login")
+        return redirect("/admin/login")
 
     db = get_db()
     cursor = db.cursor()
@@ -745,11 +683,99 @@ def delete_user(id):
     cursor.close()
     return redirect("/admin/users")
 
+#---------------- Order Success------------
+@app.route("/order-success")
+def order_success():
+    order_id = request.args.get("order_id")
+    total = request.args.get("total")
+
+    return render_template("order_success.html", order_id=order_id, total=total)
+
+# ---------------- ADMIN LOGIN ----------------
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # ✅ simple login (change later if needed)
+        if username == "admin" and password == "admin123":
+            session["admin_id"] = 1
+            return redirect("/admin/dashboard")
+        else:
+            return render_template("admin_login.html", error="Invalid credentials")
+
+    return render_template("admin_login.html")
+# ---------------- ADMIN DASHBOARD ----------------
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    if "admin_id" not in session:
+        return redirect("/admin/login")
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # ✅ Total Users
+    cursor.execute("SELECT COUNT(*) AS total FROM users")
+    total_users = cursor.fetchone()["total"]
+
+    # ✅ Total Orders (from cart for now)
+    cursor.execute("SELECT COUNT(*) AS total FROM user_packages")
+    total_orders = cursor.fetchone()["total"]
+
+    # ✅ Revenue
+    cursor.execute("""
+        SELECT SUM(p.package_price * up.quantity) AS revenue
+        FROM user_packages up
+        JOIN packages p ON up.package_id = p.package_id
+    """)
+    revenue_data = cursor.fetchone()
+    revenue = revenue_data["revenue"] if revenue_data["revenue"] else 0
+
+    # ✅ Recent Orders
+    cursor.execute("""
+        SELECT up.id AS order_id, u.first_name, u.last_name,
+               (p.package_price * up.quantity) AS total_price,
+               'Pending' AS status
+        FROM user_packages up
+        JOIN users u ON up.user_id = u.id
+        JOIN packages p ON up.package_id = p.package_id
+        ORDER BY up.id DESC
+        LIMIT 5
+    """)
+    recent_orders = cursor.fetchall()
+
+    # ✅ Photographer Applications
+    cursor.execute("SELECT * FROM photographers_applications ORDER BY id DESC")
+    applications = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_users=total_users,
+        total_orders=total_orders,
+        revenue=revenue,
+        recent_orders=recent_orders,
+        applications=applications
+    )
+#------------------ Admin Log Out--------
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop("admin_id", None)
+    return redirect("/admin/login")
+#-------------- Application Submitted-------
+
+@app.route("/photographer/submitted")
+def photographer_submitted():
+    return render_template("application_submitted.html")
+
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
 
 # ---------------- RUN APP ----------------
 if __name__ == "__main__":

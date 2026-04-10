@@ -104,20 +104,15 @@ input[type="date"] {
 <div class="container">
   <h1>Checkout</h1>
 
-  <form method="POST">
+<form action="{{ url_for('checkout') }}" method="POST">
 
   {% for item in items %}
   <div class="item">
 
     <p><strong>{{ item.package_name }}</strong></p>
-
     <p>💰 Price: ₹{{ item.package_price }}</p>
-
     <p>📦 Quantity: {{ item.quantity }}</p>
-
     <p>📍 Location: <strong>{{ item.location if item.location else "Not set" }}</strong></p>
-
-    <!-- ✅ Photographer Display -->
     <p>📸 Photographer: <strong>{{ item.photographer_name if item.photographer_name else "Not assigned" }}</strong></p>
 
     <div class="date-box">
@@ -150,9 +145,10 @@ input[type="date"] {
     </label>
   </div>
 
+  <!-- ✅ ONLY ONE BUTTON -->
   <button type="submit">Confirm Booking</button>
 
-  </form>
+</form>
 </div>
 
 </body>
