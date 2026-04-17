@@ -2,13 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Edit Profile - NA Photography Studio</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
   animation: fadeIn 0.6s ease;
 }
 
@@ -19,25 +29,61 @@ html, body {
 
 /* HEADER */
 header {
-  background: #111;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   color: white;
-  padding: 12px 25px;
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 header h1 {
   color: #ff7f50;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header h1 i {
+  font-size: 28px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.1);
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.header-btn:hover {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  transform: translateY(-2px);
 }
 
 /* CONTAINER */
 .container {
-  max-width: 420px;
-  margin: 50px auto;
+  max-width: 500px;
+  margin: 60px auto;
   background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   animation: slideUp 0.5s ease;
 }
 
@@ -46,69 +92,249 @@ header h1 {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* HEADER SECTION */
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.profile-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.profile-icon i {
+  font-size: 40px;
+  color: white;
+}
+
 h2 {
   text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 28px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+/* FORM */
+.form-group {
   margin-bottom: 20px;
 }
 
-/* INPUTS */
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-group label i {
+  color: #ff7f50;
+  width: 20px;
+}
+
 input, select {
   width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
   outline: none;
-  transition: 0.3s;
 }
 
 input:focus, select:focus {
   border-color: #ff7f50;
-  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+  box-shadow: 0 0 0 3px rgba(255,127,80,0.1);
 }
 
-/* BUTTON */
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 25px;
-  background: linear-gradient(45deg, #ff7f50, #ff6347);
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 10px;
+input:hover, select:hover {
+  border-color: #ff7f50;
 }
 
-button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 10px 20px rgba(255,127,80,0.4);
+/* NAME ROW */
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 /* HELPER TEXT */
 .helper {
-  font-size: 12px;
-  color: #777;
-  margin-top: -5px;
-  margin-bottom: 10px;
+  font-size: 11px;
+  color: #999;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* BACK BUTTON */
-.back-btn {
-  display: block;
-  text-align: center;
-  margin-top: 15px;
-  text-decoration: none;
-  background: #222;
+.helper i {
+  font-size: 10px;
+}
+
+/* PASSWORD NOTE */
+.password-note {
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-note i {
+  color: #ff7f50;
+}
+
+/* BUTTONS */
+.btn-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
-  padding: 10px;
-  border-radius: 25px;
-  transition: 0.3s;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(46,204,113,0.3);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.back-btn {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .back-btn:hover {
-  background: #ff7f50;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255,127,80,0.3);
+}
+
+/* ALERT MESSAGES */
+.alert {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert i {
+  font-size: 20px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container {
+    margin: 30px 20px;
+    padding: 25px;
+  }
+  
+  .name-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .profile-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .profile-icon i {
+    font-size: 30px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
 }
 </style>
 </head>
@@ -116,66 +342,184 @@ button:hover {
 <body>
 
 <header>
-  <h1>NA Photography Studio</h1>
+  <h1>
+    <i class="fas fa-camera"></i>
+    NA Photography Studio
+  </h1>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/orders" class="header-btn">
+      <i class="fas fa-shopping-bag"></i> Orders
+    </a>
+  </div>
 </header>
 
 <div class="container">
-  <h2>Edit Profile</h2>
+  <div class="profile-header">
+    <div class="profile-icon">
+      <i class="fas fa-user-edit"></i>
+    </div>
+    <h2>Edit Profile</h2>
+    <p class="subtitle">Update your personal information</p>
+  </div>
 
-  <form method="POST">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-    <!-- NAME -->
-    <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="First Name" required>
-    <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Last Name" required>
+  <form method="POST" id="profileForm">
+    <!-- NAME ROW -->
+    <div class="name-row">
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          First Name
+        </label>
+        <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Enter first name" required>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          Last Name
+        </label>
+        <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Enter last name" required>
+      </div>
+    </div>
 
     <!-- EMAIL -->
-    <input type="email" name="email" value="{{ user.email }}" placeholder="Email" required>
+    <div class="form-group">
+      <label>
+        <i class="fas fa-envelope"></i>
+        Email Address
+      </label>
+      <input type="email" name="email" value="{{ user.email }}" placeholder="Enter email address" required>
+    </div>
 
     <!-- MOBILE -->
-    <input 
-      type="text" 
-      name="mobile" 
-      value="{{ user.mobile }}" 
-      placeholder="Mobile Number"
-      pattern="[0-9]{10}"
-      title="Enter 10 digit mobile number"
-      required
-    >
+    <div class="form-group">
+      <label>
+        <i class="fas fa-phone"></i>
+        Mobile Number
+      </label>
+      <input 
+        type="tel" 
+        name="mobile" 
+        value="{{ user.mobile }}" 
+        placeholder="Enter 10 digit mobile number"
+        pattern="[0-9]{10}"
+        title="Enter 10 digit mobile number"
+        required
+      >
+      <div class="helper">
+        <i class="fas fa-info-circle"></i>
+        Enter 10-digit mobile number
+      </div>
+    </div>
 
     <!-- GENDER -->
-    <select name="gender">
-      <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
-      <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
-      <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
-    </select>
+    <div class="form-group">
+      <label>
+        <i class="fas fa-venus-mars"></i>
+        Gender
+      </label>
+      <select name="gender">
+        <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+        <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+        <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
 
     <!-- USERNAME -->
-    <input 
-      type="text" 
-      name="username" 
-      value="{{ user.username }}" 
-      placeholder="Username"
-      pattern="[a-zA-Z0-9]{4,20}"
-      title="4-20 letters or numbers"
-      required
-    >
-    <div class="helper">Username: 4–20 letters or numbers</div>
+    <div class="form-group">
+      <label>
+        <i class="fas fa-user-circle"></i>
+        Username
+      </label>
+      <input 
+        type="text" 
+        name="username" 
+        value="{{ user.username }}" 
+        placeholder="Enter username"
+        pattern="[a-zA-Z0-9]{4,20}"
+        title="4-20 letters or numbers"
+        required
+      >
+      <div class="helper">
+        <i class="fas fa-info-circle"></i>
+        Username must be 4-20 characters (letters or numbers only)
+      </div>
+    </div>
 
     <!-- PASSWORD (OPTIONAL) -->
-    <input 
-      type="password" 
-      name="password" 
-      placeholder="New Password (leave blank to keep old)"
-    >
-    <div class="helper">Leave blank if you don’t want to change password</div>
+    <div class="form-group">
+      <label>
+        <i class="fas fa-lock"></i>
+        New Password
+      </label>
+      <input 
+        type="password" 
+        name="password" 
+        placeholder="Enter new password (optional)"
+      >
+      <div class="password-note">
+        <i class="fas fa-info-circle"></i>
+        Leave blank if you don't want to change your password
+      </div>
+    </div>
 
-    <button type="submit">Update Profile</button>
-
+    <div class="btn-group">
+      <button type="submit">
+        <i class="fas fa-save"></i> Update Profile
+      </button>
+      <a href="/home" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Cancel
+      </a>
+    </div>
   </form>
-
-  <a href="/home" class="back-btn">⬅ Back to Home</a>
-
 </div>
+
+<script>
+// Form validation
+document.getElementById('profileForm')?.addEventListener('submit', function(e) {
+  const mobile = document.querySelector('input[name="mobile"]').value;
+  const mobilePattern = /^[0-9]{10}$/;
+  
+  if (!mobilePattern.test(mobile)) {
+    e.preventDefault();
+    alert('Please enter a valid 10-digit mobile number');
+    return false;
+  }
+  
+  const username = document.querySelector('input[name="username"]').value;
+  const usernamePattern = /^[a-zA-Z0-9]{4,20}$/;
+  
+  if (!usernamePattern.test(username)) {
+    e.preventDefault();
+    alert('Username must be 4-20 characters (letters and numbers only)');
+    return false;
+  }
+  
+  // Show loading state
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+  submitBtn.disabled = true;
+  
+  setTimeout(() => {
+    submitBtn.disabled = false;
+  }, 3000);
+});
+</script>
 
 </body>
 </html>

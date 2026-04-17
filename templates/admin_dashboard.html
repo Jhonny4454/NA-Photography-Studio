@@ -2,42 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Admin Dashboard</title>
+<title>Admin Dashboard - NA Studio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   display: flex;
   background: linear-gradient(135deg, #1f2937, #4b5563);
   color: #fff;
+  min-height: 100vh;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 240px;
-  background: rgba(0,0,0,0.4);
+  width: 260px;
+  background: rgba(0,0,0,0.5);
   backdrop-filter: blur(10px);
   height: 100vh;
-  padding: 20px;
+  padding: 25px 20px;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
 }
 
 .sidebar h2 {
   color: #ff7f50;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar h2 i {
+  font-size: 28px;
 }
 
 .sidebar a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: #ccc;
   text-decoration: none;
-  margin: 10px 0;
-  padding: 12px;
-  border-radius: 10px;
-  transition: 0.3s;
+  margin: 8px 0;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.sidebar a i {
+  width: 22px;
+  font-size: 18px;
 }
 
 .sidebar a:hover {
@@ -49,7 +74,9 @@ body {
 /* MAIN */
 .main {
   flex: 1;
-  padding: 25px;
+  padding: 25px 30px;
+  overflow-y: auto;
+  height: 100vh;
 }
 
 /* TOP BAR */
@@ -57,264 +84,482 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.btn-group a {
-  margin-left: 10px;
+.top-bar h1 {
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* BUTTONS */
-.refresh-btn, .add-btn {
-  padding: 8px 14px;
-  border-radius: 20px;
-  text-decoration: none;
-  color: white;
-  font-size: 14px;
-  transition: 0.3s;
+.btn-group {
+  display: flex;
+  gap: 12px;
 }
 
 .refresh-btn {
-  background: #3498db;
-}
-
-.add-btn {
-  background: #2ecc71;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .refresh-btn:hover {
-  background: #2980b9;
-}
-
-.add-btn:hover {
-  background: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52,152,219,0.4);
 }
 
 /* CARDS */
 .cards {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
 }
 
 .card {
-  flex: 1;
-  min-width: 220px;
   background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 15px;
+  color: #333;
+  padding: 25px;
+  border-radius: 20px;
   text-align: center;
   box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff7f50, #ff6347);
 }
 
 .card:hover {
-  transform: translateY(-5px) scale(1.02);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.card i {
+  font-size: 40px;
+  color: #ff7f50;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .card h1 {
+  font-size: 36px;
   color: #ff7f50;
+  margin-bottom: 5px;
+}
+
+/* SECTION TITLES */
+.section-title {
+  font-size: 22px;
+  margin: 30px 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff7f50;
 }
 
 /* TABLE */
+.table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  color: black;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-  margin-bottom: 30px;
+  color: #333;
 }
 
 th, td {
-  padding: 12px;
-  text-align: center;
+  padding: 15px 12px;
+  text-align: left;
 }
 
 th {
-  background: #ff7f50;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: white;
+  font-weight: 600;
+  font-size: 14px;
 }
 
-tr:nth-child(even) {
-  background: #f9f9f9;
+tr:nth-child(even) { 
+  background: #f9f9f9; 
 }
 
-tr:hover {
-  background: #f1f1f1;
+tr:hover { 
+  background: #f1f1f1; 
+  transition: 0.2s;
 }
 
-/* BUTTON */
-a.btn {
-  background: #ff7f50;
+/* STATUS BADGES */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* BUTTONS */
+.btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: white;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   text-decoration: none;
-  transition: 0.3s;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s ease;
 }
 
-a.btn:hover {
-  background: #ff6347;
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
 }
 
-/* ACTION BUTTONS */
 .action-btn {
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
   border: none;
   cursor: pointer;
   color: white;
   font-size: 12px;
-  transition: 0.3s;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin: 0 3px;
 }
 
-.approve {
-  background: #2ecc71;
+.action-btn:hover {
+  transform: translateY(-2px);
 }
 
-.reject {
-  background: #e74c3c;
+.approve { 
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
 }
 
-.approve:hover {
-  background: #27ae60;
+.reject { 
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
-.reject:hover {
-  background: #c0392b;
-}
-
-/* HEADINGS */
-h1, h2 {
-  margin-top: 0;
-}
-
-/* EMPTY */
+/* NO DATA */
 .no-data {
-  padding: 20px;
+  padding: 40px;
   text-align: center;
-  color: gray;
+  color: #999;
+  background: white;
+  border-radius: 16px;
+}
+
+.no-data i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 15px;
+  }
+  
+  .sidebar a {
+    display: inline-flex;
+    margin: 5px;
+  }
+  
+  .main {
+    padding: 20px;
+  }
+  
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  
+  th, td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .btn-group {
+    width: 100%;
+  }
+  
+  .refresh-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-  <h2>Admin</h2>
-  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-  <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
-  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
-  <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
-  <a href="/admin/photographers"><i class="fas fa-user-tie"></i> Photographers</a>
-  <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <h2>
+    <i class="fas fa-camera"></i>
+    Admin Panel
+  </h2>
+  <a href="/admin/dashboard">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
+  <a href="/admin/orders">
+    <i class="fas fa-shopping-cart"></i> Orders
+  </a>
+  <a href="/admin/packages">
+    <i class="fas fa-box"></i> Packages
+  </a>
+  <a href="/admin/users">
+    <i class="fas fa-users"></i> Users
+  </a>
+  <a href="/admin/photographers">
+    <i class="fas fa-camera-retro"></i> Photographers
+  </a>
+  <a href="/logout">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- TOP BAR -->
   <div class="top-bar">
-    <h1>Dashboard</h1>
-
+    <h1>
+      <i class="fas fa-tachometer-alt"></i>
+      Dashboard
+    </h1>
     <div class="btn-group">
-      <a href="/admin/dashboard" class="refresh-btn"><i class="fas fa-sync"></i> Refresh</a>
-      <a href="/admin/packages" class="add-btn"><i class="fas fa-plus"></i> Package</a>
-      <a href="/admin/users" class="refresh-btn"><i class="fas fa-users"></i> Users</a>
-      <a href="/admin/photographers" class="add-btn"><i class="fas fa-camera"></i> Photographers</a>
+      <a href="/admin/dashboard" class="refresh-btn">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </a>
     </div>
   </div>
 
-  <!-- CARDS -->
+  <!-- STATS CARDS -->
   <div class="cards">
     <div class="card">
+      <i class="fas fa-shopping-cart"></i>
       <h3>Total Orders</h3>
-      <h1>{{ total_orders }}</h1>
+      <h1>{{ total_orders|default(0) }}</h1>
     </div>
 
     <div class="card">
-      <h3>Revenue</h3>
-      <h1>₹{{ revenue }}</h1>
+      <i class="fas fa-rupee-sign"></i>
+      <h3>Total Revenue</h3>
+      <h1>₹{{ revenue|default(0) }}</h1>
     </div>
 
     <div class="card">
-      <h3>Users</h3>
-      <h1>{{ total_users }}</h1>
+      <i class="fas fa-users"></i>
+      <h3>Total Users</h3>
+      <h1>{{ total_users|default(0) }}</h1>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-camera-retro"></i>
+      <h3>Photographers</h3>
+      <h1>{{ total_photographers|default(0) }}</h1>
     </div>
   </div>
 
-  <!-- RECENT ORDERS -->
-  <h2>Recent Orders</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>Total</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
+  <!-- RECENT ORDERS SECTION -->
+  <div class="section-title">
+    <i class="fas fa-clock"></i>
+    Recent Orders
+  </div>
 
-    <tbody>
-      {% for o in recent_orders %}
-      <tr>
-        <td>{{ o.order_id }}</td>
-        <td>{{ o.first_name }} {{ o.last_name }}</td>
-        <td>₹{{ o.total_price }}</td>
-        <td>{{ o.status }}</td>
-        <td>
-          <a href="/admin/order_details/{{ o.order_id }}" class="btn">View</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% if recent_orders and recent_orders|length > 0 %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td>
+            <i class="fas fa-hashtag"></i> {{ order.order_id|default('N/A') }}
+          </td>
+          <td>
+            <i class="fas fa-user"></i> {{ order.first_name|default('') }} {{ order.last_name|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-rupee-sign"></i> {{ order.total_price|default(0) }}
+          </td>
+          <td>
+            <span class="status-badge status-{{ order.status|lower|default('pending') }}">
+              {{ order.status|default('Pending') }}
+            </span>
+          </td>
+          <td>
+            <i class="fas fa-calendar"></i> {{ order.created_at.strftime('%Y-%m-%d') if order.created_at else 'N/A' }}
+          </td>
+          <td>
+            <a href="/admin/order_details/{{ order.order_id }}" class="btn">
+              <i class="fas fa-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="no-data">
+    <i class="fas fa-inbox"></i>
+    <p>No recent orders found</p>
+  </div>
+  {% endif %}
 
-  <!-- APPLICATIONS -->
-  <h2>Photographer Applications</h2>
+  <!-- PHOTOGRAPHER APPLICATIONS SECTION -->
+  <div class="section-title">
+    <i class="fas fa-user-plus"></i>
+    Photographer Applications
+    {% if applications and applications|length > 0 %}
+      <span style="background: #ff7f50; padding: 2px 10px; border-radius: 20px; font-size: 14px;">
+        {{ applications|length }} New
+      </span>
+    {% endif %}
+  </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Experience</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {% for app in applications %}
-      <tr>
-        <td>{{ app.id }}</td>
-        <td>{{ app.first_name }} {{ app.last_name }}</td>
-        <td>{{ app.email }}</td>
-        <td>{{ app.phone }}</td>
-        <td>{{ app.years_exp }}y {{ app.months_exp }}m</td>
-        <td>
-          <form action="/admin/approve/{{ app.id }}" method="POST" style="display:inline;">
-            <button class="action-btn approve">Approve</button>
-          </form>
-
-          <form action="/admin/reject/{{ app.id }}" method="POST" style="display:inline;">
-            <button class="action-btn reject">Reject</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {% if applications and applications|length > 0 %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Experience</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td>#{{ app.id|default('') }}</td>
+          <td>
+            <i class="fas fa-user"></i> {{ app.first_name|default('') }} {{ app.last_name|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-envelope"></i> {{ app.email|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-phone"></i> {{ app.phone|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-calendar-alt"></i> {{ app.years_exp|default(0) }} years {{ app.months_exp|default(0) }} months
+          </td>
+          <td>
+            <form action="/admin/approve/{{ app.id }}" method="POST" style="display:inline;">
+              <button type="submit" class="action-btn approve" onclick="return confirm('Approve this photographer?')">
+                <i class="fas fa-check"></i> Approve
+              </button>
+            </form>
+            <form action="/admin/reject/{{ app.id }}" method="POST" style="display:inline;">
+              <button type="submit" class="action-btn reject" onclick="return confirm('Reject this application?')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="no-data">
+    <i class="fas fa-user-check"></i>
+    <p>No pending photographer applications</p>
+  </div>
+  {% endif %}
 
 </div>
+
+<script>
+// Confirmation for approve/reject
+document.querySelectorAll('.action-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    if (this.classList.contains('approve')) {
+      if (!confirm('Are you sure you want to approve this photographer?')) {
+        e.preventDefault();
+      }
+    } else if (this.classList.contains('reject')) {
+      if (!confirm('Are you sure you want to reject this application?')) {
+        e.preventDefault();
+      }
+    }
+  });
+});
+</script>
 
 </body>
 </html>

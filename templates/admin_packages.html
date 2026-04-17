@@ -2,51 +2,80 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Manage Packages - Admin</title>
+<title>Manage Packages - Admin | NA Studio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   display: flex;
-  background: #f4f6f9;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 230px;
-  background: #2c3e50;
+  width: 260px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   color: white;
   height: 100vh;
-  padding: 20px;
+  padding: 25px 20px;
+  position: sticky;
+  top: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
 .sidebar h2 {
   color: #ff7f50;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar h2 i {
+  font-size: 28px;
 }
 
 .sidebar a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: #ccc;
   text-decoration: none;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 8px;
+  margin: 8px 0;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.sidebar a i {
+  width: 22px;
+  font-size: 18px;
 }
 
 .sidebar a:hover {
   background: #ff7f50;
   color: white;
+  transform: translateX(5px);
 }
 
 /* MAIN */
 .main {
   flex: 1;
-  padding: 25px;
+  padding: 25px 30px;
+  overflow-y: auto;
+  height: 100vh;
 }
 
 /* TOP BAR */
@@ -54,77 +83,206 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ff7f50;
+}
+
+.top-bar h1 {
+  font-size: 28px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-bar h1 i {
+  color: #ff7f50;
+}
+
+.search-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.search-box input {
+  padding: 10px 12px 10px 35px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  width: 250px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+  width: 280px;
 }
 
 .refresh-btn {
-  background: #3498db;
+  background: linear-gradient(135deg, #3498db, #2980b9);
   color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 25px;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
 .refresh-btn:hover {
-  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52,152,219,0.4);
 }
 
-/* SEARCH */
-.search-box input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-/* FORM */
-form {
-  background: white;
-  padding: 20px;
+/* FLASH MESSAGES */
+.flash {
+  padding: 15px 20px;
   border-radius: 12px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.flash-success {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.flash-error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.flash i {
+  font-size: 20px;
+}
+
+/* ADD FORM */
+.form-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 30px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-form input {
-  padding: 10px;
-  margin: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 220px;
+.form-card h3 {
+  color: #ff7f50;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
 }
 
-/* BUTTON */
-button {
-  padding: 10px 20px;
-  border: none;
-  background: #ff7f50;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #555;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
-  border-radius: 6px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-button:hover {
-  background: #ff6347;
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(46,204,113,0.4);
 }
 
 /* TABLE */
-table {
-  width: 100%;
-  border-collapse: collapse;
+.table-wrapper {
+  overflow-x: auto;
   background: white;
-  border-radius: 12px;
-  overflow: hidden;
+  border-radius: 20px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
 th, td {
-  padding: 12px;
-  text-align: center;
+  padding: 15px 12px;
+  text-align: left;
 }
 
 th {
-  background: #ff7f50;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: white;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 tr:nth-child(even) {
@@ -133,50 +291,123 @@ tr:nth-child(even) {
 
 tr:hover {
   background: #f1f1f1;
+  transition: 0.2s;
 }
 
 /* IMAGE */
 .pkg-img {
   width: 60px;
-  height: 45px;
+  height: 50px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 /* BUTTONS */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .edit-btn {
-  color: #3498db;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
   text-decoration: none;
-  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(52,152,219,0.4);
 }
 
 .delete-btn {
-  background: #e74c3c;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
   color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
   border: none;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  transition: all 0.3s ease;
 }
 
 .delete-btn:hover {
-  background: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(231,76,60,0.4);
 }
 
-/* FLASH */
-.flash {
-  padding: 12px;
-  background: #2ecc71;
-  color: white;
-  border-radius: 6px;
-  margin-bottom: 15px;
-}
-
-/* EMPTY */
+/* NO DATA */
 .no-data {
-  padding: 20px;
   text-align: center;
-  color: gray;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.no-data i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 15px;
+  }
+  
+  .sidebar a {
+    display: inline-flex;
+    margin: 5px;
+  }
+  
+  .main {
+    padding: 20px;
+  }
+  
+  .top-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .search-section {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .search-box input {
+    width: 100%;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  th, td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
 }
 </style>
 
@@ -184,12 +415,27 @@ tr:hover {
 function searchPackage() {
   let input = document.getElementById("search").value.toLowerCase();
   let rows = document.querySelectorAll("tbody tr");
-
+  
   rows.forEach(row => {
+    if (row.querySelector(".no-data")) return;
     let text = row.innerText.toLowerCase();
     row.style.display = text.includes(input) ? "" : "none";
   });
 }
+
+// Auto-hide flash messages after 3 seconds
+setTimeout(function() {
+  const flashes = document.querySelectorAll('.flash');
+  flashes.forEach(flash => {
+    flash.style.transition = 'opacity 0.5s ease';
+    flash.style.opacity = '0';
+    setTimeout(() => {
+      if (flash.parentNode) {
+        flash.parentNode.removeChild(flash);
+      }
+    }, 500);
+  });
+}, 3000);
 </script>
 
 </head>
@@ -198,96 +444,146 @@ function searchPackage() {
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-  <h2>Admin</h2>
-  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
-  <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
-  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
-  <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
-  <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <h2>
+    <i class="fas fa-camera"></i>
+    Admin Panel
+  </h2>
+  <a href="/admin/dashboard">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
+  <a href="/admin/orders">
+    <i class="fas fa-shopping-cart"></i> Orders
+  </a>
+  <a href="/admin/packages">
+    <i class="fas fa-camera"></i> Packages
+  </a>
+  <a href="/admin/users">
+    <i class="fas fa-users"></i> Users
+  </a>
+  <a href="/admin/photographers">
+    <i class="fas fa-camera-retro"></i> Photographers
+  </a>
+  <a href="/logout">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </a>
 </div>
 
 <!-- MAIN -->
 <div class="main">
 
 <div class="top-bar">
-  <h1>Manage Packages</h1>
-  <div>
-    <input type="text" id="search" placeholder="Search packages..." onkeyup="searchPackage()">
+  <h1>
+    <i class="fas fa-box"></i>
+    Manage Packages
+  </h1>
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search" placeholder="Search packages..." onkeyup="searchPackage()">
+    </div>
     <a href="/admin/packages" class="refresh-btn">
-      <i class="fas fa-sync"></i> Refresh
+      <i class="fas fa-sync-alt"></i> Refresh
     </a>
   </div>
 </div>
 
-<!-- FLASH -->
-{% with messages = get_flashed_messages() %}
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    {% for msg in messages %}
-      <div class="flash">{{ msg }}</div>
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category if category else 'success' }}">
+        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+        {{ message }}
+      </div>
     {% endfor %}
   {% endif %}
 {% endwith %}
 
-<!-- ADD FORM -->
-<form method="POST" action="/admin/packages">
-  <input type="text" name="package_name" placeholder="Package Name" required>
-  <input type="number" name="package_price" placeholder="Price" required>
-  <input type="text" name="duration" placeholder="Duration (e.g. 2 Hours)" required>
-  <input type="text" name="image_filename" placeholder="Image filename (e.g. wedding.jpg)" required>
-  <br>
-  <button type="submit"><i class="fas fa-plus"></i> Add Package</button>
-</form>
+<!-- ADD PACKAGE FORM -->
+<div class="form-card">
+  <h3>
+    <i class="fas fa-plus-circle"></i>
+    Add New Package
+  </h3>
+  <form method="POST" action="/admin/packages">
+    <div class="form-grid">
+      <div class="form-group">
+        <label><i class="fas fa-tag"></i> Package Name</label>
+        <input type="text" name="package_name" placeholder="e.g., Wedding Photography" required>
+      </div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-rupee-sign"></i> Price</label>
+        <input type="number" name="package_price" placeholder="e.g., 50000" required>
+      </div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-clock"></i> Duration</label>
+        <input type="text" name="duration" placeholder="e.g., 4 Hours" required>
+      </div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-image"></i> Image Filename</label>
+        <input type="text" name="image_filename" placeholder="e.g., wedding.jpg" required>
+      </div>
+    </div>
+    
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-plus"></i> Add Package
+    </button>
+  </form>
+</div>
 
-<!-- TABLE -->
-<table>
-<thead>
-<tr>
-  <th>ID</th>
-  <th>Image</th>
-  <th>Name</th>
-  <th>Price</th>
-  <th>Duration</th>
-  <th>Action</th>
-</tr>
-</thead>
-
-<tbody>
-{% if packages and packages|length > 0 %}
-  {% for p in packages %}
-  <tr>
-    <td>{{ p.package_id }}</td>
-    <td>
-      <img src="/static/images/{{ p.image_filename }}"
-           class="pkg-img"
-           onerror="this.onerror=null;this.src='/static/images/default.jpg';">
-    </td>
-    <td>{{ p.package_name }}</td>
-    <td>₹{{ p.package_price }}</td>
-    <td>{{ p.duration }}</td>
-    <td>
-
-      <a href="/admin/edit_package/{{ p.package_id }}" class="edit-btn">
-        <i class="fas fa-edit"></i>
-      </a>
-
-      <form action="/admin/delete_package/{{ p.package_id }}" method="POST" style="display:inline;">
-        <button type="submit" class="delete-btn"
-        onclick="return confirm('Delete this package?')">
-          <i class="fas fa-trash"></i>
-        </button>
-      </form>
-
-    </td>
-  </tr>
-  {% endfor %}
-{% else %}
-  <tr>
-    <td colspan="6" class="no-data">No packages found</td>
-  </tr>
-{% endif %}
-</tbody>
-
-</table>
+<!-- PACKAGES TABLE -->
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Image</th>
+        <th>Package Name</th>
+        <th>Price</th>
+        <th>Duration</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if packages and packages|length > 0 %}
+        {% for p in packages %}
+        <tr>
+          <td>#{{ p.package_id }}</td>
+          <td>
+            <img src="/static/images/{{ p.image_filename }}"
+                 class="pkg-img"
+                 onerror="this.onerror=null;this.src='/static/images/default.jpg';"
+                 alt="{{ p.package_name }}">
+          </td>
+          <td><strong>{{ p.package_name }}</strong></td>
+          <td><i class="fas fa-rupee-sign"></i> {{ "%.2f"|format(p.package_price) }}</td>
+          <td><i class="fas fa-clock"></i> {{ p.duration }}</td>
+          <td class="action-buttons">
+            <a href="/admin/edit_package/{{ p.package_id }}" class="edit-btn">
+              <i class="fas fa-edit"></i> Edit
+            </a>
+            <form action="/admin/delete_package/{{ p.package_id }}" method="POST" style="display:inline;">
+              <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete "{{ p.package_name }}"? This action cannot be undone.')">
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" class="no-data">
+            <i class="fas fa-box-open"></i>
+            <p>No packages found. Add your first package above!</p>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
 
 </div>
 

@@ -9,30 +9,38 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #ff7f50, #ff9966);
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px;
-  box-sizing: border-box;
+  padding: 40px 20px;
   position: relative;
+  overflow-x: hidden;
 }
 
+/* Animated background */
 body::before {
   content: "";
   position: absolute;
   width: 600px;
   height: 600px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
   filter: blur(120px);
   top: -100px;
   left: -100px;
   border-radius: 50%;
   z-index: -2;
+  animation: float 20s ease-in-out infinite;
 }
 
 body::after {
@@ -40,24 +48,43 @@ body::after {
   position: absolute;
   width: 500px;
   height: 500px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.1);
   filter: blur(120px);
   bottom: -100px;
   right: -100px;
   border-radius: 50%;
   z-index: -2;
+  animation: float 15s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(50px, 50px); }
+}
+
+/* Particle effects */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particleFloat 10s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { opacity: 0.5; }
 }
 
 .container {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.12);
   backdrop-filter: blur(20px);
-  padding: 40px;
-  border-radius: 20px;
-  max-width: 500px;
+  padding: 45px;
+  border-radius: 28px;
+  max-width: 550px;
   width: 100%;
   box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.3);
-  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,0.25);
   position: relative;
   z-index: 1;
   animation: slideUp 0.7s ease;
@@ -68,41 +95,75 @@ body::after {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: white;
-  font-size: 24px;
-}
-
-p {
+/* Header Section */
+.header-section {
   text-align: center;
   margin-bottom: 30px;
-  color: white;
-  font-size: 16px;
 }
 
+.header-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.header-icon i {
+  font-size: 40px;
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 30px;
+  color: rgba(255,255,255,0.9);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Back Buttons */
 .back-buttons {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
+  gap: 15px;
+  margin-bottom: 25px;
 }
 
 .back-buttons a {
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.2);
+  padding: 10px 20px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.15);
   color: white;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
 }
 
 .back-buttons a:hover {
-  background: rgba(255,255,255,0.35);
-  transform: scale(1.05);
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
 }
 
+/* Form */
 form {
   display: flex;
   flex-direction: column;
@@ -116,100 +177,360 @@ form {
 .form-group i {
   position: absolute;
   top: 50%;
-  left: 14px;
+  left: 16px;
   transform: translateY(-50%);
-  color: #eee;
+  color: rgba(255,255,255,0.7);
   font-size: 16px;
+  z-index: 1;
 }
 
-input, textarea {
+input, textarea, select {
   width: 100%;
-  padding: 12px 12px 12px 40px;
-  border-radius: 12px;
+  padding: 14px 16px 14px 45px;
+  border-radius: 14px;
   border: none;
   outline: none;
   font-size: 14px;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.15);
   color: white;
   backdrop-filter: blur(10px);
-  box-sizing: border-box;
-  resize: vertical;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 input::placeholder, textarea::placeholder {
-  color: #ddd;
+  color: rgba(255,255,255,0.6);
 }
 
-input:focus, textarea:focus {
-  box-shadow: 0 0 12px rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.3);
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 15px rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
 }
 
+/* Experience row */
+.experience-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* File upload */
+.file-upload {
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  padding: 12px 16px 12px 45px;
+  cursor: pointer;
+}
+
+.file-upload i {
+  pointer-events: none;
+}
+
+/* Submit Button */
 button {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
+  padding: 15px;
+  margin-top: 25px;
   border: none;
-  border-radius: 30px;
-  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  border-radius: 35px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: white;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 button:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(255,127,80,0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(255,127,80,0.5);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Benefits Section */
+.benefits {
+  margin-top: 30px;
+  padding-top: 25px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.benefits h3 {
+  color: white;
+  font-size: 16px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+}
+
+.benefit-item i {
+  color: #ffd700;
+  font-size: 12px;
+}
+
+/* Alert messages */
+.alert {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-success {
+  background: rgba(46,204,113,0.3);
+  border: 1px solid rgba(46,204,113,0.5);
+  color: white;
+}
+
+.alert-error {
+  background: rgba(231,76,60,0.3);
+  border: 1px solid rgba(231,76,60,0.5);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 30px 25px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  .back-buttons {
+    flex-direction: column;
+  }
+  
+  .experience-row {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .header-icon i {
+    font-size: 30px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
   <div class="back-buttons">
-    <a href="/home"><i class="fas fa-home"></i> Home</a>
-    <a href="/"><i class="fas fa-sign-in-alt"></i> Login</a>
+    <a href="/home">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/">
+      <i class="fas fa-sign-in-alt"></i> Login
+    </a>
   </div>
 
-  <h1>Become a Photographer with Us</h1>
-  <p>Fill out our application form and join our talented team of photographers.</p>
+  <div class="header-section">
+    <div class="header-icon">
+      <i class="fas fa-camera-retro"></i>
+    </div>
+    <h1>Join Our Team</h1>
+    <p class="subtitle">
+      Become a part of NA Photography Studio's creative family.<br>
+      Showcase your talent and capture beautiful moments.
+    </p>
+  </div>
 
-  <form method="POST" action="/photographer/apply">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="/photographer/apply" id="applicationForm">
     <div class="form-group">
       <i class="fas fa-user"></i>
       <input type="text" name="first_name" placeholder="First Name" required>
     </div>
+    
     <div class="form-group">
       <i class="fas fa-user"></i>
       <input type="text" name="last_name" placeholder="Last Name" required>
     </div>
+    
     <div class="form-group">
       <i class="fas fa-envelope"></i>
       <input type="email" name="email" placeholder="Email Address" required>
     </div>
+    
     <div class="form-group">
       <i class="fas fa-phone"></i>
-      <input type="tel" name="phone" placeholder="Phone Number" required>
+      <input type="tel" name="phone" placeholder="Phone Number" pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" required>
     </div>
+    
     <div class="form-group">
-      <i class="fas fa-home"></i>
-      <input type="text" name="address" placeholder="Address" required>
+      <i class="fas fa-map-marker-alt"></i>
+      <input type="text" name="address" placeholder="Full Address" required>
     </div>
-    <div class="form-group">
-      <i class="fas fa-calendar-alt"></i>
-      <input type="number" name="years" placeholder="Years of Experience" min="0" required>
-    </div>
-    <div class="form-group">
-      <i class="fas fa-calendar-alt"></i>
-      <input type="number" name="months" placeholder="Months of Experience" min="0" max="11" required>
+    
+    <div class="experience-row">
+      <div class="form-group">
+        <i class="fas fa-calendar-alt"></i>
+        <input type="number" name="years" placeholder="Years of Experience" min="0" max="50" required>
+      </div>
+      
+      <div class="form-group">
+        <i class="fas fa-calendar-alt"></i>
+        <input type="number" name="months" placeholder="Months" min="0" max="11" required>
+      </div>
     </div>
 
-    <button type="submit"><i class="fas fa-paper-plane"></i> Submit Application</button>
+    <div class="form-group file-upload">
+      <i class="fas fa-upload"></i>
+      <input type="file" name="portfolio" accept="image/*,.pdf" placeholder="Portfolio (optional)">
+    </div>
+
+    <button type="submit">
+      <i class="fas fa-paper-plane"></i> Submit Application
+    </button>
   </form>
+
+  <div class="benefits">
+    <h3>Why join NA Studio?</h3>
+    <div class="benefits-grid">
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Flexible working hours</span>
+      </div>
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Competitive compensation</span>
+      </div>
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Professional equipment</span>
+      </div>
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Growth opportunities</span>
+      </div>
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Creative environment</span>
+      </div>
+      <div class="benefit-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Supportive team</span>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<script>
+// Form validation
+document.getElementById('applicationForm')?.addEventListener('submit', function(e) {
+  const phone = document.querySelector('input[name="phone"]').value;
+  const phonePattern = /^[0-9]{10}$/;
+  
+  if (!phonePattern.test(phone)) {
+    e.preventDefault();
+    alert('Please enter a valid 10-digit mobile number');
+    return false;
+  }
+  
+  const years = parseInt(document.querySelector('input[name="years"]').value);
+  const months = parseInt(document.querySelector('input[name="months"]').value);
+  
+  if (isNaN(years) || years < 0 || years > 50) {
+    e.preventDefault();
+    alert('Please enter a valid number of years (0-50)');
+    return false;
+  }
+  
+  if (isNaN(months) || months < 0 || months > 11) {
+    e.preventDefault();
+    alert('Please enter a valid number of months (0-11)');
+    return false;
+  }
+  
+  // Show loading state
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+  submitBtn.disabled = true;
+  
+  // Re-enable after 3 seconds (form will submit normally)
+  setTimeout(() => {
+    submitBtn.disabled = false;
+  }, 3000);
+});
+
+// Create floating particles
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 5 + 2;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = Math.random() * 10 + 5 + 's';
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+</script>
 
 </body>
 </html>

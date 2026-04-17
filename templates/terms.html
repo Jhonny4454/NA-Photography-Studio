@@ -2,16 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Terms & Conditions - NA Photography Studio</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
-body {
-  font-family: 'Arial', sans-serif;
+* {
   margin: 0;
-  background: #f4f4f4;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   animation: fadeIn 0.8s ease-in;
+  min-height: 100vh;
 }
 
 /* GLOBAL */
@@ -26,28 +34,105 @@ body {
 
 /* HEADER */
 header {
-  background: #fff;
-  padding: 12px 20px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logo {
   font-weight: bold;
-  font-size: 22px;
+  font-size: 24px;
   color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 28px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.header-btn {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* HERO SECTION */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.1;
+  animation: zoomIn 20s ease infinite;
+}
+
+@keyframes zoomIn {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.hero-section h1 {
+  font-size: 3em;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-section p {
+  font-size: 1.2em;
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
 }
 
 /* MAIN CONTAINER */
 .container {
-  max-width: 950px;
+  max-width: 1000px;
   margin: 50px auto;
-  background: #fff;
-  padding: 35px;
-  border-radius: 15px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  background: white;
+  padding: 45px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   animation: slideUp 0.6s ease;
 }
 
@@ -56,37 +141,117 @@ header {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* HEADINGS */
-h1 {
+/* LAST UPDATED */
+.last-updated {
   text-align: center;
-  font-size: 2.4em;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+/* TERMS SECTIONS */
+.terms-section {
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.terms-section:hover {
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.terms-section h2 {
+  color: #ff7f50;
+  margin-bottom: 15px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.terms-section h2 i {
+  font-size: 24px;
+}
+
+.terms-section p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.terms-section ul {
+  margin-left: 20px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.terms-section li {
+  margin-bottom: 8px;
+}
+
+/* HIGHLIGHT BOX */
+.highlight-box {
+  background: linear-gradient(135deg, #fff5f2, #fff);
+  border-left: 4px solid #ff7f50;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.highlight-box i {
+  color: #ff7f50;
+  margin-right: 10px;
+}
+
+/* CONTACT SECTION */
+.contact-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 16px;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.contact-section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.contact-section p {
+  color: rgba(255,255,255,0.9);
   margin-bottom: 20px;
 }
 
-h2 {
-  font-size: 1.4em;
-  margin-top: 25px;
-  color: #444;
+.contact-email {
+  background: rgba(255,255,255,0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-/* TEXT */
-p {
-  color: #555;
-  line-height: 1.7;
-  margin-bottom: 15px;
+.contact-email:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
 }
 
-/* LIST */
-ul {
-  margin-bottom: 15px;
-  padding-left: 20px;
-}
-
-li {
-  margin: 6px 0;
-}
-
-/* BUTTON STYLE */
+/* BUTTON */
 .btn {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
   padding: 12px 25px;
@@ -100,10 +265,11 @@ li {
   border: none;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+  transition: all 0.3s ease;
 }
 
 .btn:hover {
-  transform: translateY(-4px) scale(1.05);
+  transform: translateY(-3px);
   box-shadow: 0 15px 35px rgba(255,127,80,0.6);
 }
 
@@ -113,77 +279,271 @@ li {
   margin: 30px auto 0;
   width: fit-content;
 }
-</style>
 
+/* FOOTER */
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  text-align: center;
+  padding: 30px;
+  margin-top: 50px;
+}
+
+footer p {
+  color: #888;
+  margin-top: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2em;
+  }
+  
+  .container {
+    padding: 25px;
+    margin: 30px 20px;
+  }
+  
+  .terms-section {
+    padding: 20px;
+  }
+  
+  .terms-section h2 {
+    font-size: 20px;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 1.5em;
+  }
+  
+  .terms-section h2 {
+    font-size: 18px;
+  }
+  
+  .contact-section h3 {
+    font-size: 18px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">NA Studio Photography</div>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    NA Studio Photography
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/cart" class="header-btn">
+      <i class="fas fa-shopping-cart"></i> Cart
+    </a>
+  </div>
 </header>
 
-<div class="container">
-
+<div class="hero-section">
   <h1>📜 Terms & Conditions</h1>
+  <p>Please read these terms carefully before using our services</p>
+</div>
 
-  <p>
-    Welcome to NA Photography Studio. Please read these Terms & Conditions carefully before using our services.
-    By accessing or using our website, you agree to be bound by these terms.
-  </p>
+<div class="container">
+  
+  <div class="last-updated">
+    <i class="fas fa-clock"></i> Last Updated: January 2026
+  </div>
 
-  <h2>📖 1. Definitions</h2>
-  <ul>
-    <li><strong>Studio</strong>: NA Photography Studio and its services.</li>
-    <li><strong>Client</strong>: Any user using our services.</li>
-    <li><strong>Services</strong>: Photography sessions, packages, and offerings.</li>
-  </ul>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-check-circle"></i>
+      1. Acceptance of Terms
+    </h2>
+    <p>
+      Welcome to NA Photography Studio. By accessing or using our website and services, you agree to be bound by these Terms & Conditions. 
+      If you do not agree with any part of these terms, please do not use our services. These terms apply to all visitors, users, and clients.
+    </p>
+  </div>
 
-  <h2>💳 2. Booking and Payments</h2>
-  <p>
-    All bookings must be confirmed via our platform. Payments must be completed based on the selected package.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-book"></i>
+      2. Definitions
+    </h2>
+    <ul>
+      <li><strong>"Studio"</strong> refers to NA Photography Studio and its services, employees, and representatives.</li>
+      <li><strong>"Client"</strong> refers to any individual or entity using our services or website.</li>
+      <li><strong>"Services"</strong> include photography sessions, package bookings, consultations, and related offerings.</li>
+      <li><strong>"Platform"</strong> refers to our website and any associated applications.</li>
+    </ul>
+  </div>
 
-  <h2>❌ 3. Cancellation and Refunds</h2>
-  <p>
-    Cancellation policies vary by package. Refunds may include charges depending on timing and conditions.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-credit-card"></i>
+      3. Booking and Payments
+    </h2>
+    <p>
+      All bookings must be confirmed through our official platform. A booking is considered confirmed only after successful payment or deposit as specified in the package.
+    </p>
+    <ul>
+      <li>Full payment or advance deposit is required to secure your booking</li>
+      <li>Prices are subject to change without prior notice</li>
+      <li>Any additional services requested on-site will be billed separately</li>
+      <li>Payment methods accepted: UPI, Credit/Debit Cards, Cash on Service</li>
+    </ul>
+  </div>
 
-  <h2>⏰ 4. Responsibilities</h2>
-  <p>
-    Clients must arrive on time. We may reschedule sessions due to unforeseen situations.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-calendar-times"></i>
+      4. Cancellation and Refund Policy
+    </h2>
+    <p>
+      Cancellation policies vary by package. Please review the specific terms for your selected package:
+    </p>
+    <ul>
+      <li><strong>Cancellation 30+ days before event:</strong> 90% refund</li>
+      <li><strong>Cancellation 15-29 days before event:</strong> 50% refund</li>
+      <li><strong>Cancellation 7-14 days before event:</strong> 25% refund</li>
+      <li><strong>Cancellation less than 7 days:</strong> No refund</li>
+      <li>Deposits are non-refundable for custom packages</li>
+    </ul>
+    <div class="highlight-box">
+      <i class="fas fa-info-circle"></i>
+      <strong>Note:</strong> Rescheduling is allowed once free of charge with at least 14 days notice. Additional rescheduling may incur fees.
+    </div>
+  </div>
 
-  <h2>📸 5. Intellectual Property</h2>
-  <p>
-    All photos remain property of NA Studio. Clients can use images personally but not commercially without permission.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-clock"></i>
+      5. Client Responsibilities
+    </h2>
+    <p>
+      Clients are responsible for:
+    </p>
+    <ul>
+      <li>Arriving on time for scheduled sessions</li>
+      <li>Providing accurate information for bookings</li>
+      <li>Securing necessary permissions for location shoots</li>
+      <li>Informing us of any special requirements or restrictions</li>
+      <li>Ensuring a safe environment during photoshoots</li>
+    </ul>
+    <p>
+      The Studio reserves the right to cancel or reschedule sessions due to client lateness beyond 30 minutes.
+    </p>
+  </div>
 
-  <h2>🔒 6. Privacy</h2>
-  <p>
-    We respect your data and privacy. Refer to our Privacy Policy for details.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-copyright"></i>
+      6. Intellectual Property Rights
+    </h2>
+    <p>
+      All photographs, images, and creative content produced by NA Photography Studio remain the intellectual property of the Studio.
+    </p>
+    <ul>
+      <li>Clients receive a personal license to use images for non-commercial purposes</li>
+      <li>Commercial use requires explicit written permission and may incur additional fees</li>
+      <li>The Studio retains the right to use images for portfolio, marketing, and promotional purposes</li>
+      <li>Editing or altering photos without permission is prohibited</li>
+    </ul>
+  </div>
 
-  <h2>⚠️ 7. Limitation of Liability</h2>
-  <p>
-    We are not responsible for damages or losses beyond legal limits.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-lock"></i>
+      7. Privacy and Data Protection
+    </h2>
+    <p>
+      We respect your privacy and are committed to protecting your personal information. Our data practices are outlined in our Privacy Policy.
+    </p>
+    <ul>
+      <li>We collect only necessary information for service delivery</li>
+      <li>Your data is never sold or shared with third parties for marketing</li>
+      <li>You may request deletion of your account and data at any time</li>
+    </ul>
+  </div>
 
-  <h2>🔄 8. Changes to Terms</h2>
-  <p>
-    Terms may change anytime. Continued use means acceptance.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-exclamation-triangle"></i>
+      8. Limitation of Liability
+    </h2>
+    <p>
+      To the maximum extent permitted by law, NA Photography Studio shall not be liable for:
+    </p>
+    <ul>
+      <li>Indirect, incidental, or consequential damages</li>
+      <li>Loss of profits, data, or business opportunities</li>
+      <li>Delays or failures caused by circumstances beyond our control (force majeure)</li>
+    </ul>
+    <p>
+      Our total liability is limited to the amount paid by the client for the specific service in question.
+    </p>
+  </div>
 
-  <h2>⚖️ 9. Governing Law</h2>
-  <p>
-    These terms are governed by the laws of Maharashtra, India.
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-sync-alt"></i>
+      9. Modifications to Terms
+    </h2>
+    <p>
+      We reserve the right to update or modify these Terms & Conditions at any time without prior notice. 
+      Changes become effective immediately upon posting on this page. Continued use of our services constitutes acceptance of the modified terms.
+    </p>
+  </div>
 
-  <h2>📩 10. Contact Us</h2>
-  <p>
-    For queries, contact:
-    <a href="mailto:info@naphotography.com">info@naphotography.com</a>
-  </p>
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-gavel"></i>
+      10. Governing Law
+    </h2>
+    <p>
+      These Terms & Conditions shall be governed by and construed in accordance with the laws of Maharashtra, India. 
+      Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in Thane, Maharashtra.
+    </p>
+  </div>
+
+  <div class="terms-section">
+    <h2>
+      <i class="fas fa-envelope"></i>
+      11. Contact Information
+    </h2>
+    <p>
+      If you have any questions about these Terms & Conditions, please contact us:
+    </p>
+    <ul>
+      <li><strong>Email:</strong> terms@nastudio.com</li>
+      <li><strong>Phone:</strong> +91 98765 43210</li>
+      <li><strong>Address:</strong> Thane, Maharashtra, India</li>
+    </ul>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="contact-section">
+    <h3>
+      <i class="fas fa-headset"></i>
+      Need Help?
+    </h3>
+    <p>
+      If you have any questions or concerns about our Terms & Conditions, our support team is here to help.
+    </p>
+    <a href="mailto:support@nastudio.com" class="contact-email">
+      <i class="fas fa-envelope"></i> support@nastudio.com
+    </a>
+  </div>
 
   <!-- BACK BUTTON -->
   <a href="/home" class="btn btn-home">
@@ -191,6 +551,10 @@ li {
   </a>
 
 </div>
+
+<footer>
+  <p>&copy; 2026 NA Photography Studio. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
 
 </body>
 </html>

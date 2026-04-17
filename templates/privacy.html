@@ -2,16 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Privacy Policy - NA Photography Studio</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
-body {
-  font-family: 'Arial', sans-serif;
+* {
   margin: 0;
-  background: #f4f4f4;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   animation: fadeIn 0.8s ease-in;
+  min-height: 100vh;
 }
 
 /* GLOBAL */
@@ -26,28 +34,105 @@ body {
 
 /* HEADER */
 header {
-  background: #fff;
-  padding: 12px 20px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logo {
   font-weight: bold;
-  font-size: 22px;
+  font-size: 24px;
   color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 28px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.header-btn {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* HERO SECTION */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.1;
+  animation: zoomIn 20s ease infinite;
+}
+
+@keyframes zoomIn {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.hero-section h1 {
+  font-size: 3em;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-section p {
+  font-size: 1.2em;
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
 }
 
 /* MAIN CONTAINER */
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 50px auto;
-  background: #fff;
-  padding: 35px;
-  border-radius: 15px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  background: white;
+  padding: 45px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   animation: slideUp 0.6s ease;
 }
 
@@ -56,26 +141,117 @@ header {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* HEADINGS */
-h1 {
+/* LAST UPDATED */
+.last-updated {
   text-align: center;
-  font-size: 2.4em;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+/* POLICY SECTIONS */
+.policy-section {
+  margin-bottom: 35px;
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 25px;
+  transition: all 0.3s ease;
+}
+
+.policy-section:hover {
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.policy-section h2 {
+  color: #ff7f50;
+  margin-bottom: 15px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.policy-section h2 i {
+  font-size: 28px;
+}
+
+.policy-section p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+.policy-section ul {
+  margin-left: 20px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.policy-section li {
+  margin-bottom: 8px;
+}
+
+/* HIGHLIGHT BOX */
+.highlight-box {
+  background: linear-gradient(135deg, #fff5f2, #fff);
+  border-left: 4px solid #ff7f50;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.highlight-box i {
+  color: #ff7f50;
+  margin-right: 10px;
+}
+
+/* CONTACT SECTION */
+.contact-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 16px;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.contact-section h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.contact-section p {
+  color: rgba(255,255,255,0.9);
   margin-bottom: 20px;
 }
 
-h2 {
-  margin-top: 25px;
-  color: #444;
+.contact-email {
+  background: rgba(255,255,255,0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
-/* TEXT */
-p {
-  color: #555;
-  line-height: 1.7;
-  margin-bottom: 15px;
+.contact-email:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
 }
 
-/* BUTTON (same as home) */
+/* BUTTON */
 .btn {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
   padding: 12px 25px;
@@ -89,10 +265,11 @@ p {
   border: none;
   cursor: pointer;
   box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+  transition: all 0.3s ease;
 }
 
 .btn:hover {
-  transform: translateY(-4px) scale(1.05);
+  transform: translateY(-3px);
   box-shadow: 0 15px 35px rgba(255,127,80,0.6);
 }
 
@@ -102,46 +279,242 @@ p {
   margin: 30px auto 0;
   width: fit-content;
 }
-</style>
 
+/* FOOTER */
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  text-align: center;
+  padding: 30px;
+  margin-top: 50px;
+}
+
+footer p {
+  color: #888;
+  margin-top: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 2em;
+  }
+  
+  .container {
+    padding: 25px;
+    margin: 30px 20px;
+  }
+  
+  .policy-section {
+    padding: 20px;
+  }
+  
+  .policy-section h2 {
+    font-size: 20px;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 1.5em;
+  }
+  
+  .policy-section h2 {
+    font-size: 18px;
+  }
+  
+  .contact-section h3 {
+    font-size: 18px;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">NA Studio Photography</div>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    NA Studio Photography
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/cart" class="header-btn">
+      <i class="fas fa-shopping-cart"></i> Cart
+    </a>
+  </div>
 </header>
 
-<div class="container">
-
+<div class="hero-section">
   <h1>🔒 Privacy Policy</h1>
+  <p>Your privacy matters to us</p>
+</div>
 
-  <p>
-    At NA Photography Studio, your privacy is extremely important to us. 
-    We are committed to protecting your personal information and ensuring a safe experience on our platform.
-  </p>
+<div class="container">
+  
+  <div class="last-updated">
+    <i class="fas fa-clock"></i> Last Updated: January 2026
+  </div>
 
-  <h2>📌 Information We Collect</h2>
-  <p>
-    We only collect the necessary details such as your name, email, and account information 
-    to provide our photography services efficiently.
-  </p>
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-info-circle"></i>
+      Introduction
+    </h2>
+    <p>
+      At NA Photography Studio, your privacy is extremely important to us. 
+      We are committed to protecting your personal information and ensuring a safe experience on our platform.
+      This Privacy Policy explains how we collect, use, and safeguard your information when you use our services.
+    </p>
+  </div>
 
-  <h2>🛡️ How We Use Your Data</h2>
-  <p>
-    Your data is used strictly for improving user experience, managing bookings, and enhancing our services.
-    We do NOT sell or share your data with third parties.
-  </p>
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-database"></i>
+      Information We Collect
+    </h2>
+    <p>
+      We only collect the necessary details to provide our photography services efficiently:
+    </p>
+    <ul>
+      <li><strong>Personal Information:</strong> Name, email address, phone number, and account credentials</li>
+      <li><strong>Booking Details:</strong> Event date, location, package preferences, and special requests</li>
+      <li><strong>Payment Information:</strong> Transaction details (we do not store full payment credentials)</li>
+      <li><strong>Usage Data:</strong> How you interact with our website and services</li>
+    </ul>
+  </div>
 
-  <h2>🍪 Cookies & Tracking</h2>
-  <p>
-    We use cookies and analytics tools to understand user behavior and improve our website performance.
-  </p>
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-shield-alt"></i>
+      How We Use Your Data
+    </h2>
+    <p>
+      Your data is used strictly for the following purposes:
+    </p>
+    <ul>
+      <li>Processing and managing your bookings and orders</li>
+      <li>Improving user experience and website functionality</li>
+      <li>Sending important updates about your bookings</li>
+      <li>Responding to your inquiries and support requests</li>
+      <li>Enhancing our services based on user feedback</li>
+    </ul>
+    <div class="highlight-box">
+      <i class="fas fa-check-circle"></i>
+      <strong>We do NOT sell, rent, or share your personal data with third parties for marketing purposes.</strong>
+    </div>
+  </div>
 
-  <h2>✅ Your Consent</h2>
-  <p>
-    By using our website, you agree to our privacy policy and terms of service.
-  </p>
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-cookie-bite"></i>
+      Cookies & Tracking
+    </h2>
+    <p>
+      We use cookies and similar tracking technologies to enhance your browsing experience. 
+      Cookies help us understand user behavior, remember your preferences, and improve our website performance.
+    </p>
+    <ul>
+      <li><strong>Essential Cookies:</strong> Required for basic website functionality</li>
+      <li><strong>Analytics Cookies:</strong> Help us understand how visitors use our site</li>
+      <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+    </ul>
+    <p>
+      You can control cookie settings through your browser preferences. However, disabling cookies may affect certain website features.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-lock"></i>
+      Data Security
+    </h2>
+    <p>
+      We implement industry-standard security measures to protect your personal information from unauthorized access, 
+      alteration, disclosure, or destruction. These measures include:
+    </p>
+    <ul>
+      <li>Secure SSL encryption for data transmission</li>
+      <li>Regular security audits and updates</li>
+      <li>Restricted access to personal data</li>
+      <li>Secure password hashing and storage</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-user-check"></i>
+      Your Rights & Choices
+    </h2>
+    <p>
+      You have the following rights regarding your personal information:
+    </p>
+    <ul>
+      <li><strong>Access:</strong> Request a copy of your personal data</li>
+      <li><strong>Correction:</strong> Update or correct inaccurate information</li>
+      <li><strong>Deletion:</strong> Request deletion of your account and data</li>
+      <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
+    </ul>
+    <p>
+      To exercise any of these rights, please contact us using the information provided below.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-child"></i>
+      Children's Privacy
+    </h2>
+    <p>
+      Our services are not directed to individuals under the age of 13. We do not knowingly collect personal information 
+      from children. If you believe a child has provided us with personal information, please contact us immediately.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-gavel"></i>
+      Changes to This Policy
+    </h2>
+    <p>
+      We may update this Privacy Policy from time to time to reflect changes in our practices or for legal compliance. 
+      We will notify you of any material changes by posting the new policy on this page and updating the "Last Updated" date.
+      We encourage you to review this policy periodically.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-check-circle"></i>
+      Your Consent
+    </h2>
+    <p>
+      By using our website and services, you consent to the terms of this Privacy Policy and agree to our data practices 
+      as described above. If you do not agree with any part of this policy, please do not use our services.
+    </p>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="contact-section">
+    <h3>
+      <i class="fas fa-envelope"></i>
+      Contact Us
+    </h3>
+    <p>
+      If you have any questions about this Privacy Policy or our data practices, please reach out to us:
+    </p>
+    <a href="mailto:privacy@nastudio.com" class="contact-email">
+      <i class="fas fa-envelope"></i> privacy@nastudio.com
+    </a>
+  </div>
 
   <!-- BACK BUTTON -->
   <a href="/home" class="btn btn-home">
@@ -149,6 +522,10 @@ p {
   </a>
 
 </div>
+
+<footer>
+  <p>&copy; 2026 NA Photography Studio. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
 
 </body>
 </html>

@@ -2,99 +2,453 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Checkout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - NA Photography Studio</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin: 0;
+  min-height: 100vh;
+  padding: 20px;
 }
 
 .container {
-  max-width: 720px;
+  max-width: 900px;
   margin: 40px auto;
   background: white;
-  padding: 30px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
   animation: fadeIn 0.6s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-h1 {
+/* HEADER */
+.checkout-header {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: 25px 30px;
   text-align: center;
-  margin-bottom: 25px;
 }
 
-.item {
-  border-bottom: 1px solid #eee;
-  padding: 15px 0;
+.checkout-header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.checkout-header h1 i {
+  font-size: 32px;
+}
+
+.checkout-header p {
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+/* CONTENT */
+.checkout-content {
+  padding: 30px;
+}
+
+/* ORDER SUMMARY */
+.order-summary {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.order-summary h3 {
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.order-summary h3 i {
+  color: #ff7f50;
+}
+
+/* ITEMS LIST */
+.items-list {
+  margin-bottom: 20px;
+}
+
+.item-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.item-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff7f50;
+}
+
+.item-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-name i {
+  color: #ff7f50;
+}
+
+.item-price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff7f50;
+}
+
+.item-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.detail-row i {
+  width: 24px;
+  color: #ff7f50;
+  font-size: 16px;
+}
+
+.detail-row strong {
+  color: #555;
+  min-width: 100px;
+}
+
+.detail-row span {
+  color: #333;
+}
+
+.date-input {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.date-input label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.date-input input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+  max-width: 250px;
   transition: all 0.3s ease;
 }
 
-.item:hover {
-  background: #fafafa;
+.date-input input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.3);
+}
+
+/* TOTAL SECTION */
+.total-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.total-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.total-label {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+.total-amount {
+  font-size: 32px;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.total-breakdown {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Convert total to float for calculations */
+{% set total_float = total|float %}
+
+/* PAYMENT SECTION */
+.payment-section {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.payment-section h3 {
+  color: #333;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.payment-section h3 i {
+  color: #ff7f50;
+}
+
+.payment-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.payment-option {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-option:hover {
+  border-color: #ff7f50;
   transform: translateY(-2px);
 }
 
-.item p {
-  margin: 6px 0;
-  font-size: 14px;
+.payment-option.selected {
+  border-color: #ff7f50;
+  background: linear-gradient(135deg, #fff5f2, #fff);
 }
 
-.total {
-  text-align: right;
-  font-size: 22px;
-  font-weight: bold;
-  margin-top: 25px;
-  color: #222;
-}
-
-.payment {
-  margin-top: 25px;
-}
-
-.payment label {
-  display: block;
-  margin: 10px 0;
+.payment-option input {
+  margin: 0;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
-  font-size: 14px;
 }
 
-button {
+.payment-option i {
+  font-size: 28px;
+  color: #ff7f50;
+}
+
+.payment-option .payment-info {
+  flex: 1;
+}
+
+.payment-option .payment-info h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.payment-option .payment-info p {
+  font-size: 12px;
+  color: #888;
+}
+
+/* BUTTON */
+.confirm-btn {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   border: none;
-  border-radius: 30px;
-  background: linear-gradient(45deg,#2ecc71,#27ae60);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
   font-weight: bold;
+  font-size: 18px;
   cursor: pointer;
-  margin-top: 25px;
-  font-size: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(46,204,113,0.3);
+}
+
+.confirm-btn:active {
+  transform: scale(0.98);
+}
+
+.confirm-btn i {
+  font-size: 20px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #ff7f50;
+  margin-bottom: 20px;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
-button:hover {
-  transform: scale(1.02);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+.back-btn:hover {
+  transform: translateX(-5px);
+  color: #ff6347;
 }
 
-.date-box {
-  margin-top: 8px;
+/* EMPTY CART */
+.empty-cart {
+  text-align: center;
+  padding: 60px 20px;
 }
 
-input[type="date"] {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-  width: 200px;
+.empty-cart i {
+  font-size: 80px;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-cart h3 {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.empty-cart p {
+  color: #999;
+  margin-bottom: 30px;
+}
+
+.shop-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.shop-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255,127,80,0.3);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+  }
+  
+  .checkout-content {
+    padding: 20px;
+  }
+  
+  .item-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .total-amount {
+    font-size: 24px;
+  }
+  
+  .checkout-header h1 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .detail-row strong {
+    min-width: auto;
+  }
 }
 </style>
 </head>
@@ -102,54 +456,220 @@ input[type="date"] {
 <body>
 
 <div class="container">
-  <h1>Checkout</h1>
+  <div class="checkout-header">
+    <h1>
+      <i class="fas fa-credit-card"></i>
+      Checkout
+    </h1>
+    <p>Review your order and confirm booking</p>
+  </div>
 
-<form action="{{ url_for('checkout') }}" method="POST">
+  <div class="checkout-content">
+    <a href="/cart" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Cart
+    </a>
 
-  {% for item in items %}
-  <div class="item">
-
-    <p><strong>{{ item.package_name }}</strong></p>
-    <p>💰 Price: ₹{{ item.package_price }}</p>
-    <p>📦 Quantity: {{ item.quantity }}</p>
-    <p>📍 Location: <strong>{{ item.location if item.location else "Not set" }}</strong></p>
-    <p>📸 Photographer: <strong>{{ item.photographer_name if item.photographer_name else "Not assigned" }}</strong></p>
-
-    <div class="date-box">
-      <label>📅 Scheduled Date:</label><br>
-      <input 
-        type="date" 
-        name="scheduled_date_{{ item.cart_id }}" 
-        value="{{ item.scheduled_date if item.scheduled_date else '' }}"
-        required>
+    {% if items and items|length > 0 %}
+    
+    <div class="order-summary">
+      <h3>
+        <i class="fas fa-shopping-bag"></i>
+        Order Summary
+      </h3>
+      
+      <div class="items-list">
+        {% for item in items %}
+        <div class="item-card">
+          <div class="item-header">
+            <div class="item-name">
+              <i class="fas fa-camera"></i>
+              {{ item.package_name }}
+            </div>
+            <div class="item-price">
+              ₹{{ "%.2f"|format(item.package_price|float) }}
+            </div>
+          </div>
+          
+          <div class="item-details">
+            <div class="detail-row">
+              <i class="fas fa-cubes"></i>
+              <strong>Quantity:</strong>
+              <span>{{ item.quantity }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-map-marker-alt"></i>
+              <strong>Location:</strong>
+              <span>{{ item.location if item.location else 'Not set' }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-camera-retro"></i>
+              <strong>Photographer:</strong>
+              <span>{{ item.photographer_name if item.photographer_name else 'Not assigned' }}</span>
+            </div>
+          </div>
+          
+          <div class="date-input">
+            <label>
+              <i class="fas fa-calendar-alt"></i>
+              Scheduled Date <span style="color: #ff7f50;">*</span>
+            </label>
+            <input 
+              type="date" 
+              name="scheduled_date_{{ item.cart_id }}" 
+              value="{{ item.scheduled_date if item.scheduled_date else '' }}"
+              required>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
 
+    <form action="{{ url_for('checkout') }}" method="POST" id="checkoutForm">
+      <!-- Convert total to float for calculations -->
+      {% set total_float = total|float %}
+      
+      <!-- Total Section -->
+      <div class="total-section">
+        <div class="total-details">
+          <div>
+            <div class="total-label">Total Amount</div>
+            <div class="total-amount">₹{{ "%.2f"|format(total_float) }}</div>
+          </div>
+          <div>
+            <i class="fas fa-receipt" style="font-size: 48px; opacity: 0.5;"></i>
+          </div>
+        </div>
+        <div class="total-breakdown">
+          <div class="breakdown-row">
+            <span>Subtotal:</span>
+            <span>₹{{ "%.2f"|format(total_float) }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>GST (18%):</span>
+            <span>₹{{ "%.2f"|format(total_float * 0.18) }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span>Service Charge (5%):</span>
+            <span>₹{{ "%.2f"|format(total_float * 0.05) }}</span>
+          </div>
+          <div class="breakdown-row" style="font-weight: bold; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <span>Grand Total:</span>
+            <span>₹{{ "%.2f"|format(total_float * 1.23) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="payment-section">
+        <h3>
+          <i class="fas fa-wallet"></i>
+          Select Payment Method
+        </h3>
+        
+        <div class="payment-options">
+          <label class="payment-option" id="upiOption">
+            <input type="radio" name="payment" value="UPI" required>
+            <i class="fab fa-google-pay"></i>
+            <div class="payment-info">
+              <h4>UPI / Google Pay</h4>
+              <p>Pay using any UPI app</p>
+            </div>
+          </label>
+          
+          <label class="payment-option" id="cardOption">
+            <input type="radio" name="payment" value="Card">
+            <i class="fas fa-credit-card"></i>
+            <div class="payment-info">
+              <h4>Debit / Credit Card</h4>
+              <p>Visa, Mastercard, RuPay</p>
+            </div>
+          </label>
+          
+          <label class="payment-option" id="cashOption">
+            <input type="radio" name="payment" value="Cash">
+            <i class="fas fa-money-bill-wave"></i>
+            <div class="payment-info">
+              <h4>Cash on Service</h4>
+              <p>Pay at the time of service</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="confirm-btn">
+        <i class="fas fa-check-circle"></i>
+        Confirm Booking
+      </button>
+    </form>
+
+    {% else %}
+    <div class="empty-cart">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>Your cart is empty</h3>
+      <p>Add some packages to your cart before checking out</p>
+      <a href="/home" class="shop-btn">
+        <i class="fas fa-shopping-bag"></i> Browse Packages
+      </a>
+    </div>
+    {% endif %}
+
   </div>
-  {% endfor %}
-
-  <p class="total">Total: ₹{{ total }}</p>
-
-  <div class="payment">
-    <h3>Select Payment Method</h3>
-
-    <label>
-      <input type="radio" name="payment" value="UPI" required> UPI
-    </label>
-
-    <label>
-      <input type="radio" name="payment" value="Card"> Debit/Credit Card
-    </label>
-
-    <label>
-      <input type="radio" name="payment" value="Cash"> Cash on Service
-    </label>
-  </div>
-
-  <!-- ✅ ONLY ONE BUTTON -->
-  <button type="submit">Confirm Booking</button>
-
-</form>
 </div>
+
+<script>
+// Payment option selection styling
+document.querySelectorAll('.payment-option').forEach(option => {
+  const radio = option.querySelector('input[type="radio"]');
+  
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.payment-option').forEach(opt => {
+      opt.classList.remove('selected');
+    });
+    if (this.checked) {
+      option.classList.add('selected');
+    }
+  });
+  
+  option.addEventListener('click', function(e) {
+    if (e.target !== radio) {
+      radio.checked = true;
+      document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.classList.remove('selected');
+      });
+      option.classList.add('selected');
+    }
+  });
+});
+
+// Form validation
+document.getElementById('checkoutForm')?.addEventListener('submit', function(e) {
+  const selectedPayment = document.querySelector('input[name="payment"]:checked');
+  if (!selectedPayment) {
+    e.preventDefault();
+    alert('Please select a payment method');
+    return false;
+  }
+  
+  const dateInputs = document.querySelectorAll('input[type="date"]');
+  let allDatesFilled = true;
+  dateInputs.forEach(input => {
+    if (!input.value) {
+      allDatesFilled = false;
+    }
+  });
+  
+  if (!allDatesFilled) {
+    e.preventDefault();
+    alert('Please select scheduled dates for all packages');
+    return false;
+  }
+  
+  // Show loading state
+  const submitBtn = document.querySelector('.confirm-btn');
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  submitBtn.disabled = true;
+});
+</script>
 
 </body>
 </html>

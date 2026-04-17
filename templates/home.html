@@ -9,13 +9,18 @@
 
 <style>
 /* BASE */
-body {
-  font-family: 'Arial', sans-serif;
+* {
   margin: 0;
-  background: #f4f4f4;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: #f8f9fa;
   animation: fadeIn 0.8s ease;
 }
-* { transition: all 0.25s ease; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
@@ -24,9 +29,9 @@ body {
 
 /* HEADER */
 header {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.95);
   backdrop-filter: blur(10px);
-  padding: 12px 20px;
+  padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -35,10 +40,18 @@ header {
   top: 0;
   z-index: 1000;
 }
+
 .logo {
   font-weight: bold;
-  font-size: 22px;
+  font-size: 24px;
   color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: 28px;
 }
 
 /* ICON BUTTONS */
@@ -47,17 +60,21 @@ header {
   border: none;
   font-size: 1.2em;
   cursor: pointer;
-  padding: 10px;
+  padding: 10px 14px;
   border-radius: 50%;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   margin-left: 8px;
+  transition: all 0.3s ease;
 }
+
 .icon-button:hover {
   background: linear-gradient(45deg, #ff7f50, #ff6347);
   color: white;
-  transform: scale(1.15);
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(255,127,80,0.3);
 }
-.icon-button:active { transform: scale(0.9); }
+
+.icon-button:active { transform: scale(0.95); }
 
 /* PROFILE MENU */
 .profile-menu {
@@ -68,59 +85,97 @@ header {
   background: white;
   border-radius: 12px;
   padding: 10px;
-  min-width: 170px;
+  min-width: 200px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   animation: dropdownAnim 0.25s ease;
+  z-index: 1001;
 }
+
 @keyframes dropdownAnim {
   from { opacity: 0; transform: translateY(-10px) scale(0.95); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 .profile-menu a {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
-  color: black;
-  padding: 12px;
+  color: #333;
+  padding: 12px 15px;
   border-radius: 10px;
   margin: 6px 0;
-  background: #f5f5f5;
-  font-weight: bold;
+  background: #f8f9fa;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
+
 .profile-menu a:hover {
   background: linear-gradient(45deg, #ff7f50, #ff6347);
   color: white;
-  transform: translateX(6px);
+  transform: translateX(5px);
 }
 
+.profile-menu a i {
+  width: 20px;
+}
+
+/* HERO SECTION */
 .hero {
   position: relative;
-  background: url("{{ url_for('static', filename='images/background.jpg') }}") center/cover no-repeat;
-  height: 80vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 85vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
-.hero::after {
+
+.hero::before {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.55);
+  background: url('https://images.unsplash.com/photo-1452587925148-ce544e77e70d?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.3;
+  animation: zoomIn 20s ease infinite;
 }
+
+@keyframes zoomIn {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 .hero-overlay {
   position: relative;
   z-index: 2;
   text-align: center;
   color: white;
+  padding: 20px;
 }
-.hero-overlay h1 { font-size: 3em; margin-bottom: 20px; }
+
+.hero-overlay h1 {
+  font-size: 3.5em;
+  margin-bottom: 20px;
+  animation: slideUp 0.8s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-overlay p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
 
 /* BUTTON */
 .btn {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
-  padding: 12px 24px;
+  padding: 12px 28px;
   color: white;
   border-radius: 30px;
   text-decoration: none;
@@ -131,110 +186,393 @@ header {
   border: none;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(255,127,80,0.35);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.3s ease;
+  font-size: 16px;
 }
-.btn::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: -100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255,127,80,0.5);
 }
-.btn:hover::after { left: 100%; transition: 0.6s; }
-.btn:hover { transform: translateY(-4px) scale(1.04); box-shadow: 0 12px 30px rgba(255,127,80,0.5); }
+
 .btn:active { transform: scale(0.95); }
 
-section { padding: 50px 20px; }
-.search-bar input {
-  padding: 12px;
-  width: 300px;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-}
-.search-bar input:focus {
-  border-color: #ff7f50;
-  box-shadow: 0 0 10px rgba(255,127,80,0.4);
+section {
+  padding: 60px 30px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.grid {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  padding: 20px 10px;
-}
-.grid::-webkit-scrollbar { height: 6px; }
-.grid::-webkit-scrollbar-thumb { background: #ff7f50; border-radius: 10px; }
-
-.card {
-  flex: 0 0 260px;
-  background: white;
-  padding: 15px;
-  border-radius: 15px;
+.section-title {
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-.card:hover { transform: translateY(-10px); box-shadow: 0 18px 35px rgba(0,0,0,0.15); }
-.card img { width: 100%; height: 160px; border-radius: 10px; object-fit: cover; }
-.card p { color: #555; }
-
-/* STARS */
-.star { color: #FFD700; }
-.star.gray { color: #ccc; }
-
-footer {
-  background: #111;
-  color: white;
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  border-top: 3px solid #ff7f50;
-  box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
-  transition: background 0.3s ease;
-}
-footer:hover {
-  background: #222;
-}
-.footer-container {
-  display: flex;
-  flex-direction: row; /* row-wise layout */
+  font-size: 2.5em;
+  margin-bottom: 40px;
+  color: #333;
+  position: relative;
+  display: inline-block;
   width: 100%;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  border-radius: 3px;
+}
+
+/* SEARCH BAR */
+.search-bar {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.search-bar input {
+  padding: 14px 20px;
+  width: 350px;
+  border-radius: 30px;
+  border: 2px solid #e0e0e0;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 15px rgba(255,127,80,0.3);
+  width: 400px;
+}
+
+/* SLIDER CONTAINER */
+.slider-container {
+  position: relative;
+  padding: 0 50px;
+}
+
+.slider-wrapper {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  border-radius: 20px;
+}
+
+.slider {
+  display: flex;
+  gap: 30px;
+  transition: transform 0.5s ease;
+  padding: 20px 0;
+}
+
+/* SLIDER CARDS */
+.slider-card {
+  flex: 0 0 320px;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.slider-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.slider-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.slider-card:hover img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.card-content h3 {
+  font-size: 1.3em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.card-content p {
+  color: #666;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-content p i {
+  color: #ff7f50;
+  width: 20px;
+}
+
+.price {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #ff7f50;
+  margin: 10px 0;
+}
+
+.slider-card .btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 15px;
+  padding: 10px;
+}
+
+/* NAVIGATION ARROWS */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.nav-arrow:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 25px rgba(255,127,80,0.4);
+}
+
+.nav-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.nav-arrow.prev {
+  left: 0;
+}
+
+.nav-arrow.next {
+  right: 0;
+}
+
+/* REVIEWS SLIDER - Smaller Cards */
+.reviews-slider .slider-card {
+  flex: 0 0 300px;
+}
+
+.reviews-slider .slider-card img {
+  display: none;
+}
+
+.reviews-slider .card-content {
+  padding: 25px;
+}
+
+.review-rating {
+  margin: 10px 0;
+}
+
+.star {
+  color: #FFD700;
+  font-size: 14px;
+}
+
+.review-text {
+  font-style: italic;
+  line-height: 1.6;
+  margin: 15px 0;
+  color: #555;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.review-author i {
+  font-size: 40px;
+  color: #ff7f50;
+}
+
+.review-author-info h4 {
+  font-size: 1em;
+  margin-bottom: 5px;
+}
+
+.review-author-info p {
+  font-size: 0.85em;
+  color: #999;
+  margin: 0;
+}
+
+/* TOAST NOTIFICATION */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #28a745;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  z-index: 2000;
+  animation: slideInRight 0.3s ease;
+  font-weight: 500;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.error {
+  background: #dc3545;
+}
+
+/* FOOTER */
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 40px 30px;
+  margin-top: 60px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  gap: 20px;
 }
+
 .footer-left, .footer-right {
   display: flex;
-  gap: 15px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
+
 footer a {
   color: #ccc;
   text-decoration: none;
   font-size: 14px;
   padding: 8px 16px;
   border-radius: 25px;
-  background: #222;
-  transition: background 0.3s, transform 0.2s;
+  background: rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
+
 footer a:hover {
   background: linear-gradient(45deg, #ff7f50, #ff6347);
   color: #fff;
   transform: translateY(-2px);
 }
-.footer-btn {
-  font-weight: 600;
-  display: inline-block;
-}
+
 .work-with-us {
-  font-weight: bold;
   background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: #fff;
 }
-.dev-link {
-  font-weight: 600;
+
+.copyright {
+  text-align: center;
+  padding-top: 30px;
+  margin-top: 30px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+  color: #888;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .hero-overlay h1 {
+    font-size: 2em;
+  }
+  
+  section {
+    padding: 40px 20px;
+  }
+  
+  .section-title {
+    font-size: 1.8em;
+  }
+  
+  .slider-container {
+    padding: 0 35px;
+  }
+  
+  .slider-card {
+    flex: 0 0 280px;
+  }
+  
+  .search-bar input {
+    width: 90%;
+  }
+  
+  .search-bar input:focus {
+    width: 90%;
+  }
+  
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-left, .footer-right {
+    justify-content: center;
+  }
+  
+  header {
+    padding: 12px 20px;
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .nav-arrow {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-card {
+    flex: 0 0 260px;
+  }
+  
+  .reviews-slider .slider-card {
+    flex: 0 0 280px;
+  }
 }
 </style>
 </head>
@@ -242,23 +580,33 @@ footer a:hover {
 <body>
 
 <header>
-  <div class="logo">NA Studio Photography</div>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    NA Studio Photography
+  </div>
   <div>
-    <button class="icon-button" id="cartBtn">
+    <button class="icon-button" id="cartBtn" title="Shopping Cart">
       <i class="fas fa-shopping-cart"></i>
     </button>
-    <button class="icon-button" id="ordersBtn" title="Order History">
+    <button class="icon-button" id="ordersBtn" title="My Orders">
       <i class="fas fa-box"></i>
     </button>
 
     <div style="position:relative; display:inline-block;">
-      <button class="icon-button" id="profileBtn">
+      <button class="icon-button" id="profileBtn" title="Profile">
         <i class="fas fa-user"></i>
       </button>
 
       <div class="profile-menu" id="profileMenu">
-        <a href="/edit-profile" class="btn">Edit Profile</a>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="/edit-profile">
+          <i class="fas fa-user-edit"></i> Edit Profile
+        </a>
+        <a href="/orders">
+          <i class="fas fa-shopping-bag"></i> My Orders
+        </a>
+        <a href="/logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
       </div>
     </div>
   </div>
@@ -266,82 +614,125 @@ footer a:hover {
 
 <section class="hero">
   <div class="hero-overlay">
-    <h1>Capture Your Moments With Us!</h1>
-    <a href="/cart" class="btn">
+    <h1>Capture Your Precious Moments</h1>
+    <p>Professional photography services for every special occasion</p>
+    <a href="#packages" class="btn">
       <i class="fas fa-camera"></i> Explore Packages
+      <i class="fas fa-arrow-down"></i>
     </a>
   </div>
 </section>
 
 <section id="packages">
-  <h2 style="text-align:center;">Our Packages</h2>
+  <h2 class="section-title">Our Photography Packages</h2>
 
-  <div class="search-bar" style="text-align:center;">
-    <input type="text" id="searchInput" placeholder="🔍 Search packages..." onkeyup="searchPackages()">
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search packages by name..." onkeyup="filterPackages()">
   </div>
 
-  <div class="grid" id="packageList">
-    {% for p in packages %}
-    <div class="card">
-      <img src="{{ url_for('static', filename='images/' ~ p.image_filename) }}">
-      <h3>{{ p.package_name }}</h3>
-      <p>Price: ₹{{ p.package_price }}</p>
-      <p><b>Duration:</b> {{ p.duration }}</p>
-
-      <button class="btn add-to-cart-btn" data-id="{{ p.package_id }}">
-        <i class="fas fa-cart-plus"></i> Add to Cart
-      </button>
+  <div class="slider-container">
+    <button class="nav-arrow prev" onclick="slidePackages(-1)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    
+    <div class="slider-wrapper" id="packagesWrapper">
+      <div class="slider" id="packagesSlider">
+        {% for p in packages %}
+        <div class="slider-card package-card" data-package-name="{{ p.package_name|lower }}">
+          <img src="{{ url_for('static', filename='images/' ~ p.image_filename) }}" alt="{{ p.package_name }}">
+          <div class="card-content">
+            <h3>{{ p.package_name }}</h3>
+            <p><i class="fas fa-clock"></i> Duration: {{ p.duration }}</p>
+            <p class="price">₹{{ "%.2f"|format(p.package_price) }}</p>
+            <button class="btn add-to-cart-btn" data-id="{{ p.package_id }}" data-name="{{ p.package_name }}">
+              <i class="fas fa-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
-    {% endfor %}
+    
+    <button class="nav-arrow next" onclick="slidePackages(1)">
+      <i class="fas fa-chevron-right"></i>
+    </button>
   </div>
 </section>
 
 <section id="reviews">
-  <h2 style="text-align:center;">Package Ratings & Reviews</h2>
+  <h2 class="section-title">What Our Clients Say</h2>
 
-  <div class="grid">
-    {% for r in package_reviews %}
-    <div class="card">
-      <h3>{{ r.package_name }}</h3>
-      <p><b>{{ r.user_full_name }}</b></p>
+  <div class="slider-container reviews-slider">
+    <button class="nav-arrow prev" onclick="slideReviews(-1)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    
+    <div class="slider-wrapper" id="reviewsWrapper">
+      <div class="slider" id="reviewsSlider">
+        {% for r in package_reviews %}
+        <div class="slider-card">
+          <div class="card-content">
+            <h3>{{ r.package_name }}</h3>
+            
+            <div class="review-rating">
+              {% for i in range(1,6) %}
+                <i class="{% if i <= r.rating %}fas{% else %}far{% endif %} fa-star star"></i>
+              {% endfor %}
+              <span style="margin-left: 10px; color: #666;">({{ r.rating }}/5)</span>
+            </div>
 
-      <p>
-        {% for i in range(1,6) %}
-          <i class="{% if i <= r.rating %}fas{% else %}far{% endif %} fa-star" style="color:{% if i <= r.rating %}#FFD700{% else %}#ccc{% endif %};"></i>
+            <p class="review-text">
+              <i class="fas fa-quote-left" style="color: #ff7f50; margin-right: 8px;"></i>
+              {{ r.comment }}
+            </p>
+            
+            <div class="review-author">
+              <i class="fas fa-user-circle"></i>
+              <div class="review-author-info">
+                <h4>{{ r.user_full_name }}</h4>
+                <p><i class="fas fa-calendar-alt"></i> {{ r.created_at.strftime('%d %b %Y') }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-      </p>
-
-      <p>{{ r.comment }}</p>
-      <small>{{ r.created_at.strftime('%d %b %Y') }}</small>
+      </div>
     </div>
-    {% endfor %}
+    
+    <button class="nav-arrow next" onclick="slideReviews(1)">
+      <i class="fas fa-chevron-right"></i>
+    </button>
   </div>
 </section>
 
-<!-- Updated Footer with row layout -->
+<!-- Footer -->
 <footer>
   <div class="footer-container">
     <div class="footer-left">
-      <a href="/about" class="footer-btn">About Us</a>
-      <a href="/privacy" class="footer-btn">Privacy Policy</a>
-      <a href="/terms" class="footer-btn">Terms & Conditions</a>
-      <a href="/get-hired" class="footer-btn">Work With Us</a>
+      <a href="/about"><i class="fas fa-info-circle"></i> About Us</a>
+      <a href="/privacy"><i class="fas fa-lock"></i> Privacy Policy</a>
+      <a href="/terms"><i class="fas fa-file-contract"></i> Terms & Conditions</a>
+      <a href="/get-hired" class="work-with-us"><i class="fas fa-briefcase"></i> Work With Us</a>
     </div>
     <div class="footer-right">
-      <span>Developers</span>
-      <a href="https://www.instagram.com/sum_11_1995" target="_blank" class="dev-link">@Sumedh</a>
-      <a href="https://www.instagram.com/n_shaikh_n" target="_blank" class="dev-link">@Nargis</a>
+      <span><i class="fas fa-code"></i> Developers:</span>
+      <a href="https://www.instagram.com/sum_11_1995" target="_blank"><i class="fab fa-instagram"></i> @Sumedh</a>
+      <a href="https://www.instagram.com/n_shaikh_n" target="_blank"><i class="fab fa-instagram"></i> @Nargis</a>
     </div>
+  </div>
+  <div class="copyright">
+    <p>&copy; 2026 NA Photography Studio. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
   </div>
 </footer>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+let packagesScrollPosition = 0;
+let reviewsScrollPosition = 0;
 
+document.addEventListener("DOMContentLoaded", function() {
+  // Profile menu toggle
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
-  const cartBtn = document.getElementById("cartBtn");
-  const ordersBtn = document.getElementById("ordersBtn");
 
   profileBtn.onclick = (e) => {
     e.stopPropagation();
@@ -351,40 +742,150 @@ document.addEventListener("DOMContentLoaded", function() {
   profileMenu.onclick = (e) => e.stopPropagation();
   window.onclick = () => profileMenu.style.display = "none";
 
-  cartBtn.onclick = () => { window.location.href = "/cart"; };
-  ordersBtn.onclick = () => { window.location.href = "/orders"; };
+  // Navigation buttons
+  document.getElementById("cartBtn").onclick = () => { window.location.href = "/cart"; };
+  document.getElementById("ordersBtn").onclick = () => { window.location.href = "/orders"; };
 
-  function searchPackages() {
-    let input = document.getElementById("searchInput").value.toLowerCase();
-    let cards = document.querySelectorAll("#packageList .card");
-    cards.forEach(card => {
-      let text = card.innerText.toLowerCase();
-      card.style.display = text.includes(input) ? "block" : "none";
-    });
-  }
-
-  window.searchPackages = searchPackages;
-
+  // Add to cart functionality
   document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const packageId = btn.getAttribute("data-id");
-      fetch(`/add_package/${packageId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === "success") {
-            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
-            setTimeout(() => { btn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart'; }, 1500);
-          } else {
-            alert(data.message || "Failed to add to cart.");
-          }
-        })
-        .catch(() => { alert("Server error"); });
+    btn.addEventListener("click", async function() {
+      const packageId = this.getAttribute("data-id");
+      const packageName = this.getAttribute("data-name");
+      const originalText = this.innerHTML;
+      
+      try {
+        const response = await fetch(`/add_package/${packageId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === "success") {
+          showToast(`${packageName} added to cart!`, "success");
+          this.innerHTML = '<i class="fas fa-check"></i> Added!';
+          this.style.background = "#28a745";
+          
+          setTimeout(() => {
+            this.innerHTML = originalText;
+            this.style.background = "";
+          }, 2000);
+        } else {
+          showToast("Failed to add to cart", "error");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showToast("Server error. Please try again.", "error");
+      }
     });
   });
+});
 
+// Package slider function
+function slidePackages(direction) {
+  const wrapper = document.getElementById('packagesWrapper');
+  const slider = document.getElementById('packagesSlider');
+  const cardWidth = 350; // card width + gap
+  const maxScroll = slider.scrollWidth - wrapper.clientWidth;
+  
+  packagesScrollPosition += direction * cardWidth;
+  
+  if (packagesScrollPosition < 0) {
+    packagesScrollPosition = 0;
+  } else if (packagesScrollPosition > maxScroll) {
+    packagesScrollPosition = maxScroll;
+  }
+  
+  slider.style.transform = `translateX(-${packagesScrollPosition}px)`;
+}
+
+// Reviews slider function
+function slideReviews(direction) {
+  const wrapper = document.getElementById('reviewsWrapper');
+  const slider = document.getElementById('reviewsSlider');
+  const cardWidth = 330; // card width + gap
+  const maxScroll = slider.scrollWidth - wrapper.clientWidth;
+  
+  reviewsScrollPosition += direction * cardWidth;
+  
+  if (reviewsScrollPosition < 0) {
+    reviewsScrollPosition = 0;
+  } else if (reviewsScrollPosition > maxScroll) {
+    reviewsScrollPosition = maxScroll;
+  }
+  
+  slider.style.transform = `translateX(-${reviewsScrollPosition}px)`;
+}
+
+// Filter packages based on search
+function filterPackages() {
+  let input = document.getElementById("searchInput").value.toLowerCase();
+  let cards = document.querySelectorAll(".package-card");
+  let visibleCount = 0;
+  
+  cards.forEach(card => {
+    let packageName = card.getAttribute("data-package-name");
+    if (packageName.includes(input)) {
+      card.style.display = "block";
+      visibleCount++;
+    } else {
+      card.style.display = "none";
+    }
+  });
+  
+  // Reset slider position when filtering
+  if (visibleCount > 0) {
+    packagesScrollPosition = 0;
+    const slider = document.getElementById('packagesSlider');
+    slider.style.transform = `translateX(0px)`;
+  }
+}
+
+// Toast notification function
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <i class="fas fa-${type === "success" ? "check-circle" : "exclamation-circle"}"></i>
+    <span>${message}</span>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = "slideOutRight 0.3s ease";
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Add slideOut animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideOutRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+// Handle window resize to reset slider positions
+window.addEventListener('resize', function() {
+  packagesScrollPosition = 0;
+  reviewsScrollPosition = 0;
+  const packagesSlider = document.getElementById('packagesSlider');
+  const reviewsSlider = document.getElementById('reviewsSlider');
+  if (packagesSlider) packagesSlider.style.transform = 'translateX(0px)';
+  if (reviewsSlider) reviewsSlider.style.transform = 'translateX(0px)';
 });
 </script>
 
