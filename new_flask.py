@@ -888,6 +888,37 @@ def delete_photographer(id):
     cursor.close()
     return redirect("/admin/photographers")
 
+@app.route('/admin/view_user/<int:user_id>')
+def view_user(user_id):
+    if 'admin_id' not in session:
+        return redirect('/admin/login')
+
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    # Get user details
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+
+    if not user:
+        flash("User not found", "error")
+        return redirect('/admin/users')
+
+    # Get user's orders
+    cursor.execute("""
+        SELECT order_id, total_price, status, created_at 
+        FROM orders 
+        WHERE user_id = %s 
+        ORDER BY created_at DESC
+    """, (user_id,))
+    orders = cursor.fetchall()
+    user['orders'] = orders
+
+    cursor.close()
+    db.close()
+
+    return render_template('admin_view_user.html', user=user)
+
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
