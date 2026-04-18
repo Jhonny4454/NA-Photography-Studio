@@ -9,11 +9,15 @@ app = Flask(__name__)
 app.secret_key = "secret_key_123"
 
 # ---------------- DATABASE CONFIG ----------------
-DB_NAME = os.getenv("DB_NAME", "sumedh")
-DB_USER = os.getenv("DB_USER", "root")
-DB_PASS = os.getenv("DB_PASS", "sumedh2004")
-DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = int(os.getenv("DB_PORT", 3306))
 
+# safety check
+if not all([DB_HOST, DB_USER, DB_PASS, DB_NAME]):
+    raise Exception("❌ Database environment variables not set")
 # ---------------- DATABASE CONNECTION ----------------
 def get_db():
     if "db" not in g:
@@ -22,7 +26,8 @@ def get_db():
                 host=DB_HOST,
                 user=DB_USER,
                 password=DB_PASS,
-                database=DB_NAME
+                database=DB_NAME,
+                port=DB_PORT   # ✅ ADD THIS LINE
             )
         except Exception as e:
             print("DB Error:", e)
