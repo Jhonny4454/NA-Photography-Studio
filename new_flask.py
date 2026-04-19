@@ -52,10 +52,9 @@ def get_db():
                     'connection_timeout': 30
                 }
 
-                # SSL for cloud databases
+                # ✅ FIXED: Disable SSL for Railway (SSL causes connection failure)
                 if ON_RENDER:
-                    config['ssl_disabled'] = False
-                    config['ssl_verify_cert'] = False
+                    config['ssl_disabled'] = True
 
                 g.db = mysql.connector.connect(**config)
                 print("✅ Database connected successfully")
@@ -90,7 +89,12 @@ def test_db():
         if not db:
             return jsonify({
                 "status": "error",
-                "message": "Database connection failed"
+                "message": "Connection failed - check Render logs for details",
+                "host": DB_HOST,
+                "port": DB_PORT,
+                "user": DB_USER,
+                "db": DB_NAME,
+                "on_render": ON_RENDER
             }), 500
 
         cursor = db.cursor(dictionary=True)
@@ -102,6 +106,7 @@ def test_db():
             "status": "success",
             "message": "Database connected!",
             "host": DB_HOST,
+            "port": DB_PORT,
             "database": DB_NAME,
             "result": result
         })
@@ -109,8 +114,11 @@ def test_db():
     except Exception as e:
         return jsonify({
             "status": "error",
-            "message": str(e)
+            "message": str(e),
+            "host": DB_HOST,
+            "port": DB_PORT
         }), 500
+
 # ---------------- Admin Login ----------------
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
