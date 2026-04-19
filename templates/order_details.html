@@ -478,7 +478,18 @@ footer {
     <h2><i class="fas fa-receipt"></i> Order Details</h2>
 
     {% if order %}
-    
+
+    <!-- ✅ Calculate totals at the TOP so they're available everywhere on the page -->
+    {% set subtotal = namespace(value=0) %}
+    {% if items %}
+      {% for item in items %}
+        {% set subtotal.value = subtotal.value + (item.price * item.quantity) %}
+      {% endfor %}
+    {% endif %}
+    {% set gst_amount = subtotal.value * 0.18 %}
+    {% set service_charge = subtotal.value * 0.05 %}
+    {% set grand_total = subtotal.value * 1.23 %}
+
     <!-- Order Information Grid -->
     <div class="order-info-grid">
       <!-- Order Details Section -->
@@ -527,10 +538,14 @@ footer {
           <strong>Payment Method:</strong>
           <span>{{ order.payment_method|title if order.payment_method else 'Not specified' }}</span>
         </div>
+        <!-- ✅ FIXED: Now shows GST-inclusive grand total instead of raw DB price -->
         <div class="info-item">
           <i class="fas fa-rupee-sign"></i>
           <strong>Total Amount:</strong>
-          <span>₹{{ "%.2f"|format(order.total_price if order.total_price else 0) }}</span>
+          <span style="color: #ff7f50; font-size: 18px; font-weight: bold;">
+            ₹{{ "%.2f"|format(grand_total) }}
+            <small style="color: #888; font-size: 12px;">(incl. GST)</small>
+          </span>
         </div>
         <div class="info-item">
           <i class="fas fa-receipt"></i>
@@ -557,10 +572,8 @@ footer {
           </tr>
         </thead>
         <tbody>
-          {% set calculated_total = 0 %}
           {% for item in items %}
             {% set item_total = item.price * item.quantity %}
-            {% set calculated_total = calculated_total + item_total %}
             <tr>
               <td>
                 <strong>{{ item.package_name }}</strong>
@@ -577,7 +590,7 @@ footer {
                     <span class="photographer-name">
                       <i class="fas fa-camera-retro"></i> {{ item.photographer_name }}
                     </span>
-                    {% if item.photographer_rating %}
+                    {% if item.photographer_rating is not none %}
                       <span class="photographer-rating">
                         {% set rating = item.photographer_rating|float %}
                         {% for i in range(rating|int) %}
@@ -606,26 +619,26 @@ footer {
       </table>
     </div>
 
-    <!-- Beautiful Bill Section with Taxes -->
+    <!-- ✅ Bill Section uses the namespace variables calculated at top -->
     <div class="bill-section">
       <div class="bill-header">
         <i class="fas fa-file-invoice-dollar"></i> Payment Summary
       </div>
       <div class="bill-details">
         <span class="bill-label">Subtotal:</span>
-        <span class="bill-value">₹{{ "%.2f"|format(calculated_total) }}</span>
+        <span class="bill-value">₹{{ "%.2f"|format(subtotal.value) }}</span>
       </div>
       <div class="bill-details">
         <span class="bill-label">GST (18%):</span>
-        <span class="bill-value">₹{{ "%.2f"|format(calculated_total * 0.18) }}</span>
+        <span class="bill-value">₹{{ "%.2f"|format(gst_amount) }}</span>
       </div>
       <div class="bill-details">
         <span class="bill-label">Service Charge (5%):</span>
-        <span class="bill-value">₹{{ "%.2f"|format(calculated_total * 0.05) }}</span>
+        <span class="bill-value">₹{{ "%.2f"|format(service_charge) }}</span>
       </div>
       <div class="bill-total">
         <span class="bill-label">Grand Total:</span>
-        <span class="bill-value">₹{{ "%.2f"|format(calculated_total * 1.23) }}</span>
+        <span class="bill-value">₹{{ "%.2f"|format(grand_total) }}</span>
       </div>
       <small style="display: block; margin-top: 15px; text-align: center; opacity: 0.8;">
         <i class="fas fa-check-circle"></i> Inclusive of all taxes and charges
@@ -680,7 +693,6 @@ function downloadInvoice() {
   window.print();
 }
 
-// Add animation when page loads
 document.addEventListener('DOMContentLoaded', function() {
   const billSection = document.querySelector('.bill-section');
   if (billSection) {
