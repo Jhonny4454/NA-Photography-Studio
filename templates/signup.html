@@ -17,113 +17,80 @@
 html, body {
   margin: 0;
   font-family: 'Segoe UI', 'Arial', sans-serif;
-  background: linear-gradient(135deg, 
-    #ff7f50, #ff9966, #ff6b6b, #c06c84, 
-    #6c5b7b, #355c7d, #2193b0, #ff7f50);
-  background-size: 400% 400%;
-  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: gradientShift 4s ease infinite;
+  padding: 20px;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-/* Fast 7-color smooth gradient animation */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  14% { background-position: 20% 50%; }
-  28% { background-position: 40% 50%; }
-  42% { background-position: 60% 50%; }
-  57% { background-position: 80% 50%; }
-  71% { background-position: 100% 50%; }
-  85% { background-position: 80% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Animated background particles */
+/* Simple static background - NO ANIMATION */
 body::before {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.15) 0%, transparent 60%);
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
   pointer-events: none;
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-}
-
-/* Floating particles */
+/* Simple floating particles - reduced for better performance */
 .particle {
   position: absolute;
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.15);
   border-radius: 50%;
   pointer-events: none;
-  animation: float 10s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-  25% { opacity: 0.4; }
-  50% { transform: translateY(-60px) translateX(40px); opacity: 0.6; }
-  75% { opacity: 0.4; }
-}
-
-/* LOGIN CONTAINER - Glass Morphism */
+/* LOGIN CONTAINER */
 .login-container {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(15px);
-  padding: clamp(30px, 7vw, 45px);
-  border-radius: 28px;
-  width: min(420px, 90%);
-  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-  animation: slideUp 0.6s ease;
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(10px);
+  padding: clamp(25px, 7vw, 40px);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   border: 1px solid rgba(255,255,255,0.3);
   position: relative;
   z-index: 10;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 35px 70px rgba(0,0,0,0.35);
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(50px); }
-  to { opacity: 1; transform: translateY(0); }
+  transform: translateY(-3px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
 }
 
 /* Logo Section */
 .logo-section {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .logo-icon {
-  width: 70px;
-  height: 70px;
+  width: 65px;
+  height: 65px;
   background: linear-gradient(135deg, #ff7f50, #ff6347);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 15px;
-  animation: bounce 2s ease infinite;
+  transition: transform 0.3s ease;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+.logo-icon:hover {
+  transform: scale(1.05);
 }
 
 .logo-icon i {
-  font-size: 32px;
+  font-size: 30px;
   color: white;
 }
 
@@ -131,7 +98,7 @@ h2 {
   text-align: center;
   margin-bottom: 8px;
   color: #333;
-  font-size: clamp(26px, 6vw, 32px);
+  font-size: clamp(24px, 6vw, 28px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,41 +108,41 @@ h2 {
 .subtitle {
   text-align: center;
   color: #888;
-  font-size: 14px;
-  margin-bottom: 30px;
+  font-size: 13px;
+  margin-bottom: 25px;
 }
 
 /* Input Groups */
 .input-group {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .input-group i {
   position: absolute;
   top: 50%;
-  left: 15px;
+  left: 14px;
   transform: translateY(-50%);
   color: #999;
   z-index: 1;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
+  font-size: 14px;
 }
 
 .input-group input {
   width: 100%;
-  padding: 14px 15px 14px 45px;
-  border-radius: 14px;
-  border: 2px solid #e0e0e0;
+  padding: 12px 12px 12px 42px;
+  border-radius: 12px;
+  border: 1.5px solid #e0e0e0;
   outline: none;
-  transition: all 0.3s ease;
-  font-size: 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 14px;
   background: white;
 }
 
 .input-group input:focus {
   border-color: #ff7f50;
-  box-shadow: 0 0 0 4px rgba(255,127,80,0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(255,127,80,0.1);
 }
 
 .input-group input:focus + i {
@@ -186,48 +153,42 @@ h2 {
 .toggle-password {
   position: absolute;
   top: 50%;
-  right: 15px;
+  right: 14px;
   transform: translateY(-50%);
   cursor: pointer;
   color: #999;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
   z-index: 2;
+  font-size: 14px;
 }
 
 .toggle-password:hover {
   color: #ff7f50;
 }
 
-/* Button - Animated */
+/* Button */
 .login-btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 25px;
+  padding: 12px;
+  margin-top: 20px;
   border: none;
-  border-radius: 35px;
+  border-radius: 30px;
   background: linear-gradient(135deg, #ff7f50, #ff6347);
-  background-size: 200% 200%;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+  box-shadow: 0 8px 20px rgba(255,127,80,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  animation: buttonGradient 3s ease infinite;
-}
-
-@keyframes buttonGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  gap: 8px;
 }
 
 .login-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(255,127,80,0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(255,127,80,0.4);
 }
 
 .login-btn:active {
@@ -237,8 +198,8 @@ h2 {
 /* Sign Up Link */
 .signup-link {
   text-align: center;
-  margin-top: 25px;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding-top: 18px;
   border-top: 1px solid #e0e0e0;
 }
 
@@ -248,28 +209,26 @@ h2 {
   font-weight: bold;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  gap: 6px;
+  transition: color 0.3s ease;
+  font-size: 13px;
 }
 
 .signup-link a:hover {
   color: #ff6347;
-  transform: translateX(5px);
 }
 
 /* Forgot Password */
 .forgot-link {
   text-align: right;
-  margin-top: -10px;
   margin-bottom: 5px;
 }
 
 .forgot-link a {
   text-decoration: none;
   color: #999;
-  font-size: 12px;
-  transition: all 0.3s ease;
+  font-size: 11px;
+  transition: color 0.3s ease;
 }
 
 .forgot-link a:hover {
@@ -281,27 +240,24 @@ h2 {
   margin-top: 15px;
   text-align: center;
   color: #e74c3c;
-  font-size: 13px;
+  font-size: 12px;
   background: rgba(231,76,60,0.1);
-  padding: 12px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  gap: 6px;
 }
 
 /* Responsive */
 @media (max-width: 480px) {
+  html, body {
+    padding: 15px;
+  }
+  
   .login-container {
-    padding: 25px 20px;
+    padding: 20px;
   }
   
   .logo-icon {
@@ -314,22 +270,40 @@ h2 {
   }
   
   .input-group input {
-    padding: 12px 12px 12px 42px;
+    padding: 10px 10px 10px 38px;
+  }
+  
+  .input-group i {
+    left: 12px;
+    font-size: 13px;
+  }
+  
+  .login-btn {
+    padding: 10px;
+    font-size: 14px;
   }
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
+  html, body {
+    padding: 20px;
+  }
+  
   .login-container {
     padding: 20px;
   }
   
   .logo-section {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   
   .logo-icon {
     width: 50px;
     height: 50px;
+  }
+  
+  .subtitle {
+    margin-bottom: 20px;
   }
 }
 
@@ -418,18 +392,17 @@ function togglePassword() {
   }
 }
 
-// Create floating particles
+// Create simple static particles (no animation for better performance)
 function createParticles() {
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 20; i++) {
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    const size = Math.random() * 8 + 2;
+    const size = Math.random() * 4 + 1;
     particle.style.width = size + 'px';
     particle.style.height = size + 'px';
     particle.style.left = Math.random() * 100 + '%';
     particle.style.top = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 10 + 's';
-    particle.style.animationDuration = Math.random() * 15 + 10 + 's';
+    particle.style.opacity = Math.random() * 0.3;
     document.body.appendChild(particle);
   }
 }
