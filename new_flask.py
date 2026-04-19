@@ -553,8 +553,7 @@ def orders():
 
     return render_template("orders.html", orders=orders)
 
-#------------------ Order Details (UPDATED WITH GST CALCULATION) ----------------
-#------------------ Order Details (UPDATED WITH DEBUGGING) ----------------
+#------------------ Order Details (UPDATED WITH DECIMAL HANDLING) ----------------
 @app.route("/order_details/<string:order_id>")
 def order_details(order_id):
     if "user_id" not in session:
@@ -583,24 +582,10 @@ def order_details(order_id):
         """, (order_id, session["user_id"]))
 
         order = cursor.fetchone()
-        
-        print(f"🔍 Looking for order: {order_id} for user: {session['user_id']}")
-        print(f"📦 Order found: {order}")
 
         if not order:
-            # Check if order exists but belongs to different user
-            cursor.execute("""
-                SELECT user_id FROM orders WHERE order_id = %s
-            """, (order_id,))
-            wrong_user = cursor.fetchone()
-            
-            if wrong_user:
-                flash("⚠️ This order belongs to a different account!", "error")
-            else:
-                flash("❌ Order not found!", "error")
-            
             cursor.close()
-            return redirect("/orders")
+            return render_template("order_details.html", order=None, items=[], subtotal=0, gst_amount=0, service_charge=0, grand_total=0)
 
         # Fetch order items
         cursor.execute("""
@@ -618,10 +603,15 @@ def order_details(order_id):
         """, (order_id,))
         
         items = cursor.fetchall()
-        print(f"📦 Items found: {len(items)}")
         
-        # Calculate totals
-        subtotal = sum(item["price"] * item["quantity"] for item in items)
+        # Calculate subtotal - Convert Decimal to float for calculation
+        subtotal = 0.0
+        for item in items:
+            price = float(item["price"]) if item["price"] else 0
+            quantity = int(item["quantity"]) if item["quantity"] else 0
+            subtotal += price * quantity
+        
+        # Calculate GST (18%) and Service Charge (5%) using float
         gst_amount = subtotal * 0.18
         service_charge = subtotal * 0.05
         grand_total = subtotal + gst_amount + service_charge

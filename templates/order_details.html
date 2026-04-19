@@ -495,25 +495,11 @@ footer {
 
     {% if order %}
 
-    <!-- Check if we have calculated values passed from Flask, otherwise calculate here -->
-    {% if subtotal is defined and gst_amount is defined and service_charge is defined and grand_total is defined %}
-      <!-- Use values passed from Flask -->
-      {% set final_subtotal = subtotal %}
-      {% set final_gst = gst_amount %}
-      {% set final_service = service_charge %}
-      {% set final_grand = grand_total %}
-    {% else %}
-      <!-- Fallback calculation in template -->
-      {% set final_subtotal = 0 %}
-      {% if items %}
-        {% for item in items %}
-          {% set final_subtotal = final_subtotal + (item.price * item.quantity) %}
-        {% endfor %}
-      {% endif %}
-      {% set final_gst = final_subtotal * 0.18 %}
-      {% set final_service = final_subtotal * 0.05 %}
-      {% set final_grand = final_subtotal + final_gst + final_service %}
-    {% endif %}
+    <!-- Use values passed from Flask (already converted to float) -->
+    {% set final_subtotal = subtotal|float %}
+    {% set final_gst = gst_amount|float %}
+    {% set final_service = service_charge|float %}
+    {% set final_grand = grand_total|float %}
 
     <!-- Order Information Grid -->
     <div class="order-info-grid">
@@ -597,7 +583,9 @@ footer {
         </thead>
         <tbody>
           {% for item in items %}
-            {% set item_total = item.price * item.quantity %}
+            {% set item_price = item.price|float %}
+            {% set item_quantity = item.quantity|int %}
+            {% set item_total = item_price * item_quantity %}
             <tr>
               <td>
                 <strong>{{ item.package_name }}</strong>
@@ -607,7 +595,7 @@ footer {
                 {% if item.location %}
                   <br><small style="color: #888;">📍 {{ item.location }}</small>
                 {% endif %}
-              </td>
+               </td>
               <td>
                 <div class="photographer-info">
                   {% if item.photographer_name %}
@@ -633,9 +621,9 @@ footer {
                     <small style="color: #ff7f50;">Will be assigned soon</small>
                   {% endif %}
                 </div>
-              </td>
-              <td>₹{{ "%.2f"|format(item.price) }}</td>
-              <td>{{ item.quantity }}</td>
+               </td>
+              <td>₹{{ "%.2f"|format(item_price) }}</td>
+              <td>{{ item_quantity }}</td>
               <td>₹{{ "%.2f"|format(item_total) }}</td>
             </tr>
           {% endfor %}
