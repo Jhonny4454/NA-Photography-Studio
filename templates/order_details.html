@@ -479,16 +479,16 @@ footer {
 
     {% if order %}
 
-    <!-- ✅ Calculate totals at the TOP so they're available everywhere on the page -->
-    {% set subtotal = namespace(value=0) %}
+    <!-- ✅ Calculate totals using simple Jinja2 arithmetic -->
+    {% set subtotal = 0 %}
     {% if items %}
       {% for item in items %}
-        {% set subtotal.value = subtotal.value + (item.price * item.quantity) %}
+        {% set subtotal = subtotal + (item.price * item.quantity) %}
       {% endfor %}
     {% endif %}
-    {% set gst_amount = subtotal.value * 0.18 %}
-    {% set service_charge = subtotal.value * 0.05 %}
-    {% set grand_total = subtotal.value * 1.23 %}
+    {% set gst_amount = subtotal * 0.18 %}
+    {% set service_charge = subtotal * 0.05 %}
+    {% set grand_total = subtotal + gst_amount + service_charge %}
 
     <!-- Order Information Grid -->
     <div class="order-info-grid">
@@ -538,7 +538,7 @@ footer {
           <strong>Payment Method:</strong>
           <span>{{ order.payment_method|title if order.payment_method else 'Not specified' }}</span>
         </div>
-        <!-- ✅ FIXED: Now shows GST-inclusive grand total instead of raw DB price -->
+        <!-- ✅ FIXED: Now shows GST-inclusive grand total -->
         <div class="info-item">
           <i class="fas fa-rupee-sign"></i>
           <strong>Total Amount:</strong>
@@ -583,7 +583,7 @@ footer {
                 {% if item.location %}
                   <br><small style="color: #888;">📍 {{ item.location }}</small>
                 {% endif %}
-              </td>
+               </td>
               <td>
                 <div class="photographer-info">
                   {% if item.photographer_name %}
@@ -609,24 +609,24 @@ footer {
                     <small style="color: #ff7f50;">Will be assigned soon</small>
                   {% endif %}
                 </div>
-              </td>
+               </td>
               <td>₹{{ "%.2f"|format(item.price) }}</td>
               <td>{{ item.quantity }}</td>
               <td>₹{{ "%.2f"|format(item_total) }}</td>
             </tr>
           {% endfor %}
         </tbody>
-      </table>
+       </table>
     </div>
 
-    <!-- ✅ Bill Section uses the namespace variables calculated at top -->
+    <!-- ✅ Bill Section with proper GST calculation -->
     <div class="bill-section">
       <div class="bill-header">
         <i class="fas fa-file-invoice-dollar"></i> Payment Summary
       </div>
       <div class="bill-details">
         <span class="bill-label">Subtotal:</span>
-        <span class="bill-value">₹{{ "%.2f"|format(subtotal.value) }}</span>
+        <span class="bill-value">₹{{ "%.2f"|format(subtotal) }}</span>
       </div>
       <div class="bill-details">
         <span class="bill-label">GST (18%):</span>
