@@ -257,7 +257,6 @@ def home():
     )
 
 # ---------------- CART ----------------
-# ---------------- CART ----------------
 @app.route("/cart", methods=["GET", "POST"])
 def cart():
     if "user_id" not in session:
@@ -307,14 +306,13 @@ def cart():
         """, (user_id,))
         cart_items = cursor.fetchall()
 
-        # ✅ FIXED: Removed status filter so all photographers show
         cursor.execute("""
             SELECT id, CONCAT(first_name, ' ', last_name) AS name, rating, status
             FROM photographers
             ORDER BY rating DESC
         """)
         photographers = cursor.fetchall()
-        print("DEBUG photographers:", photographers)  # Check terminal to verify
+        print("DEBUG photographers:", photographers)
 
         total = sum(item["package_price"] * item["quantity"] for item in cart_items)
     except Exception as e:
@@ -327,6 +325,7 @@ def cart():
         cursor.close()
         
     return render_template("cart.html", cart_items=cart_items, total=total, photographers=photographers)
+
 # ---------------- ADD TO CART ----------------
 @app.route("/add_package/<int:package_id>", methods=["POST"])
 def add_package(package_id):
@@ -554,7 +553,7 @@ def orders():
 
     return render_template("orders.html", orders=orders)
 
-#------------------ Order Details ----------------
+#------------------ Order Details (UPDATED WITH GST CALCULATION) ----------------
 @app.route("/order_details/<string:order_id>")
 def order_details(order_id):
     if "user_id" not in session:
@@ -585,7 +584,7 @@ def order_details(order_id):
 
         if not order:
             cursor.close()
-            return render_template("order_details.html", order=None, items=[], grand_total=0)
+            return render_template("order_details.html", order=None, items=[], subtotal=0, gst_amount=0, service_charge=0, grand_total=0)
 
         cursor.execute("""
             SELECT 
@@ -602,16 +601,35 @@ def order_details(order_id):
         """, (order_id,))
         
         items = cursor.fetchall()
-        grand_total = sum(item["price"] * item["quantity"] for item in items)
+        
+        # Calculate subtotal (sum of all item prices * quantities)
+        subtotal = sum(item["price"] * item["quantity"] for item in items)
+        
+        # Calculate GST (18%) and Service Charge (5%)
+        gst_amount = subtotal * 0.18
+        service_charge = subtotal * 0.05
+        grand_total = subtotal + gst_amount + service_charge
+        
     except Exception as e:
         print("Order Details Error:", e)
         order = None
         items = []
+        subtotal = 0
+        gst_amount = 0
+        service_charge = 0
         grand_total = 0
     finally:
         cursor.close()
 
-    return render_template("order_details.html", order=order, items=items, grand_total=grand_total)
+    return render_template(
+        "order_details.html", 
+        order=order, 
+        items=items, 
+        subtotal=subtotal,
+        gst_amount=gst_amount,
+        service_charge=service_charge,
+        grand_total=grand_total
+    )
 
 # ---------------- PHOTOGRAPHER APPLY ----------------
 @app.route("/photographer/apply", methods=["POST"])
