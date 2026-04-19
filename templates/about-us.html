@@ -17,30 +17,14 @@
 body {
   font-family: 'Segoe UI', 'Arial', sans-serif;
   margin: 0;
-  background: linear-gradient(135deg, 
-    #ff7f50, #ff9966, #ff6b6b, #c06c84, 
-    #6c5b7b, #355c7d, #2193b0, #ff7f50);
-  background-size: 400% 400%;
-  animation: gradientShift 4s ease infinite, fadeIn 0.8s ease-in;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   overflow-x: hidden;
   width: 100%;
   position: relative;
 }
 
-/* Fast 7-color smooth gradient animation */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  14% { background-position: 20% 50%; }
-  28% { background-position: 40% 50%; }
-  42% { background-position: 60% 50%; }
-  57% { background-position: 80% 50%; }
-  71% { background-position: 100% 50%; }
-  85% { background-position: 80% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Animated background overlay */
+/* Simple static background - NO ANIMATION */
 body::before {
   content: "";
   position: absolute;
@@ -48,30 +32,16 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
   pointer-events: none;
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-}
-
-/* Floating particles */
+/* Simple static particles - NO ANIMATION */
 .particle {
   position: absolute;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
   border-radius: 50%;
   pointer-events: none;
-  animation: float 10s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-  25% { opacity: 0.3; }
-  50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
-  75% { opacity: 0.3; }
 }
 
 /* GLOBAL */
@@ -79,12 +49,7 @@ body::before {
   transition: all 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* HEADER - Responsive with glass morphism */
+/* HEADER - Glass morphism */
 header {
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(10px);
@@ -111,12 +76,6 @@ header {
 
 .logo i {
   font-size: clamp(20px, 6vw, 28px);
-  animation: bounce 2s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
 }
 
 .header-buttons {
@@ -127,7 +86,6 @@ header {
 
 .header-btn {
   background: linear-gradient(45deg, #ff7f50, #ff6347);
-  background-size: 200% 200%;
   color: white;
   text-decoration: none;
   padding: clamp(6px, 2vw, 10px) clamp(12px, 4vw, 20px);
@@ -139,12 +97,6 @@ header {
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 500;
   white-space: nowrap;
-  animation: buttonGradient 3s ease infinite;
-}
-
-@keyframes buttonGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .header-btn:hover {
@@ -152,7 +104,7 @@ header {
   box-shadow: 0 5px 15px rgba(255,127,80,0.4);
 }
 
-/* HERO SECTION - Responsive with animation */
+/* HERO SECTION - Static */
 .hero-section {
   background: rgba(0,0,0,0.3);
   color: white;
@@ -171,13 +123,6 @@ header {
   bottom: 0;
   background: url('https://images.unsplash.com/photo-1452587925148-ce544e77e70d?ixlib=rb-4.0.3') center/cover no-repeat;
   opacity: 0.3;
-  animation: zoomIn 20s ease infinite;
-}
-
-@keyframes zoomIn {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
 }
 
 .hero-section h1 {
@@ -216,7 +161,7 @@ header {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* SECTIONS - Responsive */
+/* SECTIONS */
 .section {
   margin-bottom: clamp(25px, 6vw, 50px);
 }
@@ -243,7 +188,7 @@ header {
   font-size: clamp(14px, 4vw, 17px);
 }
 
-/* STATS - Animated Cards */
+/* STATS - Cards */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -271,7 +216,6 @@ header {
   font-size: clamp(30px, 8vw, 45px);
   color: #ff7f50;
   margin-bottom: 10px;
-  animation: bounce 2s ease infinite;
 }
 
 .stat-number {
@@ -286,7 +230,7 @@ header {
   font-size: clamp(12px, 3.5vw, 15px);
 }
 
-/* TEAM - Animated Cards */
+/* TEAM - Cards */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -315,16 +259,9 @@ header {
   object-fit: cover;
   transition: transform 0.5s ease;
   background: linear-gradient(135deg, #667eea, #764ba2);
-  background-size: 200% 200%;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: imageGradient 3s ease infinite;
-}
-
-@keyframes imageGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .member-image i {
@@ -364,7 +301,7 @@ header {
   line-height: 1.6;
 }
 
-/* FEATURES LIST - Animated */
+/* FEATURES LIST */
 .features-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -400,7 +337,7 @@ header {
   font-size: clamp(12px, 3.5vw, 14px);
 }
 
-/* SOCIAL SECTION - Animated */
+/* SOCIAL SECTION */
 .social-section {
   background: rgba(248,249,250,0.9);
   backdrop-filter: blur(5px);
@@ -427,7 +364,6 @@ header {
 
 .social-btn {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
-  background-size: 200% 200%;
   color: white;
   text-decoration: none;
   padding: clamp(10px, 3vw, 14px) clamp(20px, 5vw, 32px);
@@ -438,7 +374,6 @@ header {
   font-weight: bold;
   transition: all 0.3s ease;
   font-size: clamp(12px, 3.5vw, 15px);
-  animation: buttonGradient 3s ease infinite;
 }
 
 .social-btn:hover {
@@ -450,7 +385,7 @@ header {
   font-size: clamp(16px, 4vw, 20px);
 }
 
-/* BACK BUTTON - Animated */
+/* BACK BUTTON */
 .back-home {
   text-align: center;
   margin-top: clamp(30px, 8vw, 50px);
@@ -461,7 +396,6 @@ header {
   align-items: center;
   gap: 10px;
   background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-  background-size: 200% 200%;
   color: white;
   text-decoration: none;
   padding: clamp(10px, 3vw, 14px) clamp(20px, 6vw, 35px);
@@ -469,7 +403,6 @@ header {
   font-weight: bold;
   transition: all 0.3s ease;
   font-size: clamp(13px, 4vw, 16px);
-  animation: buttonGradient 3s ease infinite;
 }
 
 .btn-home:hover {
@@ -478,7 +411,7 @@ header {
   box-shadow: 0 12px 28px rgba(255,127,80,0.4);
 }
 
-/* FOOTER - Responsive */
+/* FOOTER */
 footer {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   color: white;
@@ -584,7 +517,6 @@ footer p {
   
   body {
     background: white;
-    animation: none;
   }
   
   .about-container {
@@ -787,18 +719,17 @@ footer p {
 </footer>
 
 <script>
-// Create floating particles
+// Create static particles (no animation)
 function createParticles() {
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 40; i++) {
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    const size = Math.random() * 6 + 2;
+    const size = Math.random() * 4 + 1;
     particle.style.width = size + 'px';
     particle.style.height = size + 'px';
     particle.style.left = Math.random() * 100 + '%';
     particle.style.top = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 10 + 's';
-    particle.style.animationDuration = Math.random() * 15 + 8 + 's';
+    particle.style.opacity = Math.random() * 0.3;
     document.body.appendChild(particle);
   }
 }

@@ -170,6 +170,13 @@ def signup():
                 flash("Passwords do not match!", "error")
                 return redirect("/signup")
             
+            # Check if username or email already exists (optional but good)
+            cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", 
+                          (request.form["username"], request.form["email"]))
+            if cursor.fetchone():
+                flash("Username or email already exists. Please choose another.", "error")
+                return redirect("/signup")
+            
             cursor.execute("""
                 INSERT INTO users (first_name, last_name, email, mobile, gender, username, password, role)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, 'user')

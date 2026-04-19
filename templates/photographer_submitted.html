@@ -16,10 +16,7 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, 
-    #ff7f50, #ff9966, #ff6b6b, #c06c84, 
-    #6c5b7b, #355c7d, #2193b0, #ff7f50);
-  background-size: 400% 400%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -27,69 +24,24 @@ body {
   padding: clamp(15px, 4vw, 20px);
   position: relative;
   overflow-x: hidden;
-  animation: gradientShift 4s ease infinite;
 }
 
-/* Fast 7-color smooth gradient animation */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  14% { background-position: 20% 50%; }
-  28% { background-position: 40% 50%; }
-  42% { background-position: 60% 50%; }
-  57% { background-position: 80% 50%; }
-  71% { background-position: 100% 50%; }
-  85% { background-position: 80% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Animated background overlay */
+/* Simple static background - NO ANIMATION */
 body::before {
   content: "";
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
   pointer-events: none;
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-}
-
-/* Animated background particles */
-body::before {
-  content: "";
+/* Simple static particles - NO ANIMATION */
+.particle {
   position: absolute;
-  width: 600px;
-  height: 600px;
   background: rgba(255,255,255,0.1);
-  filter: blur(120px);
-  top: -100px;
-  left: -100px;
   border-radius: 50%;
-  z-index: -2;
-  animation: floatBackground 20s ease-in-out infinite;
-}
-
-body::after {
-  content: "";
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: rgba(0,0,0,0.1);
-  filter: blur(120px);
-  bottom: -100px;
-  right: -100px;
-  border-radius: 50%;
-  z-index: -2;
-  animation: floatBackground 15s ease-in-out infinite reverse;
-}
-
-@keyframes floatBackground {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(50px, 50px); }
+  pointer-events: none;
 }
 
 .container {
@@ -117,23 +69,17 @@ body::after {
   }
 }
 
-/* Success Icon - Animated */
+/* Success Icon */
 .success-icon {
   width: clamp(80px, 20vw, 100px);
   height: clamp(80px, 20vw, 100px);
   background: linear-gradient(135deg, #2ecc71, #27ae60);
-  background-size: 200% 200%;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 25px;
-  animation: bounce 0.6s ease, iconGradient 3s ease infinite;
-}
-
-@keyframes iconGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  animation: bounce 0.6s ease;
 }
 
 @keyframes bounce {
@@ -153,7 +99,7 @@ body::after {
   100% { transform: scale(1); }
 }
 
-/* Headings - Responsive */
+/* Headings */
 h1 {
   color: #27ae60;
   font-size: clamp(28px, 7vw, 32px);
@@ -169,7 +115,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* Info Card - Animated */
+/* Info Card */
 .info-card {
   background: rgba(248,249,250,0.9);
   backdrop-filter: blur(5px);
@@ -234,7 +180,7 @@ h1 {
   width: 22px;
 }
 
-/* Next Steps - Animated */
+/* Next Steps */
 .next-steps {
   background: linear-gradient(135deg, #fff5f2, #fff);
   border-radius: 16px;
@@ -266,7 +212,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* Button Group - Animated */
+/* Button Group */
 .button-group {
   display: flex;
   gap: 15px;
@@ -287,19 +233,11 @@ h1 {
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
-  background-size: 200% 200%;
 }
 
 .btn-home {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
-  background-size: 200% 200%;
   color: white;
-  animation: buttonGradient 3s ease infinite;
-}
-
-@keyframes buttonGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .btn-home:hover {
@@ -309,9 +247,7 @@ h1 {
 
 .btn-website {
   background: linear-gradient(135deg, #3498db, #2980b9);
-  background-size: 200% 200%;
   color: white;
-  animation: buttonGradient 3s ease infinite;
 }
 
 .btn-website:hover {
@@ -319,7 +255,7 @@ h1 {
   box-shadow: 0 12px 28px rgba(52,152,219,0.4);
 }
 
-/* Footer - Responsive */
+/* Footer */
 .footer {
   margin-top: 30px;
   padding-top: 20px;
@@ -417,7 +353,6 @@ h1 {
   
   body {
     background: white;
-    animation: none;
   }
   
   .container {
@@ -486,37 +421,21 @@ h1 {
   </div>
 </div>
 
-<!-- Particle animation script -->
 <script>
-// Create floating particles
+// Create static particles (no animation)
 function createParticles() {
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 30; i++) {
     const particle = document.createElement('div');
-    particle.style.position = 'absolute';
-    particle.style.width = Math.random() * 6 + 2 + 'px';
-    particle.style.height = particle.style.width;
-    particle.style.background = 'rgba(255,255,255,0.25)';
-    particle.style.borderRadius = '50%';
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
     particle.style.left = Math.random() * 100 + '%';
     particle.style.top = Math.random() * 100 + '%';
-    particle.style.animation = 'floatParticle ' + (Math.random() * 15 + 8) + 's ease-in-out infinite';
-    particle.style.animationDelay = Math.random() * 5 + 's';
-    particle.style.pointerEvents = 'none';
+    particle.style.opacity = Math.random() * 0.3;
     document.body.appendChild(particle);
   }
 }
-
-// Add particle animation style
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes floatParticle {
-    0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-    25% { opacity: 0.3; }
-    50% { transform: translateY(-40px) translateX(25px); opacity: 0.6; }
-    75% { opacity: 0.3; }
-  }
-`;
-document.head.appendChild(style);
 
 createParticles();
 </script>

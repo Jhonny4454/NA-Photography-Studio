@@ -16,32 +16,16 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, 
-    #ff7f50, #ff9966, #ff6b6b, #c06c84, 
-    #6c5b7b, #355c7d, #2193b0, #ff7f50);
-  background-size: 400% 400%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   margin: 0;
   min-height: 100vh;
   padding: clamp(15px, 4vw, 20px);
   overflow-x: hidden;
   width: 100%;
   position: relative;
-  animation: gradientShift 4s ease infinite;
 }
 
-/* Fast 7-color smooth gradient animation */
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  14% { background-position: 20% 50%; }
-  28% { background-position: 40% 50%; }
-  42% { background-position: 60% 50%; }
-  57% { background-position: 80% 50%; }
-  71% { background-position: 100% 50%; }
-  85% { background-position: 80% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Animated background overlay */
+/* Simple static background - NO ANIMATION */
 body::before {
   content: "";
   position: absolute;
@@ -49,30 +33,16 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
   pointer-events: none;
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
-}
-
-/* Floating particles */
+/* Simple static particles - NO ANIMATION */
 .particle {
   position: absolute;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
   border-radius: 50%;
   pointer-events: none;
-  animation: float 10s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-  25% { opacity: 0.3; }
-  50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
-  75% { opacity: 0.3; }
 }
 
 .container {
@@ -93,19 +63,12 @@ body::before {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* HEADER - Animated Gradient */
+/* HEADER - Static Gradient */
 .checkout-header {
-  background: linear-gradient(135deg, #ff7f50, #ff6347, #ff9966);
-  background-size: 200% 200%;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
   color: white;
   padding: clamp(20px, 5vw, 30px) clamp(20px, 5vw, 30px);
   text-align: center;
-  animation: headerGradient 3s ease infinite;
-}
-
-@keyframes headerGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .checkout-header h1 {
@@ -120,12 +83,6 @@ body::before {
 
 .checkout-header h1 i {
   font-size: clamp(26px, 7vw, 32px);
-  animation: bounce 2s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
 }
 
 .checkout-header p {
@@ -138,7 +95,7 @@ body::before {
   padding: clamp(20px, 5vw, 30px);
 }
 
-/* BACK BUTTON - Animated */
+/* BACK BUTTON - Animation KEPT */
 .back-btn {
   display: inline-flex;
   align-items: center;
@@ -304,20 +261,13 @@ body::before {
   box-shadow: 0 0 8px rgba(255,127,80,0.3);
 }
 
-/* TOTAL SECTION - Animated Gradient */
+/* TOTAL SECTION - Static Gradient */
 .total-section {
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
-  background-size: 300% 300%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 16px;
   padding: clamp(15px, 4vw, 20px);
   margin-bottom: 30px;
   color: white;
-  animation: totalGradient 5s ease infinite;
-}
-
-@keyframes totalGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .total-details {
@@ -434,14 +384,13 @@ body::before {
   color: #888;
 }
 
-/* BUTTON - Animated */
+/* BUTTON - Animation KEPT */
 .confirm-btn {
   width: 100%;
   padding: clamp(14px, 4vw, 16px);
   border: none;
   border-radius: 30px;
-  background: linear-gradient(135deg, #2ecc71, #27ae60, #20c997);
-  background-size: 200% 200%;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
   font-weight: bold;
   font-size: clamp(16px, 4.5vw, 18px);
@@ -451,12 +400,6 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  animation: buttonGradient 3s ease infinite;
-}
-
-@keyframes buttonGradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 .confirm-btn:hover {
@@ -487,7 +430,6 @@ body::before {
   font-size: clamp(60px, 15vw, 80px);
   color: #ff7f50;
   margin-bottom: 20px;
-  animation: bounce 2s ease infinite;
 }
 
 .empty-cart h3 {
@@ -507,7 +449,6 @@ body::before {
   align-items: center;
   gap: 10px;
   background: linear-gradient(135deg, #ff7f50, #ff6347);
-  background-size: 200% 200%;
   color: white;
   padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 30px);
   border-radius: 30px;
@@ -515,7 +456,6 @@ body::before {
   font-weight: bold;
   transition: all 0.3s ease;
   font-size: clamp(13px, 3.5vw, 14px);
-  animation: buttonGradient 3s ease infinite;
 }
 
 .shop-btn:hover {
@@ -611,7 +551,6 @@ footer {
   
   body {
     background: white;
-    animation: none;
   }
   
   .container {
@@ -798,18 +737,17 @@ footer {
 </footer>
 
 <script>
-// Create floating particles
+// Create static particles (no animation)
 function createParticles() {
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 30; i++) {
     const particle = document.createElement('div');
     particle.classList.add('particle');
-    const size = Math.random() * 6 + 2;
+    const size = Math.random() * 4 + 1;
     particle.style.width = size + 'px';
     particle.style.height = size + 'px';
     particle.style.left = Math.random() * 100 + '%';
     particle.style.top = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 10 + 's';
-    particle.style.animationDuration = Math.random() * 15 + 8 + 's';
+    particle.style.opacity = Math.random() * 0.3;
     document.body.appendChild(particle);
   }
 }
