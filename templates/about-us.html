@@ -235,6 +235,15 @@ header {
   height: 280px;
   object-fit: cover;
   transition: transform 0.5s ease;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-image i {
+  font-size: 80px;
+  color: rgba(255,255,255,0.8);
 }
 
 .team-member:hover .member-image {
@@ -504,7 +513,7 @@ footer p {
     </div>
   </div>
 
-  <!-- Team Section -->
+  <!-- Team Section - FIXED with correct information -->
   <div class="section">
     <h2>
       <i class="fas fa-users"></i>
@@ -512,28 +521,34 @@ footer p {
     </h2>
     
     <div class="team-grid">
+      <!-- Team Member 1: Sumedh -->
       <div class="team-member">
-        <img src="{{ url_for('static', filename='images/sumedh.jpeg') }}" alt="Sumedh" class="member-image" onerror="this.src='https://via.placeholder.com/300x280?text=Sumedh'">
+        <div class="member-image">
+          <i class="fas fa-user-circle"></i>
+        </div>
         <div class="member-info">
           <h3>Sumedh</h3>
-          <div class="member-role">
-            <i class="fas fa-code"></i> Developer & Creative Support
-          </div>
-          <p class="member-bio">
-            Bringing ideas to life through code and creativity. Sumedh ensures every digital experience is seamless and beautiful.
-          </p>
-        </div>
-      </div>
-
-      <div class="team-member">
-        <img src="{{ url_for('static', filename='images/nargis.jpeg') }}" alt="Nargis" class="member-image" onerror="this.src='https://via.placeholder.com/300x280?text=Nargis'">
-        <div class="member-info">
-          <h3>Nargis</h3>
           <div class="member-role">
             <i class="fas fa-camera-retro"></i> Founder & Lead Photographer
           </div>
           <p class="member-bio">
-            Capturing real emotions and stories through the lens. Nargis brings artistic vision and technical expertise to every shoot.
+            Capturing real emotions and stories through the lens. Sumedh brings artistic vision and technical expertise to every shoot, ensuring every moment is perfectly framed.
+          </p>
+        </div>
+      </div>
+
+      <!-- Team Member 2: Ramkrishna -->
+      <div class="team-member">
+        <div class="member-image">
+          <i class="fas fa-code"></i>
+        </div>
+        <div class="member-info">
+          <h3>Ramkrishna</h3>
+          <div class="member-role">
+            <i class="fas fa-laptop-code"></i> Technical Director & Developer
+          </div>
+          <p class="member-bio">
+            Bringing ideas to life through code and creativity. Ramkrishna ensures every digital experience is seamless, from website functionality to photo editing workflows.
           </p>
         </div>
       </div>
@@ -587,8 +602,8 @@ footer p {
       <a href="https://www.instagram.com/sum_11_1995" target="_blank" class="social-btn">
         <i class="fab fa-instagram"></i> Follow Sumedh
       </a>
-      <a href="https://www.instagram.com/n_shaikh_n" target="_blank" class="social-btn">
-        <i class="fab fa-instagram"></i> Follow Nargis
+      <a href="https://www.instagram.com/barai.ramkrishna" target="_blank" class="social-btn">
+        <i class="fab fa-instagram"></i> Follow Ramkrishna
       </a>
     </div>
   </div>
