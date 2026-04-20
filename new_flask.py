@@ -464,6 +464,12 @@ def edit_photographer(id):
             status = request.form.get("status")
             profile_image = request.form.get("profile_image")
             
+            # 🔥 FIX: Handle empty rating value (convert to None)
+            if rating is not None and rating.strip() != '':
+                rating = float(rating)
+            else:
+                rating = None
+            
             cursor.execute("""
                 UPDATE photographers 
                 SET first_name=%s, last_name=%s, email=%s, phone=%s, 
@@ -476,7 +482,7 @@ def edit_photographer(id):
         except Exception as e:
             print("Update Error:", e)
             db.rollback()
-            flash("❌ Error updating photographer", "error")
+            flash(f"❌ Error updating photographer: {str(e)}", "error")
             return redirect(f"/admin/edit_photographer/{id}")
     
     try:
