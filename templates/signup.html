@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Login - SnapHire</title>
+<title>Sign Up - SnapHire</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -60,14 +60,14 @@ body::before {
   100% { transform: translateY(0) translateX(0); opacity: 0; }
 }
 
-/* LOGIN CONTAINER – Enhanced glassmorphism */
-.login-container {
+/* SIGNUP CONTAINER – Enhanced glassmorphism (slightly wider) */
+.signup-container {
   background: rgba(255,255,255,0.95);
   backdrop-filter: blur(12px);
   padding: clamp(30px, 7vw, 45px);
   border-radius: 28px;
   width: 100%;
-  max-width: 450px;
+  max-width: 520px;
   box-shadow: 0 25px 45px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.2);
   position: relative;
   z-index: 10;
@@ -75,7 +75,7 @@ body::before {
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-.login-container:hover {
+.signup-container:hover {
   transform: translateY(-5px);
   box-shadow: 0 35px 55px rgba(0,0,0,0.3);
 }
@@ -83,7 +83,7 @@ body::before {
 /* Logo Section */
 .logo-section {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 25px;
 }
 
 .logo-icon {
@@ -125,14 +125,14 @@ h2 {
   text-align: center;
   color: #5d6d7e;
   font-size: 14px;
-  margin-bottom: 30px;
+  margin-bottom: 28px;
   font-weight: 400;
 }
 
 /* Input Groups */
 .input-group {
   position: relative;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .input-group i {
@@ -146,9 +146,9 @@ h2 {
   font-size: 16px;
 }
 
-.input-group input {
+.input-group input, .input-group select {
   width: 100%;
-  padding: 14px 14px 14px 46px;
+  padding: 13px 14px 13px 46px;
   border-radius: 16px;
   border: 1.5px solid #e2e8f0;
   outline: none;
@@ -159,13 +159,27 @@ h2 {
   color: #1e293b;
 }
 
-.input-group input:focus {
+.input-group select {
+  appearance: none;
+  padding: 13px 14px 13px 46px;
+  cursor: pointer;
+}
+
+.input-group input:focus, .input-group select:focus {
   border-color: #ff7f50;
   box-shadow: 0 0 0 4px rgba(255,127,80,0.15);
 }
 
-.input-group input:focus + i {
+.input-group input:focus + i, .input-group select:focus + i {
   color: #ff7f50;
+}
+
+/* Row for two columns (first/last name) */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 0;
 }
 
 /* Password Toggle */
@@ -186,10 +200,10 @@ h2 {
 }
 
 /* Button */
-.login-btn {
+.signup-btn {
   width: 100%;
   padding: 14px;
-  margin-top: 28px;
+  margin-top: 25px;
   border: none;
   border-radius: 40px;
   background: linear-gradient(135deg, #ff7f50, #ff6347);
@@ -206,24 +220,24 @@ h2 {
   letter-spacing: 0.5px;
 }
 
-.login-btn:hover {
+.signup-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 15px 30px rgba(255,127,80,0.45);
 }
 
-.login-btn:active {
+.signup-btn:active {
   transform: scale(0.98);
 }
 
-/* Sign Up Link */
-.signup-link {
+/* Login Link */
+.login-link {
   text-align: center;
   margin-top: 25px;
   padding-top: 22px;
   border-top: 1px solid rgba(0,0,0,0.08);
 }
 
-.signup-link a {
+.login-link a {
   text-decoration: none;
   color: #ff7f50;
   font-weight: 600;
@@ -234,27 +248,9 @@ h2 {
   font-size: 14px;
 }
 
-.signup-link a:hover {
+.login-link a:hover {
   color: #ff6347;
   gap: 12px;
-}
-
-/* Forgot Password */
-.forgot-link {
-  text-align: right;
-  margin-top: -8px;
-  margin-bottom: 8px;
-}
-
-.forgot-link a {
-  text-decoration: none;
-  color: #7f8c8d;
-  font-size: 12px;
-  transition: color 0.3s ease;
-}
-
-.forgot-link a:hover {
-  color: #ff7f50;
 }
 
 /* Error Message */
@@ -274,12 +270,12 @@ h2 {
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 550px) {
   html, body {
     padding: 15px;
   }
   
-  .login-container {
+  .signup-container {
     padding: 25px;
   }
   
@@ -292,7 +288,12 @@ h2 {
     font-size: 28px;
   }
   
-  .input-group input {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .input-group input, .input-group select {
     padding: 12px 12px 12px 42px;
   }
   
@@ -301,7 +302,7 @@ h2 {
     font-size: 14px;
   }
   
-  .login-btn {
+  .signup-btn {
     padding: 12px;
     font-size: 15px;
   }
@@ -312,7 +313,7 @@ h2 {
     padding: 20px;
   }
   
-  .login-container {
+  .signup-container {
     padding: 20px;
   }
   
@@ -341,12 +342,12 @@ h2 {
   .particle {
     display: none;
   }
-  .login-container {
+  .signup-container {
     background: white;
     box-shadow: none;
     border: 1px solid #ddd;
   }
-  .login-btn {
+  .signup-btn {
     display: none;
   }
 }
@@ -355,7 +356,7 @@ h2 {
 
 <body>
 
-<div class="login-container">
+<div class="signup-container">
   <div class="logo-section">
     <div class="logo-icon">
       <i class="fas fa-camera"></i>
@@ -364,62 +365,110 @@ h2 {
       <i class="fas fa-camera"></i>
       SnapHire
     </h2>
-    <p class="subtitle">Welcome back! Please login to your account</p>
+    <p class="subtitle">Create your account to get started</p>
   </div>
 
-  {% if error %}
-    <div class="error">
-      <i class="fas fa-exclamation-circle"></i>
-      {{ error }}
-    </div>
-  {% endif %}
+  <!-- Flash messages / errors -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="error">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-  <form method="POST" action="/" id="loginForm">
+  <form method="POST" action="/signup" id="signupForm">
+    <div class="row">
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="first_name" placeholder="First Name" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="last_name" placeholder="Last Name" required>
+      </div>
+    </div>
+
     <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" name="username" placeholder="Username" required autofocus>
+      <i class="fas fa-envelope"></i>
+      <input type="email" name="email" placeholder="Email Address" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input type="tel" name="mobile" placeholder="Mobile Number (10 digits)" pattern="[0-9]{10}" title="10-digit mobile number" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-venus-mars"></i>
+      <select name="gender" required>
+        <option value="" disabled selected>Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <i class="fas fa-chevron-down" style="left: auto; right: 16px; pointer-events: none;"></i>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-user-circle"></i>
+      <input type="text" name="username" placeholder="Username" required>
     </div>
 
     <div class="input-group">
       <i class="fas fa-lock"></i>
       <input type="password" id="password" name="password" placeholder="Password" required>
-      <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+      <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
     </div>
 
-    <div class="forgot-link">
-      <a href="#">Forgot Password?</a>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+      <i class="fas fa-eye toggle-password" onclick="togglePassword('confirm_password')"></i>
     </div>
 
-    <button type="submit" class="login-btn">
-      <i class="fas fa-sign-in-alt"></i> Login
+    <button type="submit" class="signup-btn">
+      <i class="fas fa-user-plus"></i> Sign Up
     </button>
   </form>
 
-  <div class="signup-link">
-    <a href="/signup">
-      <i class="fas fa-user-plus"></i> Don't have an account? Sign Up
+  <div class="login-link">
+    <a href="/">
+      <i class="fas fa-sign-in-alt"></i> Already have an account? Login
     </a>
   </div>
 </div>
 
 <script>
 // Toggle password visibility
-function togglePassword() {
-  const password = document.getElementById("password");
-  const icon = document.querySelector(".toggle-password");
-  
-  if (password.type === "password") {
-    password.type = "text";
+function togglePassword(fieldId) {
+  const field = document.getElementById(fieldId);
+  const icon = event.currentTarget;
+  if (field.type === "password") {
+    field.type = "text";
     icon.classList.remove("fa-eye");
     icon.classList.add("fa-eye-slash");
   } else {
-    password.type = "password";
+    field.type = "password";
     icon.classList.remove("fa-eye-slash");
     icon.classList.add("fa-eye");
   }
 }
 
-// Create subtle floating particles (reduced for performance)
+// Simple client-side password match check (optional)
+document.getElementById("signupForm").addEventListener("submit", function(e) {
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirm_password").value;
+  if (password !== confirm) {
+    e.preventDefault();
+    alert("Passwords do not match!");
+  }
+});
+
+// Create subtle floating particles
 function createParticles() {
   for (let i = 0; i < 25; i++) {
     const particle = document.createElement('div');
