@@ -1,59 +1,427 @@
-{% extends "base.html" %}
-{% block title %}Our Best Work - Photography Portfolio{% endblock %}
-{% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-4">🌟 Our Photographers' Best Work</h1>
-    <p class="text-center mb-5">Each photographer shares their favourite shots with location and date.</p>
-    <div id="full-portfolio" class="row">
-        <div class="text-center"><div class="spinner-border"></div> Loading...</div>
-    </div>
-</div>
-<script>
-fetch('/api/portfolio')
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById('full-portfolio');
-        container.innerHTML = '';
-        if (data.length === 0) {
-            container.innerHTML = '<div class="alert alert-info">No portfolio images yet.</div>';
-            return;
-        }
-        for (const photographer of data) {
-            if (photographer.images.length === 0) continue;
-            const section = document.createElement('div');
-            section.className = 'photographer-section mb-5';
-            section.innerHTML = `
-                <div class="card">
-                    <div class="card-header bg-dark text-white">
-                        <h3>📷 ${photographer.name} ${photographer.rating ? `<span class="badge bg-warning">⭐ ${photographer.rating}</span>` : ''}</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            ${photographer.images.map(img => `
-                                <div class="col-md-4 mb-4">
-                                    <div class="card h-100">
-                                        <img src="${img.url}" class="card-img-top" style="height: 250px; object-fit: cover;" alt="Portfolio">
-                                        <div class="card-body">
-                                            <p><strong>📍 Location:</strong> ${img.location || 'Not specified'}</p>
-                                            <p><strong>📅 Shoot Date:</strong> ${img.shoot_date || 'Unknown'}</p>
-                                            <p>${img.description || ''}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(section);
-        }
-    })
-    .catch(err => {
-        document.getElementById('full-portfolio').innerHTML = '<div class="alert alert-danger">Error loading portfolio</div>';
-    });
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Our Best Work - SnapHire Portfolio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
 <style>
-.photographer-section { margin-bottom: 40px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-.card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-attachment: fixed;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated background overlay */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  pointer-events: none;
+}
+
+/* Floating particles */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 15s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
+}
+
+/* Header */
+.header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(20px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: clamp(20px, 6vw, 26px);
+  font-weight: bold;
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: clamp(24px, 6vw, 28px);
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 20px);
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 500;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* Container */
+.container {
+  width: min(95%, 1200px);
+  margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(25px, 6vw, 40px);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 15px;
+  font-size: clamp(28px, 7vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+h1 i {
+  color: #ff7f50;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 40px;
+  font-size: clamp(14px, 4vw, 16px);
+}
+
+/* Photographer Section */
+.photographer-section {
+  margin-bottom: 40px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.photographer-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+}
+
+.card-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: clamp(18px, 5vw, 22px);
+}
+
+.card-header .badge {
+  background: #ffc107;
+  color: #333;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.card-body {
+  padding: 25px;
+  background: white;
+}
+
+/* Image Grid */
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.portfolio-card {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.portfolio-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.portfolio-card .card-body {
+  padding: 15px;
+}
+
+.portfolio-card p {
+  margin: 8px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.portfolio-card p i {
+  width: 25px;
+  color: #ff7f50;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top-color: #ff7f50;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.alert {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border-left: 4px solid #17a2b8;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+/* Footer */
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .card-header h3 {
+    justify-content: center;
+  }
+  
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-card img {
+    height: 200px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+}
+
+/* Print */
+@media print {
+  body::before, .particle, .header, footer {
+    display: none;
+  }
+  
+  .container {
+    background: white;
+    box-shadow: none;
+    padding: 0;
+  }
+  
+  .photographer-section {
+    break-inside: avoid;
+  }
+}
 </style>
-{% endblock %}
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/cart" class="header-btn">
+      <i class="fas fa-shopping-cart"></i> Cart
+    </a>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <h1>
+    <i class="fas fa-images"></i>
+    Our Photographers' Best Work
+  </h1>
+  <p class="subtitle">Each photographer shares their favourite shots with location and date.</p>
+  
+  <div id="full-portfolio">
+    <div class="text-center">
+      <div class="spinner"></div>
+      <p style="margin-top: 15px;">Loading portfolio...</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 SnapHire. Capturing your special moments.</p>
+</footer>
+
+<script>
+// Create floating particles
+function createParticles() {
+  for (let i = 0; i < 40; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 6 + 2;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = Math.random() * 15 + 8 + 's';
+    document.body.appendChild(particle);
+  }
+}
+createParticles();
+
+// Fetch and render portfolio
+fetch('/api/portfolio')
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById('full-portfolio');
+    container.innerHTML = '';
+    
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="alert alert-info">No portfolio images yet. Check back soon!</div>';
+      return;
+    }
+    
+    for (const photographer of data) {
+      if (!photographer.images || photographer.images.length === 0) continue;
+      
+      const section = document.createElement('div');
+      section.className = 'photographer-section';
+      
+      const ratingHtml = photographer.rating ? `<span class="badge">⭐ ${photographer.rating}</span>` : '';
+      
+      section.innerHTML = `
+        <div class="card-header">
+          <h3>📷 ${photographer.name} ${ratingHtml}</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            ${photographer.images.map(img => `
+              <div class="portfolio-card">
+                <img src="${img.url}" alt="${photographer.name}'s work" loading="lazy">
+                <div class="card-body">
+                  <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> ${img.location || 'Not specified'}</p>
+                  <p><i class="fas fa-calendar-alt"></i> <strong>Shoot Date:</strong> ${img.shoot_date || 'Unknown'}</p>
+                  ${img.description ? `<p><i class="fas fa-camera"></i> ${img.description}</p>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      container.appendChild(section);
+    }
+  })
+  .catch(err => {
+    console.error('Portfolio error:', err);
+    document.getElementById('full-portfolio').innerHTML = '<div class="alert alert-danger">Failed to load portfolio. Please try again later.</div>';
+  });
+</script>
+
+</body>
+</html>

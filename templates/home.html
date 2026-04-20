@@ -486,10 +486,40 @@ section {
   color: #ff7f50;
 }
 
+/* Simple spinner (no Bootstrap) */
+.spinner {
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top-color: #ff7f50;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 .loading-spinner {
   grid-column: 1 / -1;
   text-align: center;
   padding: 50px;
+}
+
+/* Small button for "View more" inside portfolio card */
+.btn-sm {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-top: 10px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+.btn-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
 }
 
 /* TOAST NOTIFICATION - Animations KEPT */
@@ -848,19 +878,17 @@ footer a:hover {
   </div>
 </section>
 
-<!-- ========== NEW: OUR BEST WORK SECTION ========== -->
+<!-- ========== OUR BEST WORK SECTION ========== -->
 <section id="best-work">
   <h2 class="section-title">📸 Our Best Work</h2>
-  <p class="text-center" style="text-align: center; margin-bottom: 20px; color: #555;">Explore stunning captures from our talented photographers</p>
+  <p style="text-align: center; margin-bottom: 20px; color: #555;">Explore stunning captures from our talented photographers</p>
   <div id="portfolio-grid" class="portfolio-grid">
     <div class="loading-spinner">
-      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+      <div class="spinner"></div>
     </div>
   </div>
   <div class="text-center mt-4">
-    <a href="/portfolio" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #ff7f50, #ff6347);">
+    <a href="/portfolio" class="btn">
       <i class="fas fa-images"></i> View Full Portfolio →
     </a>
   </div>
@@ -1030,7 +1058,7 @@ async function fetchPortfolio() {
     const data = await response.json();
     
     if (!data || data.length === 0) {
-      grid.innerHTML = '<div class="col-12 text-center"><p>No portfolio images yet. Check back soon!</p></div>';
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center;"><p>No portfolio images yet. Check back soon!</p></div>';
       return;
     }
     
@@ -1053,7 +1081,7 @@ async function fetchPortfolio() {
             <i class="fas fa-calendar-alt"></i> ${img.shoot_date || 'Date not available'}
           </div>
           <p style="margin-top: 8px; font-size: 0.9rem;">${img.description ? img.description.substring(0, 80) : 'Beautiful capture from our talented photographer.'}</p>
-          <a href="/portfolio" class="btn btn-sm" style="margin-top: 10px; display: inline-block; padding: 6px 12px; font-size: 0.8rem;">View more by ${photographer.name.split(' ')[0]}</a>
+          <a href="/portfolio" class="btn-sm">View more by ${photographer.name.split(' ')[0]}</a>
         </div>
       `;
       grid.appendChild(card);
@@ -1061,11 +1089,11 @@ async function fetchPortfolio() {
     }
     
     if (displayCount === 0) {
-      grid.innerHTML = '<div class="col-12 text-center"><p>No portfolio images yet.</p></div>';
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center;"><p>No portfolio images yet.</p></div>';
     }
   } catch (error) {
     console.error('Portfolio load error:', error);
-    grid.innerHTML = '<div class="col-12 text-center text-danger">Failed to load portfolio. Please try again later.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#d9534f;">Failed to load portfolio. Please try again later.</div>';
   }
 }
 

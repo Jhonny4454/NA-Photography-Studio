@@ -562,6 +562,10 @@ createParticles();
   <a href="/admin/photographers">
     <i class="fas fa-camera-retro"></i> Photographers
   </a>
+  <!-- NEW PORTFOLIO LINK -->
+  <a href="/admin/portfolio">
+    <i class="fas fa-images"></i> Portfolio
+  </a>
   <a href="/logout">
     <i class="fas fa-sign-out-alt"></i> Logout
   </a>
@@ -654,23 +658,23 @@ createParticles();
           <td>#{{ u.id }}</td>
           <td>
             <strong>{{ u.first_name }} {{ u.last_name }}</strong>
-          </td>
+           </td>
           <td>
             <i class="fas fa-envelope"></i> {{ u.email }}<br>
             <i class="fas fa-phone"></i> {{ u.mobile if u.mobile else 'N/A' }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-user-circle"></i> {{ u.username }}
-          </td>
+           </td>
           <td>
             <span class="role-badge role-{{ u.role if u.role else 'user' }}">
               <i class="fas fa-{{ 'shield-alt' if u.role == 'admin' else 'user' }}"></i>
               {{ u.role|capitalize if u.role else 'User' }}
             </span>
-          </td>
+           </td>
           <td>
             <i class="fas fa-calendar-alt"></i> {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'N/A' }}
-          </td>
+           </td>
           <td class="action-buttons">
             <a href="/admin/view_user/{{ u.id }}" class="view-btn">
               <i class="fas fa-eye"></i> View
@@ -684,15 +688,15 @@ createParticles();
             {% else %}
               <span style="color: #999; font-size: 12px;">Cannot delete admin</span>
             {% endif %}
-          </td>
-        </tr>
+           </td>
+         </tr>
         {% endfor %}
       {% else %}
         <tr>
           <td colspan="7" class="no-data">
             <i class="fas fa-users-slash"></i>
             <p>No users found</p>
-          </td>
+           </td>
         </tr>
       {% endif %}
     </tbody>

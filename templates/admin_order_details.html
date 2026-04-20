@@ -114,17 +114,11 @@ header {
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* HEADER SECTION - Responsive */
+/* HEADER SECTION */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -173,7 +167,7 @@ header {
   color: #0c5460;
 }
 
-/* ORDER INFO GRID - Responsive */
+/* ORDER INFO GRID */
 .order-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -250,7 +244,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  min-width: 500px;
+  min-width: 600px;
 }
 
 th, td {
@@ -278,36 +272,56 @@ tr:hover {
   background: #f9f9f9;
 }
 
-/* TOTAL SECTION - Responsive */
-.total-section {
+/* PRICE BREAKDOWN */
+.price-breakdown {
   margin-top: 25px;
-  padding: clamp(15px, 4vw, 20px);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  background: #f8f9fa;
   border-radius: 16px;
-  color: white;
+}
+
+.breakdown-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #ddd;
+  font-size: clamp(13px, 3.5vw, 14px);
 }
 
-.total-label {
+.breakdown-row.total {
+  border-bottom: none;
+  font-weight: bold;
   font-size: clamp(16px, 4.5vw, 18px);
-  font-weight: bold;
+  color: #ff7f50;
+  margin-top: 5px;
+  padding-top: 10px;
+  border-top: 2px solid #ff7f50;
 }
 
-.total-amount {
-  font-size: clamp(28px, 7vw, 32px);
-  font-weight: bold;
-  color: #ffd700;
+/* STATUS UPDATE FORM */
+.status-update {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
-/* ACTION BUTTONS - Responsive */
+.status-select {
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: 1px solid #ff7f50;
+  font-size: clamp(12px, 3.5vw, 14px);
+  background: white;
+  cursor: pointer;
+}
+
+/* ACTION BUTTONS */
 .action-buttons {
   display: flex;
   gap: 15px;
-  margin-top: 25px;
+  margin-top: 20px;
   justify-content: flex-end;
   flex-wrap: wrap;
 }
@@ -318,7 +332,7 @@ tr:hover {
   border-radius: 25px;
   cursor: pointer;
   font-weight: bold;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
@@ -329,18 +343,13 @@ tr:hover {
   transform: translateY(-2px);
 }
 
-.btn-confirm {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
-  color: white;
-}
-
-.btn-cancel {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
+.btn-update {
+  background: linear-gradient(135deg, #3498db, #2980b9);
   color: white;
 }
 
 .btn-print {
-  background: linear-gradient(135deg, #3498db, #2980b9);
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: white;
 }
 
@@ -362,39 +371,28 @@ tr:hover {
   margin-bottom: 10px;
 }
 
-.no-data p {
-  font-size: clamp(13px, 3.5vw, 15px);
-}
-
-/* RESPONSIVE BREAKPOINTS */
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .container {
     margin: 20px;
     padding: 25px;
   }
-  
   .order-info-grid {
     grid-template-columns: 1fr;
   }
-  
   .info-row {
     flex-direction: column;
   }
-  
   .info-label {
     width: 100%;
     margin-bottom: 5px;
   }
-  
-  .total-section {
-    flex-direction: column;
-    text-align: center;
+  .status-update {
+    justify-content: center;
   }
-  
   .action-buttons {
     justify-content: center;
   }
-  
   header {
     flex-direction: column;
     text-align: center;
@@ -406,58 +404,34 @@ tr:hover {
     flex-direction: column;
     text-align: center;
   }
-  
-  .action-buttons {
+  .status-update {
     flex-direction: column;
+    width: 100%;
   }
-  
+  .status-select {
+    width: 100%;
+  }
   .action-btn {
     width: 100%;
     justify-content: center;
   }
 }
 
-/* LANDSCAPE MODE */
-@media (max-width: 768px) and (orientation: landscape) {
-  .order-info-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .info-row {
-    flex-direction: row;
-  }
-  
-  .info-label {
-    width: 100px;
-  }
-}
-
-/* PRINT STYLES */
 @media print {
-  body::before, .particle, header, .action-buttons, .back-btn {
+  body::before, .particle, header, .action-buttons, .status-update, .back-btn {
     display: none;
   }
-  
   .container {
     background: white;
     box-shadow: none;
     padding: 0;
     margin: 0;
-    width: 100%;
   }
-  
   .status-badge {
     border: 1px solid #ccc;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  
-  .total-section {
-    background: #667eea;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  
   th {
     background: #ff7f50;
     -webkit-print-color-adjust: exact;
@@ -500,101 +474,46 @@ tr:hover {
     <div class="order-info-grid">
       <!-- Customer Info -->
       <div class="info-card">
-        <h3>
-          <i class="fas fa-user"></i>
-          Customer Information
-        </h3>
-        <div class="info-row">
-          <div class="info-label">Full Name:</div>
-          <div class="info-value">{{ order.first_name|default('') }} {{ order.last_name|default('') }}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Email:</div>
-          <div class="info-value">{{ order.email|default('N/A') }}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Phone:</div>
-          <div class="info-value">{{ order.mobile|default('N/A') }}</div>
-        </div>
+        <h3><i class="fas fa-user"></i> Customer Information</h3>
+        <div class="info-row"><div class="info-label">Full Name:</div><div class="info-value">{{ order.first_name|default('') }} {{ order.last_name|default('') }}</div></div>
+        <div class="info-row"><div class="info-label">Email:</div><div class="info-value">{{ order.email|default('N/A') }}</div></div>
+        <div class="info-row"><div class="info-label">Phone:</div><div class="info-value">{{ order.mobile|default('N/A') }}</div></div>
       </div>
 
       <!-- Order Info -->
       <div class="info-card">
-        <h3>
-          <i class="fas fa-info-circle"></i>
-          Order Information
-        </h3>
-        <div class="info-row">
-          <div class="info-label">Order ID:</div>
-          <div class="info-value">{{ order.order_id|default('N/A') }}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Order Date:</div>
-          <div class="info-value">{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Payment Method:</div>
-          <div class="info-value">{{ order.payment_method|title|default('N/A') }}</div>
-        </div>
+        <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+        <div class="info-row"><div class="info-label">Order ID:</div><div class="info-value">{{ order.order_id|default('N/A') }}</div></div>
+        <div class="info-row"><div class="info-label">Order Date:</div><div class="info-value">{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'N/A' }}</div></div>
+        <div class="info-row"><div class="info-label">Payment Method:</div><div class="info-value">{{ order.payment_method|title|default('N/A') }}</div></div>
       </div>
 
       <!-- Event Info -->
       <div class="info-card">
-        <h3>
-          <i class="fas fa-calendar-check"></i>
-          Event Details
-        </h3>
-        <div class="info-row">
-          <div class="info-label">Location:</div>
-          <div class="info-value">{{ order.location|default('Not specified') }}</div>
-        </div>
-        <div class="info-row">
-          <div class="info-label">Scheduled Date:</div>
-          <div class="info-value">{{ order.scheduled_date|default('Not scheduled') }}</div>
-        </div>
+        <h3><i class="fas fa-calendar-check"></i> Event Details</h3>
+        <div class="info-row"><div class="info-label">Location:</div><div class="info-value">{{ order.location|default('Not specified') }}</div></div>
+        <div class="info-row"><div class="info-label">Scheduled Date:</div><div class="info-value">{{ order.scheduled_date|default('Not scheduled') }}</div></div>
       </div>
     </div>
 
-    <!-- Order Items Section -->
+    <!-- Order Items -->
     {% if items and items|length > 0 %}
     <div class="items-section">
-      <h3>
-        <i class="fas fa-box"></i>
-        Order Items
-      </h3>
+      <h3><i class="fas fa-box"></i> Order Items</h3>
       <div class="table-wrapper">
         <table>
           <thead>
-            <tr>
-              <th>Package Name</th>
-              <th>Photographer</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-            </tr>
+            <tr><th>Package</th><th>Photographer</th><th>Location</th><th>Price</th><th>Qty</th><th>Total</th></tr>
           </thead>
           <tbody>
-            {% set ns = namespace(grand_total=0) %}
+            {% set ns = namespace(subtotal=0) %}
             {% for item in items %}
               {% set item_total = item.price * item.quantity %}
-              {% set ns.grand_total = ns.grand_total + item_total %}
+              {% set ns.subtotal = ns.subtotal + item_total %}
               <tr>
-                <td>
-                  <strong>{{ item.package_name|default('N/A') }}</strong>
-                  {% if item.duration %}
-                    <br><small style="color: #888;">Duration: {{ item.duration }}</small>
-                  {% endif %}
-                </td>
-                <td>
-                  {% if item.photographer_name %}
-                    <i class="fas fa-camera-retro"></i> {{ item.photographer_name }}
-                    {% if item.photographer_rating %}
-                      <br><small>⭐ {{ item.photographer_rating }}</small>
-                    {% endif %}
-                  {% else %}
-                    <span style="color: #999;">Not assigned</span>
-                  {% endif %}
-                </td>
+                <td><strong>{{ item.package_name|default('N/A') }}</strong><br><small>{{ item.duration|default('') }}</small></td>
+                <td>{% if item.photographer_name %}<i class="fas fa-camera-retro"></i> {{ item.photographer_name }}{% if item.photographer_rating %} <br>⭐ {{ item.photographer_rating }}{% endif %}{% else %}<span style="color:#999;">Not assigned</span>{% endif %}</td>
+                <td>{{ item.location|default('Not specified') }}</td>
                 <td>₹{{ "%.2f"|format(item.price|float) }}</td>
                 <td>{{ item.quantity }}</td>
                 <td>₹{{ "%.2f"|format(item_total|float) }}</td>
@@ -604,31 +523,41 @@ tr:hover {
         </table>
       </div>
     </div>
-    {% endif %}
 
-    <!-- Total Section -->
-    <div class="total-section">
-      <div class="total-label">
-        <i class="fas fa-calculator"></i> Grand Total
-      </div>
-      <div class="total-amount">
-        ₹{{ "%.2f"|format(order.total_price|float) }}
-      </div>
+    <!-- Price Breakdown (GST 18%, Service Charge 5%) -->
+    {% set subtotal = ns.subtotal %}
+    {% set gst = subtotal * 0.18 %}
+    {% set service = subtotal * 0.05 %}
+    {% set grand_total = subtotal + gst + service %}
+
+    <div class="price-breakdown">
+      <div class="breakdown-row"><span>Subtotal</span><span>₹{{ "%.2f"|format(subtotal) }}</span></div>
+      <div class="breakdown-row"><span>GST (18%)</span><span>₹{{ "%.2f"|format(gst) }}</span></div>
+      <div class="breakdown-row"><span>Service Charge (5%)</span><span>₹{{ "%.2f"|format(service) }}</span></div>
+      <div class="breakdown-row total"><span>Grand Total</span><span>₹{{ "%.2f"|format(grand_total) }}</span></div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      {% if order.status != 'Cancelled' %}
-      <form action="/admin/update_order_status/{{ order.order_id }}" method="POST" style="display:inline;">
-        <input type="hidden" name="status" value="Cancelled">
-        <button type="submit" class="action-btn btn-cancel" onclick="return confirm('Are you sure you want to cancel this order?')">
-          <i class="fas fa-times-circle"></i> Cancel Order
+    {% endif %}
+
+    <!-- Status Update Form -->
+    <div class="status-update">
+      <form action="/admin/update_order_status/{{ order.order_id }}" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <select name="status" class="status-select">
+          <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+          <option value="Confirmed" {% if order.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+          <option value="Completed" {% if order.status == 'Completed' %}selected{% endif %}>Completed</option>
+          <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+        <button type="submit" class="action-btn btn-update">
+          <i class="fas fa-save"></i> Update Status
         </button>
       </form>
-      {% endif %}
-      
+    </div>
+
+    <!-- Print Button -->
+    <div class="action-buttons">
       <button onclick="window.print()" class="action-btn btn-print">
-        <i class="fas fa-print"></i> Print Details
+        <i class="fas fa-print"></i> Print Order
       </button>
     </div>
 
@@ -658,7 +587,6 @@ function createParticles() {
     document.body.appendChild(particle);
   }
 }
-
 createParticles();
 </script>
 

@@ -579,6 +579,10 @@ createParticles();
   <a href="/admin/photographers">
     <i class="fas fa-camera-retro"></i> Photographers
   </a>
+  <!-- NEW PORTFOLIO LINK -->
+  <a href="/admin/portfolio">
+    <i class="fas fa-images"></i> Portfolio
+  </a>
   <a href="/logout">
     <i class="fas fa-sign-out-alt"></i> Logout
   </a>
@@ -673,7 +677,7 @@ createParticles();
                  class="pkg-img"
                  onerror="this.onerror=null;this.src='/static/images/default.jpg';"
                  alt="{{ p.package_name }}">
-           </td>
+            </td>
           <td><strong>{{ p.package_name }}</strong></td>
           <td><i class="fas fa-rupee-sign"></i> {{ "%.2f"|format(p.package_price) }}</td>
           <td><i class="fas fa-clock"></i> {{ p.duration }}</td>
@@ -687,7 +691,7 @@ createParticles();
               </button>
             </form>
           </td>
-         </tr>
+        </tr>
         {% endfor %}
       {% else %}
         <tr>

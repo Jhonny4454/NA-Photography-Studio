@@ -417,6 +417,10 @@ body::before {
   <a href="/admin/photographers">
     <i class="fas fa-camera-retro"></i> Photographers
   </a>
+  <!-- NEW PORTFOLIO LINK -->
+  <a href="/admin/portfolio">
+    <i class="fas fa-images"></i> Portfolio
+  </a>
   <a href="/logout">
     <i class="fas fa-sign-out-alt"></i> Logout
   </a>
@@ -475,6 +479,13 @@ body::before {
     <div class="form-group">
       <label><i class="fas fa-briefcase"></i> Experience</label>
       <input type="text" name="experience" value="{{ photographer.experience }}" placeholder="e.g., 5 years in wedding photography">
+    </div>
+    
+    <!-- NEW: Profile Image URL field -->
+    <div class="form-group">
+      <label><i class="fas fa-image"></i> Profile Image URL</label>
+      <input type="url" name="profile_image" value="{{ photographer.profile_image }}" placeholder="https://example.com/profile.jpg">
+      <small style="color: #999; font-size: 12px;">Direct image URL for photographer's avatar (shown in portfolio).</small>
     </div>
     
     <div class="form-row">
