@@ -295,10 +295,15 @@ def get_portfolio():
     """Return portfolio images grouped by photographer"""
     db = get_db()
     if not db:
-        return jsonify({"error": "Database error"}), 500
+        return jsonify([])  # Return empty list on error
     
     cursor = db.cursor(dictionary=True)
     try:
+        # Check if table exists to avoid errors
+        cursor.execute("SHOW TABLES LIKE 'portfolio_images'")
+        if not cursor.fetchone():
+            return jsonify([])
+        
         cursor.execute("""
             SELECT 
                 p.id as photographer_id,
@@ -341,7 +346,7 @@ def get_portfolio():
         return jsonify(list(portfolio.values()))
     except Exception as e:
         print("Portfolio API Error:", e)
-        return jsonify({"error": str(e)}), 500
+        return jsonify([])
     finally:
         cursor.close()
 

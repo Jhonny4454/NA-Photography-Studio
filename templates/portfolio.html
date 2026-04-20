@@ -4,12 +4,10 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">🌟 Our Photographers' Best Work</h1>
     <p class="text-center mb-5">Each photographer shares their favourite shots with location and date.</p>
-    
     <div id="full-portfolio" class="row">
         <div class="text-center"><div class="spinner-border"></div> Loading...</div>
     </div>
 </div>
-
 <script>
 fetch('/api/portfolio')
     .then(res => res.json())
