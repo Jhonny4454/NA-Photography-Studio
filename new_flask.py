@@ -53,6 +53,10 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ---------------- HASH PASSWORD ----------------
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
 # ---------------- DATABASE CONNECTION WITH RETRY ----------------
 def get_db():
     if "db" not in g:
@@ -99,6 +103,27 @@ def close_db(exception):
     db = g.pop("db", None)
     if db is not None and db.is_connected():
         db.close()
+
+# ---------------- CREATE ADMIN USER IF NOT EXISTS ----------------
+def create_admin_user():
+    """Ensure there is at least one admin user in the database (for stats display)."""
+    db = get_db()
+    if not db:
+        return
+    cursor = db.cursor()
+    try:
+        cursor.execute("SELECT id FROM users WHERE role = 'admin'")
+        if not cursor.fetchone():
+            cursor.execute("""
+                INSERT INTO users (first_name, last_name, email, mobile, gender, username, password, role, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, ('Admin', 'User', 'admin@snaphire.com', '0000000000', 'other', 'admin', hash_password('admin123'), 'admin', datetime.now()))
+            db.commit()
+            print("✅ Admin user created successfully")
+    except Exception as e:
+        print("Admin creation error:", e)
+    finally:
+        cursor.close()
 
 # ---------------- TEST DATABASE ROUTE ----------------
 @app.route("/test-db")
@@ -151,10 +176,6 @@ def admin_login():
             return render_template("admin_login.html", error="Invalid credentials")
     return render_template("admin_login.html")
 
-# ---------------- HASH PASSWORD ----------------
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
-
 # ---------------- SIGNUP ----------------
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -167,6 +188,11 @@ def signup():
         try:
             if request.form["password"] != request.form["confirm_password"]:
                 flash("Passwords do not match!", "error")
+                return redirect("/signup")
+            
+            # Prevent username 'admin' from being taken
+            if request.form["username"].lower() == "admin":
+                flash("Username not available", "error")
                 return redirect("/signup")
             
             cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", 
@@ -1544,6 +1570,10 @@ def logout():
     return redirect("/")
 
 # ---------------- RUN APP ----------------
+# Create admin user before starting the app (ensures admin exists in DB)
+with app.app_context():
+    create_admin_user()
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
