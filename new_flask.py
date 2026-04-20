@@ -165,12 +165,10 @@ def signup():
             return redirect("/signup")
         cursor = db.cursor()
         try:
-            # Check if password and confirm password match
             if request.form["password"] != request.form["confirm_password"]:
                 flash("Passwords do not match!", "error")
                 return redirect("/signup")
             
-            # Check if username or email already exists (optional but good)
             cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", 
                           (request.form["username"], request.form["email"]))
             if cursor.fetchone():
@@ -288,6 +286,210 @@ def home():
         package_reviews=package_reviews,
         orders=orders
     )
+
+# ==================== PORTFOLIO / BEST WORK FEATURE ====================
+
+# ---------------- API: GET PORTFOLIO DATA (for homepage & portfolio page) ----------------
+@app.route("/api/portfolio")
+def get_portfolio():
+    """Return portfolio images grouped by photographer"""
+    db = get_db()
+    if not db:
+        return jsonify({"error": "Database error"}), 500
+    
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT 
+                p.id as photographer_id,
+                p.first_name,
+                p.last_name,
+                p.profile_image,
+                p.rating,
+                pi.id as image_id,
+                pi.image_url,
+                pi.location,
+                pi.shoot_date,
+                pi.description
+            FROM photographers p
+            JOIN portfolio_images pi ON p.id = pi.photographer_id
+            WHERE p.status = 'active'
+            ORDER BY p.id, pi.shoot_date DESC
+        """)
+        rows = cursor.fetchall()
+        
+        # Group images by photographer
+        portfolio = {}
+        for row in rows:
+            pid = row['photographer_id']
+            if pid not in portfolio:
+                portfolio[pid] = {
+                    'photographer_id': pid,
+                    'name': f"{row['first_name']} {row['last_name']}",
+                    'profile_image': row['profile_image'],
+                    'rating': row['rating'],
+                    'images': []
+                }
+            portfolio[pid]['images'].append({
+                'id': row['image_id'],
+                'url': row['image_url'],
+                'location': row['location'],
+                'shoot_date': row['shoot_date'].strftime('%Y-%m-%d') if row['shoot_date'] else None,
+                'description': row['description']
+            })
+        
+        return jsonify(list(portfolio.values()))
+    except Exception as e:
+        print("Portfolio API Error:", e)
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+
+# ---------------- DEDICATED PORTFOLIO PAGE ----------------
+@app.route("/portfolio")
+def portfolio_page():
+    return render_template("portfolio.html")
+
+# ---------------- ADMIN: PORTFOLIO MANAGEMENT (list photographers with image count) ----------------
+@app.route("/admin/portfolio")
+@admin_required
+def admin_portfolio():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT p.*, COUNT(pi.id) as image_count
+            FROM photographers p
+            LEFT JOIN portfolio_images pi ON p.id = pi.photographer_id
+            GROUP BY p.id
+            ORDER BY p.id DESC
+        """)
+        photographers = cursor.fetchall()
+    except Exception as e:
+        print("Admin Portfolio Error:", e)
+        photographers = []
+    finally:
+        cursor.close()
+    
+    return render_template("admin_portfolio.html", photographers=photographers)
+
+# ---------------- ADMIN: ADD PORTFOLIO IMAGE FOR A PHOTOGRAPHER ----------------
+@app.route("/admin/portfolio/add/<int:photographer_id>", methods=["GET", "POST"])
+@admin_required
+def admin_add_portfolio_image(photographer_id):
+    db = get_db()
+    
+    if request.method == "POST":
+        image_url = request.form.get("image_url")
+        location = request.form.get("location")
+        shoot_date = request.form.get("shoot_date")
+        description = request.form.get("description")
+        
+        cursor = db.cursor()
+        try:
+            cursor.execute("""
+                INSERT INTO portfolio_images (photographer_id, image_url, location, shoot_date, description)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (photographer_id, image_url, location, shoot_date, description))
+            db.commit()
+            flash("✅ Image added to portfolio!", "success")
+        except Exception as e:
+            print("Add Portfolio Error:", e)
+            db.rollback()
+            flash("❌ Error adding image", "error")
+        finally:
+            cursor.close()
+        return redirect("/admin/portfolio")
+    
+    # GET - show form
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM photographers WHERE id = %s", (photographer_id,))
+        photographer = cursor.fetchone()
+    except Exception as e:
+        print("Fetch Photographer Error:", e)
+        photographer = None
+    finally:
+        cursor.close()
+    
+    if not photographer:
+        flash("Photographer not found!", "error")
+        return redirect("/admin/portfolio")
+    
+    return render_template("admin_add_portfolio_image.html", photographer=photographer)
+
+# ---------------- ADMIN: DELETE PORTFOLIO IMAGE ----------------
+@app.route("/admin/portfolio/delete/<int:image_id>", methods=["POST"])
+@admin_required
+def admin_delete_portfolio_image(image_id):
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM portfolio_images WHERE id = %s", (image_id,))
+        db.commit()
+        flash("🗑️ Image deleted successfully", "success")
+    except Exception as e:
+        print("Delete Portfolio Error:", e)
+        db.rollback()
+        flash("❌ Error deleting image", "error")
+    finally:
+        cursor.close()
+    return redirect("/admin/portfolio")
+
+# ---------------- UPDATE PHOTOGRAPHER EDIT FORM TO INCLUDE PROFILE_IMAGE ----------------
+@app.route("/admin/edit_photographer/<int:id>", methods=["GET", "POST"])
+@admin_required
+def edit_photographer(id):
+    db = get_db()
+    if not db:
+        flash("Database error", "error")
+        return redirect("/admin/photographers")
+        
+    cursor = db.cursor(dictionary=True)
+    
+    if request.method == "POST":
+        try:
+            first_name = request.form.get("first_name")
+            last_name = request.form.get("last_name")
+            email = request.form.get("email")
+            phone = request.form.get("phone")
+            experience = request.form.get("experience")
+            rating = request.form.get("rating")
+            status = request.form.get("status")
+            profile_image = request.form.get("profile_image")
+            
+            cursor.execute("""
+                UPDATE photographers 
+                SET first_name=%s, last_name=%s, email=%s, phone=%s, 
+                    experience=%s, rating=%s, status=%s, profile_image=%s
+                WHERE id=%s
+            """, (first_name, last_name, email, phone, experience, rating, status, profile_image, id))
+            db.commit()
+            flash("✅ Photographer updated successfully!", "success")
+            return redirect("/admin/photographers")
+        except Exception as e:
+            print("Update Error:", e)
+            db.rollback()
+            flash("❌ Error updating photographer", "error")
+            return redirect(f"/admin/edit_photographer/{id}")
+    
+    try:
+        cursor.execute("SELECT * FROM photographers WHERE id=%s", (id,))
+        photographer = cursor.fetchone()
+    except Exception as e:
+        print("Fetch Photographer Error:", e)
+        photographer = None
+    finally:
+        cursor.close()
+    
+    if not photographer:
+        flash("❌ Photographer not found!", "error")
+        return redirect("/admin/photographers")
+    
+    return render_template("admin_edit_photographer.html", photographer=photographer)
+
+# ==================== END OF PORTFOLIO FEATURE ====================
 
 # ---------------- CART ----------------
 @app.route("/cart", methods=["GET", "POST"])
@@ -1059,190 +1261,6 @@ def delete_user(id):
         cursor.close()
     return redirect("/admin/users")
 
-# ---------------- Order Success ----------------
-@app.route("/order-success")
-def order_success():
-    order_id = request.args.get("order_id")
-    total = request.args.get("total")
-    return render_template("order_success.html", order_id=order_id, total=total)
-
-#----------------- Check Out Route (FIXED) ----------------
-@app.route("/checkout", methods=["GET", "POST"])
-@login_required
-def checkout():
-    db = get_db()
-    if not db:
-        flash("Database error", "error")
-        return redirect("/cart")
-        
-    cursor = db.cursor(dictionary=True)
-
-    # ---------------- GET ----------------
-    if request.method == "GET":
-        try:
-            cursor.execute("""
-                SELECT 
-                    up.id AS cart_id,
-                    up.quantity,
-                    up.location,
-                    up.scheduled_date,
-                    p.package_name,
-                    p.package_price,
-                    p.duration,
-                    CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
-                    up.photographer_id
-                FROM user_packages up
-                JOIN packages p ON up.package_id = p.package_id
-                LEFT JOIN photographers ph ON up.photographer_id = ph.id
-                WHERE up.user_id = %s
-            """, (session["user_id"],))
-
-            items = cursor.fetchall()
-
-            # 🔥 VALIDATION CHECK (IMPORTANT)
-            for item in items:
-                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
-                    flash("⚠️ Please complete all package details before checkout!", "error")
-                    return redirect("/cart")
-
-            total = sum(item["package_price"] * item["quantity"] for item in items)
-
-        except Exception as e:
-            print("Checkout GET Error:", e)
-            items = []
-            total = 0
-        finally:
-            cursor.close()
-
-        return render_template("checkout.html", items=items, total=total)
-
-    # ---------------- POST ----------------
-    if request.method == "POST":
-        payment_method = request.form.get("payment")
-
-        try:
-            cursor.execute("""
-                SELECT up.*, p.package_name, p.package_price, p.duration
-                FROM user_packages up
-                JOIN packages p ON up.package_id = p.package_id
-                WHERE up.user_id = %s
-            """, (session["user_id"],))
-
-            cart_items = cursor.fetchall()
-
-            if not cart_items:
-                flash("Your cart is empty!", "error")
-                return redirect("/cart")
-
-            # 🔥 VALIDATION AGAIN (CRITICAL)
-            for item in cart_items:
-                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
-                    flash("⚠️ Please complete all package details before placing order!", "error")
-                    return redirect("/cart")
-
-            total = sum(item["package_price"] * item["quantity"] for item in cart_items)
-
-            # Use first item (or you can improve later for multi-location)
-            location = cart_items[0]["location"]
-            scheduled_date = cart_items[0]["scheduled_date"]
-
-            order_code = str(uuid.uuid4())[:8]
-
-            cursor.execute("""
-                INSERT INTO orders 
-                (user_id, total_price, location, payment_method, status, order_id, scheduled_date)
-                VALUES (%s,%s,%s,%s,%s,%s,%s)
-            """, (
-                session["user_id"],
-                total,
-                location,
-                payment_method,
-                "Confirmed",
-                order_code,
-                scheduled_date
-            ))
-
-            for item in cart_items:
-                cursor.execute("""
-                    INSERT INTO order_items 
-                    (order_id, package_name, price, duration, location, quantity, photographer_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    order_code,
-                    item["package_name"],
-                    item["package_price"],
-                    item["duration"],
-                    item["location"],
-                    item["quantity"],
-                    item["photographer_id"]
-                ))
-
-            # Clear cart
-            cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
-
-            db.commit()
-            cursor.close()
-
-            flash("🎉 Order placed successfully!", "success")
-            return redirect(f"/order-success?order_id={order_code}&total={total}")
-
-        except Exception as e:
-            print("Checkout POST Error:", e)
-            db.rollback()
-            flash("❌ Error processing checkout", "error")
-            cursor.close()
-            return redirect("/cart")
-# ---------------- ADMIN EDIT PHOTOGRAPHER ----------------
-@app.route("/admin/edit_photographer/<int:id>", methods=["GET", "POST"])
-@admin_required
-def edit_photographer(id):
-    db = get_db()
-    if not db:
-        flash("Database error", "error")
-        return redirect("/admin/photographers")
-        
-    cursor = db.cursor(dictionary=True)
-    
-    if request.method == "POST":
-        try:
-            first_name = request.form.get("first_name")
-            last_name = request.form.get("last_name")
-            email = request.form.get("email")
-            phone = request.form.get("phone")
-            experience = request.form.get("experience")
-            rating = request.form.get("rating")
-            status = request.form.get("status")
-            
-            cursor.execute("""
-                UPDATE photographers 
-                SET first_name=%s, last_name=%s, email=%s, phone=%s, 
-                    experience=%s, rating=%s, status=%s
-                WHERE id=%s
-            """, (first_name, last_name, email, phone, experience, rating, status, id))
-            db.commit()
-            flash("✅ Photographer updated successfully!", "success")
-            return redirect("/admin/photographers")
-        except Exception as e:
-            print("Update Error:", e)
-            db.rollback()
-            flash("❌ Error updating photographer", "error")
-            return redirect(f"/admin/edit_photographer/{id}")
-    
-    try:
-        cursor.execute("SELECT * FROM photographers WHERE id=%s", (id,))
-        photographer = cursor.fetchone()
-    except Exception as e:
-        print("Fetch Photographer Error:", e)
-        photographer = None
-    finally:
-        cursor.close()
-    
-    if not photographer:
-        flash("❌ Photographer not found!", "error")
-        return redirect("/admin/photographers")
-    
-    return render_template("admin_edit_photographer.html", photographer=photographer)
-
 # ---------------- ADMIN DELETE PHOTOGRAPHER ----------------
 @app.route("/admin/delete_photographer/<int:id>", methods=["POST"])
 @admin_required
@@ -1306,6 +1324,136 @@ def view_user(user_id):
         cursor.close()
 
     return render_template('admin_view_user.html', user=user)
+
+# ---------------- Order Success ----------------
+@app.route("/order-success")
+def order_success():
+    order_id = request.args.get("order_id")
+    total = request.args.get("total")
+    return render_template("order_success.html", order_id=order_id, total=total)
+
+#----------------- CheckOut Route----------------
+@app.route("/checkout", methods=["GET", "POST"])
+@login_required
+def checkout():
+    db = get_db()
+    if not db:
+        flash("Database error", "error")
+        return redirect("/cart")
+        
+    cursor = db.cursor(dictionary=True)
+
+    # ---------------- GET ----------------
+    if request.method == "GET":
+        try:
+            cursor.execute("""
+                SELECT 
+                    up.id AS cart_id,
+                    up.quantity,
+                    up.location,
+                    up.scheduled_date,
+                    p.package_name,
+                    p.package_price,
+                    p.duration,
+                    CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+                    up.photographer_id
+                FROM user_packages up
+                JOIN packages p ON up.package_id = p.package_id
+                LEFT JOIN photographers ph ON up.photographer_id = ph.id
+                WHERE up.user_id = %s
+            """, (session["user_id"],))
+
+            items = cursor.fetchall()
+
+            for item in items:
+                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
+                    flash("⚠️ Please complete all package details before checkout!", "error")
+                    return redirect("/cart")
+
+            total = sum(item["package_price"] * item["quantity"] for item in items)
+
+        except Exception as e:
+            print("Checkout GET Error:", e)
+            items = []
+            total = 0
+        finally:
+            cursor.close()
+
+        return render_template("checkout.html", items=items, total=total)
+
+    # ---------------- POST ----------------
+    if request.method == "POST":
+        payment_method = request.form.get("payment")
+
+        try:
+            cursor.execute("""
+                SELECT up.*, p.package_name, p.package_price, p.duration
+                FROM user_packages up
+                JOIN packages p ON up.package_id = p.package_id
+                WHERE up.user_id = %s
+            """, (session["user_id"],))
+
+            cart_items = cursor.fetchall()
+
+            if not cart_items:
+                flash("Your cart is empty!", "error")
+                return redirect("/cart")
+
+            for item in cart_items:
+                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
+                    flash("⚠️ Please complete all package details before placing order!", "error")
+                    return redirect("/cart")
+
+            total = sum(item["package_price"] * item["quantity"] for item in cart_items)
+
+            location = cart_items[0]["location"]
+            scheduled_date = cart_items[0]["scheduled_date"]
+
+            order_code = str(uuid.uuid4())[:8]
+
+            cursor.execute("""
+                INSERT INTO orders 
+                (user_id, total_price, location, payment_method, status, order_id, scheduled_date)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
+            """, (
+                session["user_id"],
+                total,
+                location,
+                payment_method,
+                "Confirmed",
+                order_code,
+                scheduled_date
+            ))
+
+            for item in cart_items:
+                cursor.execute("""
+                    INSERT INTO order_items 
+                    (order_id, package_name, price, duration, location, quantity, photographer_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    order_code,
+                    item["package_name"],
+                    item["package_price"],
+                    item["duration"],
+                    item["location"],
+                    item["quantity"],
+                    item["photographer_id"]
+                ))
+
+            cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
+
+            db.commit()
+            cursor.close()
+
+            flash("🎉 Order placed successfully!", "success")
+            return redirect(f"/order-success?order_id={order_code}&total={total}")
+
+        except Exception as e:
+            print("Checkout POST Error:", e)
+            db.rollback()
+            flash("❌ Error processing checkout", "error")
+            cursor.close()
+            return redirect("/cart")
 
 # ---------------- LOGOUT ----------------
 @app.route("/logout")

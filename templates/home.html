@@ -437,6 +437,61 @@ section {
   margin: 0;
 }
 
+/* Portfolio Grid Styles (Best Work) */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.portfolio-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.portfolio-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.portfolio-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+.portfolio-card-body {
+  padding: 15px;
+}
+
+.photographer-name {
+  font-weight: bold;
+  color: #e91e63;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.portfolio-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+.portfolio-meta i {
+  width: 20px;
+  color: #ff7f50;
+}
+
+.loading-spinner {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px;
+}
+
 /* TOAST NOTIFICATION - Animations KEPT */
 .toast {
   position: fixed;
@@ -580,6 +635,11 @@ footer a:hover {
     height: 35px;
     font-size: 16px;
   }
+  
+  .portfolio-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -606,6 +666,14 @@ footer a:hover {
   .profile-menu {
     right: -10px;
     min-width: 180px;
+  }
+  
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .portfolio-card img {
+    height: 200px;
   }
 }
 
@@ -780,6 +848,25 @@ footer a:hover {
   </div>
 </section>
 
+<!-- ========== NEW: OUR BEST WORK SECTION ========== -->
+<section id="best-work">
+  <h2 class="section-title">📸 Our Best Work</h2>
+  <p class="text-center" style="text-align: center; margin-bottom: 20px; color: #555;">Explore stunning captures from our talented photographers</p>
+  <div id="portfolio-grid" class="portfolio-grid">
+    <div class="loading-spinner">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <a href="/portfolio" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #ff7f50, #ff6347);">
+      <i class="fas fa-images"></i> View Full Portfolio →
+    </a>
+  </div>
+</section>
+<!-- ========== END BEST WORK SECTION ========== -->
+
 <!-- Footer -->
 <footer>
   <div class="footer-container">
@@ -871,6 +958,9 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   });
+
+  // Load Portfolio (Best Work)
+  fetchPortfolio();
 });
 
 // Package slider function
@@ -929,6 +1019,53 @@ function filterPackages() {
     packagesScrollPosition = 0;
     const slider = document.getElementById('packagesSlider');
     slider.style.transform = `translateX(0px)`;
+  }
+}
+
+// Fetch portfolio data and render grid (max 6 images, one per photographer)
+async function fetchPortfolio() {
+  const grid = document.getElementById('portfolio-grid');
+  try {
+    const response = await fetch('/api/portfolio');
+    const data = await response.json();
+    
+    if (!data || data.length === 0) {
+      grid.innerHTML = '<div class="col-12 text-center"><p>No portfolio images yet. Check back soon!</p></div>';
+      return;
+    }
+    
+    grid.innerHTML = '';
+    let displayCount = 0;
+    for (const photographer of data) {
+      if (displayCount >= 6) break;
+      if (!photographer.images || photographer.images.length === 0) continue;
+      
+      // Take the first image as representative
+      const img = photographer.images[0];
+      const card = document.createElement('div');
+      card.className = 'portfolio-card';
+      card.innerHTML = `
+        <img src="${img.url}" alt="${photographer.name}'s work" loading="lazy">
+        <div class="portfolio-card-body">
+          <div class="photographer-name">📷 ${photographer.name}</div>
+          <div class="portfolio-meta">
+            <i class="fas fa-map-marker-alt"></i> ${img.location || 'Location not specified'}<br>
+            <i class="fas fa-calendar-alt"></i> ${img.shoot_date || 'Date not available'}
+          </div>
+          <p style="margin-top: 8px; font-size: 0.9rem;">${img.description ? img.description.substring(0, 80) : 'Beautiful capture from our talented photographer.'}</p>
+          <a href="/portfolio" class="btn btn-sm" style="margin-top: 10px; display: inline-block; padding: 6px 12px; font-size: 0.8rem;">View more by ${photographer.name.split(' ')[0]}</a>
+        </div>
+      `;
+      grid.appendChild(card);
+      displayCount++;
+    }
+    
+    if (displayCount === 0) {
+      grid.innerHTML = '<div class="col-12 text-center"><p>No portfolio images yet.</p></div>';
+    }
+  } catch (error) {
+    console.error('Portfolio load error:', error);
+    grid.innerHTML = '<div class="col-12 text-center text-danger">Failed to load portfolio. Please try again later.</div>';
   }
 }
 

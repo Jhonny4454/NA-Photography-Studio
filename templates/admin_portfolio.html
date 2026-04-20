@@ -1,0 +1,18 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>📸 Portfolio Management</h2>
+    <table class="table table-striped">
+        <thead><tr><th>Photographer</th><th>Images Count</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for p in photographers %}
+            <tr>
+                <td>{{ p.first_name }} {{ p.last_name }}</td>
+                <td>{{ p.image_count or 0 }}</td>
+                <td><a href="/admin/portfolio/add/{{ p.id }}" class="btn btn-sm btn-primary">Add Image</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
