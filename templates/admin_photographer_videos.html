@@ -1,0 +1,30 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h1>Videos for {{ photographer.first_name }} {{ photographer.last_name }}</h1>
+<a href="/admin/photographer_videos/add/{{ photographer.id }}" class="btn btn-primary">Add Video</a>
+<a href="/admin/portfolio" class="btn btn-secondary">Back to Portfolio</a>
+
+<table class="table table-striped">
+  <thead>
+    <tr><th>ID</th><th>Title</th><th>Short Loop</th><th>Sort Order</th><th>Formats</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for v in videos %}
+    <tr>
+      <td>{{ v.id }}</td><td>{{ v.title }}</td>
+      <td>{{ 'Yes' if v.is_short_loop else 'No' }}</td>
+      <td>{{ v.sort_order }}</td>
+      <td>{{ v.formats or '—' }}</td>
+      <td>
+        <a href="/admin/videos/edit/{{ v.id }}">Edit</a>
+        <form method="POST" action="/admin/videos/delete/{{ v.id }}" style="display:inline;" onsubmit="return confirm('Delete video?')">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No videos for this photographer.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
