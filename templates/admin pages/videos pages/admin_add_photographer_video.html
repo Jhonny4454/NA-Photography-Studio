@@ -158,6 +158,11 @@
             color: white;
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -316,7 +321,7 @@
             .button-group {
                 flex-direction: column;
             }
-            .btn-primary, .btn-secondary {
+            .btn-primary, .btn-secondary, .btn-info {
                 width: 100%;
                 justify-content: center;
             }
@@ -370,6 +375,10 @@
     <div class="top-bar">
         <h1><i class="fas fa-plus-circle"></i> Add Video for {{ photographer.first_name }} {{ photographer.last_name }}</h1>
         <div class="btn-group">
+            <!-- NEW: Manage Images button -->
+            <a href="/admin/portfolio/images/{{ photographer.id }}" class="btn btn-info">
+                <i class="fas fa-images"></i> Manage Images
+            </a>
             <a href="/admin/photographer_videos/{{ photographer.id }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Videos
             </a>

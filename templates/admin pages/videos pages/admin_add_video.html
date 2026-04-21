@@ -158,6 +158,11 @@
             color: white;
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -316,7 +321,7 @@
             .button-group {
                 flex-direction: column;
             }
-            .btn-primary, .btn-secondary {
+            .btn-primary, .btn-secondary, .btn-info {
                 width: 100%;
                 justify-content: center;
             }
@@ -370,6 +375,10 @@
     <div class="top-bar">
         <h1><i class="fas fa-plus-circle"></i> Add New Video</h1>
         <div class="btn-group">
+            <!-- NEW: Dynamic Manage Images button -->
+            <a id="manageImagesBtn" href="#" class="btn btn-info" style="display: none;">
+                <i class="fas fa-images"></i> Manage Images
+            </a>
             <a href="/admin/videos" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Videos
             </a>
@@ -392,7 +401,7 @@
         <form method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label><i class="fas fa-user"></i> Photographer *</label>
-                <select name="photographer_id" required>
+                <select name="photographer_id" id="photographerSelect" required>
                     {% for p in photographers %}
                         <option value="{{ p.id }}">{{ p.first_name }} {{ p.last_name }}</option>
                     {% endfor %}
@@ -480,6 +489,23 @@
             }, 500);
         });
     }, 3000);
+
+    // Dynamic "Manage Images" button: update href when photographer selection changes
+    const photographerSelect = document.getElementById('photographerSelect');
+    const manageImagesBtn = document.getElementById('manageImagesBtn');
+
+    function updateManageImagesLink() {
+        const selectedId = photographerSelect.value;
+        if (selectedId) {
+            manageImagesBtn.href = `/admin/portfolio/images/${selectedId}`;
+            manageImagesBtn.style.display = 'inline-flex';
+        } else {
+            manageImagesBtn.style.display = 'none';
+        }
+    }
+
+    photographerSelect.addEventListener('change', updateManageImagesLink);
+    updateManageImagesLink(); // initial call
 </script>
 
 </body>

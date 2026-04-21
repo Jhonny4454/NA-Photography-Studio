@@ -355,7 +355,7 @@ tr:hover {
   flex-wrap: wrap;
 }
 
-.edit-btn, .portfolio-btn, .videos-btn {
+.edit-btn, .images-btn, .videos-btn {
   padding: 6px 12px;
   border-radius: 30px;
   text-decoration: none;
@@ -374,16 +374,7 @@ tr:hover {
   color: white;
 }
 
-.edit-btn:hover, .portfolio-btn:hover, .videos-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-
-.edit-btn:active, .portfolio-btn:active, .videos-btn:active {
-  transform: translateY(0);
-}
-
-.portfolio-btn {
+.images-btn {
   background: linear-gradient(135deg, #9b59b6, #8e44ad);
   color: white;
 }
@@ -391,6 +382,15 @@ tr:hover {
 .videos-btn {
   background: linear-gradient(135deg, #e67e22, #d35400);
   color: white;
+}
+
+.edit-btn:hover, .images-btn:hover, .videos-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.edit-btn:active, .images-btn:active, .videos-btn:active {
+  transform: translateY(0);
 }
 
 .delete-btn {
@@ -479,7 +479,7 @@ tr:hover {
     flex-direction: column;
   }
   
-  .edit-btn, .portfolio-btn, .videos-btn, .delete-btn {
+  .edit-btn, .images-btn, .videos-btn, .delete-btn {
     width: 100%;
     justify-content: center;
   }
@@ -745,8 +745,9 @@ createParticles();
             <a href="/admin/edit_photographer/{{ p.id }}" class="edit-btn">
               <i class="fas fa-edit"></i> Edit
             </a>
-            <a href="/admin/portfolio" class="portfolio-btn">
-              <i class="fas fa-images"></i> Portfolio
+            <!-- UPDATED: Images button (per‑photographer) -->
+            <a href="/admin/portfolio/images/{{ p.id }}" class="images-btn">
+              <i class="fas fa-images"></i> Images
             </a>
             <a href="/admin/photographer_videos/{{ p.id }}" class="videos-btn">
               <i class="fas fa-video"></i> Videos

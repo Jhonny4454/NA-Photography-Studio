@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* (your existing CSS – unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +23,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated background overlay */
         body::before {
             content: "";
             position: absolute;
@@ -34,7 +34,6 @@
             pointer-events: none;
         }
 
-        /* Floating particles */
         .particle {
             position: absolute;
             background: rgba(255,255,255,0.15);
@@ -48,7 +47,6 @@
             50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
         }
 
-        /* SIDEBAR - Glassmorphism */
         .sidebar {
             width: 260px;
             background: rgba(0,0,0,0.4);
@@ -95,7 +93,6 @@
             transform: translateX(5px);
         }
 
-        /* MAIN CONTENT */
         .main {
             flex: 1;
             padding: clamp(20px, 5vw, 30px);
@@ -103,7 +100,6 @@
             height: 100vh;
         }
 
-        /* TOP BAR */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -133,7 +129,6 @@
             flex-wrap: wrap;
         }
 
-        /* BUTTONS with animations */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -177,7 +172,6 @@
             transform: translateY(0);
         }
 
-        /* FLASH MESSAGES */
         .flash {
             padding: 15px 20px;
             border-radius: 12px;
@@ -210,7 +204,6 @@
             font-size: 20px;
         }
 
-        /* TABLE WRAPPER */
         .table-wrapper {
             overflow-x: auto;
             background: rgba(255,255,255,0.95);
@@ -270,7 +263,6 @@
             color: #ddd;
         }
 
-        /* RESPONSIVE */
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -318,7 +310,6 @@
             }
         }
 
-        /* PRINT */
         @media print {
             body::before, .particle, .sidebar, .btn-group {
                 display: none;
@@ -433,7 +424,6 @@
 </div>
 
 <script>
-    // Create floating particles
     function createParticles() {
         for (let i = 0; i < 30; i++) {
             const particle = document.createElement('div');
@@ -450,7 +440,6 @@
     }
     createParticles();
 
-    // Auto-hide flash messages after 3 seconds
     setTimeout(function() {
         const flashes = document.querySelectorAll('.flash');
         flashes.forEach(flash => {

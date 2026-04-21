@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Edit Photographer - Admin | SnapHire</title>
+<title>Portfolio Management - Admin | SnapHire</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -102,7 +102,7 @@ body::before {
   transform: translateX(5px);
 }
 
-/* MAIN - Responsive */
+/* MAIN CONTENT */
 .main {
   flex: 1;
   padding: clamp(20px, 5vw, 30px) clamp(20px, 5vw, 30px);
@@ -110,7 +110,7 @@ body::before {
   height: 100vh;
 }
 
-/* TOP BAR - Responsive */
+/* TOP BAR */
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -134,13 +134,7 @@ body::before {
   color: #ff7f50;
 }
 
-.action-links {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.back-btn, .manage-videos-btn {
+.refresh-btn {
   background: rgba(255,255,255,0.15);
   color: white;
   padding: 8px 18px;
@@ -152,132 +146,17 @@ body::before {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: clamp(12px, 3.5vw, 14px);
   font-weight: 500;
+  border: none;
+  cursor: pointer;
 }
 
-.back-btn:hover, .manage-videos-btn:hover {
+.refresh-btn:hover {
   background: linear-gradient(135deg, #ff7f50, #ff6347);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255,127,80,0.4);
 }
 
-.back-btn:active, .manage-videos-btn:active {
-  transform: translateY(0);
-}
-
-/* FORM CARD - Glass Morphism */
-.form-card {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  padding: clamp(25px, 6vw, 35px);
-  border-radius: 24px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-  max-width: 700px;
-  margin: 0 auto;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
-  font-size: clamp(13px, 3.5vw, 14px);
-}
-
-.form-group label i {
-  color: #ff7f50;
-  width: 20px;
-}
-
-.form-group input, .form-group select {
-  width: 100%;
-  padding: clamp(10px, 3vw, 12px);
-  border-radius: 12px;
-  border: 2px solid #e0e0e0;
-  font-size: clamp(13px, 3.5vw, 14px);
-  transition: all 0.3s ease;
-  background: white;
-}
-
-.form-group input:focus, .form-group select:focus {
-  outline: none;
-  border-color: #ff7f50;
-  box-shadow: 0 0 0 3px rgba(255,127,80,0.1);
-}
-
-.form-group small {
-  display: block;
-  margin-top: 5px;
-  font-size: 12px;
-  color: #888;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
-}
-
-/* BUTTONS - Responsive with smooth animations */
-.button-group {
-  display: flex;
-  gap: 15px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.btn-save {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
-  color: white;
-  padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 25px);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: clamp(14px, 4vw, 16px);
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(46,204,113,0.4);
-}
-
-.btn-save:active {
-  transform: translateY(0);
-}
-
-.btn-cancel {
-  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-  color: white;
-  padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 25px);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: clamp(14px, 4vw, 16px);
-  font-weight: bold;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-cancel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(149,165,166,0.4);
-}
-
-.btn-cancel:active {
+.refresh-btn:active {
   transform: translateY(0);
 }
 
@@ -296,14 +175,8 @@ body::before {
 }
 
 @keyframes slideDown {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .flash-success {
@@ -320,7 +193,131 @@ body::before {
   font-size: 20px;
 }
 
-/* RESPONSIVE BREAKPOINTS */
+/* TABLE WRAPPER */
+.table-wrapper {
+  overflow-x: auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th, td {
+  padding: clamp(12px, 3vw, 16px) clamp(10px, 2.5vw, 15px);
+  text-align: left;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+th {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  font-weight: 600;
+}
+
+tr {
+  transition: background 0.2s ease;
+}
+
+tr:nth-child(even) {
+  background: rgba(249,249,249,0.8);
+}
+
+tr:hover {
+  background: rgba(241,241,241,0.9);
+}
+
+/* COUNT BADGES */
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: clamp(12px, 3.5vw, 13px);
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.count-badge.video {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.count-badge:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ACTION BUTTONS */
+.btn-manage, .btn-add {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 30px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(12px, 3.5vw, 13px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-manage:hover, .btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52,152,219,0.4);
+}
+
+.btn-manage:active, .btn-add:active {
+  transform: translateY(0);
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.btn-add:hover {
+  box-shadow: 0 5px 15px rgba(46,204,113,0.4);
+}
+
+.btn-manage.video {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.btn-manage.video:hover {
+  box-shadow: 0 5px 15px rgba(230,126,34,0.4);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* NO DATA */
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.no-data i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
   body {
     flex-direction: column;
@@ -347,23 +344,22 @@ body::before {
     padding: 20px;
   }
   
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-  
-  .button-group {
-    flex-direction: column;
-  }
-  
-  .btn-save, .btn-cancel {
-    width: 100%;
-    justify-content: center;
-  }
-  
   .top-bar {
     flex-direction: column;
     text-align: center;
+  }
+  
+  th, td {
+    padding: 10px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-manage, .btn-add {
+    justify-content: center;
   }
 }
 
@@ -376,13 +372,8 @@ body::before {
   .sidebar h2 {
     text-align: center;
   }
-  
-  .form-card {
-    padding: 20px;
-  }
 }
 
-/* LANDSCAPE MODE */
 @media (max-width: 768px) and (orientation: landscape) {
   .sidebar {
     padding: 10px;
@@ -391,16 +382,11 @@ body::before {
   .sidebar a {
     padding: 8px 12px;
   }
-  
-  .form-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
 }
 
-/* PRINT STYLES */
+/* PRINT */
 @media print {
-  body::before, .particle, .sidebar, .button-group, .action-links {
+  body::before, .particle, .sidebar, .refresh-btn, .btn-manage, .btn-add {
     display: none;
   }
   
@@ -409,14 +395,16 @@ body::before {
     margin: 0;
   }
   
-  .form-card {
+  .table-wrapper {
     background: white;
     box-shadow: none;
-    padding: 0;
+    border: 1px solid #ddd;
   }
   
-  .form-group input, .form-group select {
-    border: 1px solid #ddd;
+  th {
+    background: #ff7f50;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 </style>
@@ -424,7 +412,6 @@ body::before {
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h2>
     <i class="fas fa-camera"></i>
@@ -456,25 +443,18 @@ body::before {
   </a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
 <div class="top-bar">
   <h1>
-    <i class="fas fa-edit"></i>
-    Edit Photographer
+    <i class="fas fa-images"></i>
+    Portfolio & Video Management
   </h1>
-  <div class="action-links">
-    <a href="/admin/photographer_videos/{{ photographer.id }}" class="manage-videos-btn">
-      <i class="fas fa-video"></i> Manage Videos
-    </a>
-    <a href="/admin/photographers" class="back-btn">
-      <i class="fas fa-arrow-left"></i> Back to Photographers
-    </a>
-  </div>
+  <a href="/admin/portfolio" class="refresh-btn">
+    <i class="fas fa-sync-alt"></i> Refresh
+  </a>
 </div>
 
-<!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
@@ -486,73 +466,66 @@ body::before {
   {% endif %}
 {% endwith %}
 
-<!-- EDIT FORM -->
-<div class="form-card">
-  <form method="POST" action="/admin/edit_photographer/{{ photographer.id }}">
-    <div class="form-row">
-      <div class="form-group">
-        <label><i class="fas fa-user"></i> First Name</label>
-        <input type="text" name="first_name" value="{{ photographer.first_name }}" required>
-      </div>
-      
-      <div class="form-group">
-        <label><i class="fas fa-user"></i> Last Name</label>
-        <input type="text" name="last_name" value="{{ photographer.last_name }}" required>
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label><i class="fas fa-envelope"></i> Email</label>
-      <input type="email" name="email" value="{{ photographer.email }}" required>
-    </div>
-    
-    <div class="form-group">
-      <label><i class="fas fa-phone"></i> Phone</label>
-      <input type="tel" name="phone" value="{{ photographer.phone }}" placeholder="Enter phone number">
-    </div>
-    
-    <div class="form-group">
-      <label><i class="fas fa-briefcase"></i> Experience</label>
-      <input type="text" name="experience" value="{{ photographer.experience }}" placeholder="e.g., 5 years in wedding photography">
-    </div>
-    
-    <!-- Profile Image URL field -->
-    <div class="form-group">
-      <label><i class="fas fa-image"></i> Profile Image URL</label>
-      <input type="url" name="profile_image" value="{{ photographer.profile_image }}" placeholder="https://example.com/profile.jpg">
-      <small>Direct image URL for photographer's avatar (shown in portfolio).</small>
-    </div>
-    
-    <div class="form-row">
-      <div class="form-group">
-        <label><i class="fas fa-star"></i> Rating (0-5)</label>
-        <input type="number" name="rating" step="0.1" min="0" max="5" value="{{ photographer.rating }}">
-      </div>
-      
-      <div class="form-group">
-        <label><i class="fas fa-toggle-on"></i> Status</label>
-        <select name="status">
-          <option value="active" {% if photographer.status == 'active' %}selected{% endif %}>Active</option>
-          <option value="inactive" {% if photographer.status == 'inactive' %}selected{% endif %}>Inactive</option>
-        </select>
-      </div>
-    </div>
-    
-    <div class="button-group">
-      <button type="submit" class="btn-save">
-        <i class="fas fa-save"></i> Save Changes
-      </button>
-      <a href="/admin/photographers" class="btn-cancel">
-        <i class="fas fa-times"></i> Cancel
-      </a>
-    </div>
-  </form>
+<div class="table-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Photographer</th>
+        <th>Images</th>
+        <th>Videos</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if photographers and photographers|length > 0 %}
+        {% for p in photographers %}
+        <tr>
+          <td>
+            <strong>{{ p.first_name }} {{ p.last_name }}</strong>
+          </td>
+          <td class="text-center">
+            <span class="count-badge">
+              <i class="fas fa-image"></i> {{ p.image_count or 0 }}
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="count-badge video">
+              <i class="fas fa-video"></i> {{ p.video_count or 0 }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <!-- Manage Images (list, edit, delete) -->
+              <a href="/admin/portfolio/images/{{ p.id }}" class="btn-manage">
+                <i class="fas fa-images"></i> Manage Images
+              </a>
+              <!-- NEW: Direct Add Image button -->
+              <a href="/admin/portfolio/add/{{ p.id }}" class="btn-add">
+                <i class="fas fa-plus-circle"></i> Add Image
+              </a>
+              <!-- Manage Videos -->
+              <a href="/admin/photographer_videos/{{ p.id }}" class="btn-manage video">
+                <i class="fas fa-video"></i> Manage Videos
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="4" class="no-data">
+            <i class="fas fa-camera-retro"></i>
+            <p>No photographers found. Please add photographers first.</p>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
 </div>
 
 </div>
 
 <script>
-// Create floating particles
 function createParticles() {
   for (let i = 0; i < 30; i++) {
     const particle = document.createElement('div');
@@ -567,19 +540,15 @@ function createParticles() {
     document.body.appendChild(particle);
   }
 }
-
 createParticles();
 
-// Auto-hide flash messages after 3 seconds
 setTimeout(function() {
   const flashes = document.querySelectorAll('.flash');
   flashes.forEach(flash => {
     flash.style.transition = 'opacity 0.5s ease';
     flash.style.opacity = '0';
     setTimeout(() => {
-      if (flash.parentNode) {
-        flash.parentNode.removeChild(flash);
-      }
+      if (flash.parentNode) flash.parentNode.removeChild(flash);
     }, 500);
   });
 }, 3000);

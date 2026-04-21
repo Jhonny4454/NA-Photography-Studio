@@ -1162,6 +1162,11 @@ def admin_dashboard():
         total_users = cursor.fetchone()["count"]
         cursor.execute("SELECT COUNT(*) as count FROM photographers")
         total_photographers = cursor.fetchone()["count"]
+        
+        # NEW: Get total videos count
+        cursor.execute("SELECT COUNT(*) as count FROM videos")
+        total_videos = cursor.fetchone()["count"]
+        
         cursor.execute("""
             SELECT o.order_id, o.total_price, o.status, o.created_at, u.first_name, u.last_name
             FROM orders o JOIN users u ON o.user_id = u.id
@@ -1176,11 +1181,19 @@ def admin_dashboard():
         revenue = 0
         total_users = 0
         total_photographers = 0
+        total_videos = 0
         recent_orders = []
         applications = []
     finally:
         cursor.close()
-    return render_template("admin_dashboard.html", total_orders=total_orders, revenue=revenue, total_users=total_users, total_photographers=total_photographers, recent_orders=recent_orders, applications=applications)
+    return render_template("admin_dashboard.html", 
+                         total_orders=total_orders,
+                         revenue=revenue,
+                         total_users=total_users,
+                         total_photographers=total_photographers,
+                         total_videos=total_videos,
+                         recent_orders=recent_orders,
+                         applications=applications)
 
 @app.route("/admin/order_details/<string:order_id>")
 @admin_required
