@@ -848,7 +848,57 @@ def admin_add_photographer_video(photographer_id):
 
 # ==================== END VIDEO MANAGEMENT ====================
 
-# ---------------- CART & ORDER ROUTES (unchanged) ----------------
+# ==================== EDIT PHOTOGRAPHER (FIXED) ====================
+@app.route("/admin/edit_photographer/<int:id>", methods=["GET", "POST"])
+@admin_required
+def edit_photographer(id):
+    db = get_db()
+    if not db:
+        flash("Database error", "error")
+        return redirect("/admin/photographers")
+    cursor = db.cursor(dictionary=True)
+    
+    if request.method == "POST":
+        try:
+            cursor.execute("""
+                UPDATE photographers 
+                SET first_name=%s, last_name=%s, email=%s, phone=%s, 
+                    experience=%s, rating=%s, status=%s, profile_image=%s
+                WHERE id=%s
+            """, (
+                request.form.get("first_name"),
+                request.form.get("last_name"),
+                request.form.get("email"),
+                request.form.get("phone"),
+                request.form.get("experience"),
+                request.form.get("rating") or None,
+                request.form.get("status"),
+                request.form.get("profile_image"),
+                id
+            ))
+            db.commit()
+            flash("✅ Photographer updated successfully!", "success")
+            return redirect("/admin/photographers")
+        except Exception as e:
+            print("Update Error:", e)
+            db.rollback()
+            flash(f"❌ Error updating photographer: {str(e)}", "error")
+            return redirect(f"/admin/edit_photographer/{id}")
+    else:
+        try:
+            cursor.execute("SELECT * FROM photographers WHERE id=%s", (id,))
+            photographer = cursor.fetchone()
+        except Exception as e:
+            print("Fetch Photographer Error:", e)
+            photographer = None
+        finally:
+            cursor.close()
+        if not photographer:
+            flash("❌ Photographer not found!", "error")
+            return redirect("/admin/photographers")
+        return render_template("admin_edit_photographer.html", photographer=photographer)
+
+# ==================== CART & ORDER ROUTES ====================
 @app.route("/cart", methods=["GET", "POST"])
 @login_required
 def cart():
@@ -1163,7 +1213,7 @@ def admin_dashboard():
         cursor.execute("SELECT COUNT(*) as count FROM photographers")
         total_photographers = cursor.fetchone()["count"]
         
-        # NEW: Get total videos count
+        # Get total videos count
         cursor.execute("SELECT COUNT(*) as count FROM videos")
         total_videos = cursor.fetchone()["count"]
         
