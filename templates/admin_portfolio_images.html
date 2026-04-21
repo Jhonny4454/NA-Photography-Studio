@@ -67,7 +67,6 @@ body::before { content: ""; position: absolute; top: 0; left: 0; right: 0; botto
   <div class="top-bar">
     <h1><i class="fas fa-images"></i> Portfolio Media - {{ photographer.first_name }} {{ photographer.last_name }}</h1>
     <div class="action-links">
-      <!-- FIXED: Manage Videos button -->
       <a href="/admin/photographer_videos/{{ photographer.id }}" class="manage-videos-btn">
         <i class="fas fa-video"></i> Manage Videos
       </a>
@@ -87,7 +86,6 @@ body::before { content: ""; position: absolute; top: 0; left: 0; right: 0; botto
 
   <div class="section-header">
     <h2><i class="fas fa-camera"></i> Images</h2>
-    <!-- FIXED: Add Image button -->
     <a href="/admin/portfolio/add/{{ photographer.id }}" class="add-btn">
       <i class="fas fa-plus"></i> Add Image
     </a>
