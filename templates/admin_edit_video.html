@@ -260,13 +260,6 @@ body::before {
 }
 
 /* EXISTING FORMATS */
-.formats-section {
-  background: #f8f9fa;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 25px;
-}
-
 .formats-list {
   display: flex;
   flex-wrap: wrap;
@@ -340,6 +333,7 @@ body::before {
   gap: 15px;
   margin-top: 30px;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .btn-save {
@@ -522,7 +516,7 @@ body::before {
 {% endwith %}
 
 <!-- EDIT FORM -->
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" action="/admin/videos/edit/{{ video.id if video else '' }}">
   <div class="form-card">
     <div class="form-section-title">
       <i class="fas fa-info-circle"></i>
@@ -591,12 +585,13 @@ body::before {
 
     <div class="form-group">
       <label><i class="fas fa-upload"></i> Upload New Poster (optional)</label>
-      <div class="file-input-wrapper" onclick="document.getElementById('poster_input').click()">
+      <div class="file-input-wrapper" id="poster_upload_wrapper">
         <i class="fas fa-cloud-upload-alt"></i>
         <p>Click to upload poster image</p>
         <p style="font-size: 12px; color: #999;">Supports: JPG, PNG, WEBP</p>
         <input type="file" id="poster_input" name="poster_image" accept="image/jpeg,image/png,image/webp" style="display: none;">
       </div>
+      <div id="posterPreview" style="margin-top: 10px; font-size: 12px;"></div>
     </div>
   </div>
 
@@ -639,13 +634,13 @@ body::before {
 
     <div class="form-group">
       <label><i class="fas fa-upload"></i> Upload Additional Video Files</label>
-      <div class="file-input-wrapper" onclick="document.getElementById('video_input').click()">
+      <div class="file-input-wrapper" id="video_upload_wrapper">
         <i class="fas fa-cloud-upload-alt"></i>
         <p>Click to upload video files</p>
         <p style="font-size: 12px; color: #999;">Supports: MP4, WebM, OGG, MOV (multiple files allowed)</p>
         <input type="file" id="video_input" name="new_video_files" accept="video/mp4,video/webm,video/ogg,video/quicktime" multiple style="display: none;">
       </div>
-      <div id="fileList" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
+      <div id="videoFileList" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
     </div>
   </div>
 
@@ -657,14 +652,18 @@ body::before {
     <a href="/admin/videos" class="btn-cancel">
       <i class="fas fa-times"></i> Cancel
     </a>
-    <button type="button" class="btn-cancel btn-danger" onclick="confirmDelete()" style="margin-left: auto;">
+    {% if video and video.id %}
+    <button type="button" class="btn-cancel btn-danger" onclick="confirmDelete()">
       <i class="fas fa-trash-alt"></i> Delete Video
     </button>
+    {% endif %}
   </div>
 </form>
 
 <!-- Delete Form (hidden) -->
-<form id="deleteForm" action="/admin/videos/delete/{{ video.id if video else '' }}" method="POST" style="display: none;"></form>
+{% if video and video.id %}
+<form id="deleteForm" action="/admin/videos/delete/{{ video.id }}" method="POST" style="display: none;"></form>
+{% endif %}
 
 </div>
 
@@ -700,31 +699,36 @@ setTimeout(function() {
   });
 }, 3000);
 
-// Display selected file names
-document.getElementById('video_input').addEventListener('change', function(e) {
-  const fileList = document.getElementById('fileList');
-  const files = Array.from(e.target.files);
-  if (files.length > 0) {
-    fileList.innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> Selected: ' + files.map(f => f.name).join(', ');
-    fileList.style.color = '#27ae60';
-  } else {
-    fileList.innerHTML = '';
-  }
-});
+// Display selected video file names
+const videoInput = document.getElementById('video_input');
+const videoFileList = document.getElementById('videoFileList');
 
-document.getElementById('poster_input').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (file) {
-    const posterPreview = document.querySelector('#poster_preview') || (() => {
-      const div = document.createElement('div');
-      div.id = 'poster_preview';
-      div.style.marginTop = '10px';
-      this.parentNode.appendChild(div);
-      return div;
-    })();
-    posterPreview.innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> New poster selected: ' + file.name;
-  }
-});
+if (videoInput) {
+  videoInput.addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      videoFileList.innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> Selected: ' + files.map(f => f.name).join(', ');
+      videoFileList.style.color = '#27ae60';
+    } else {
+      videoFileList.innerHTML = '';
+    }
+  });
+}
+
+// Poster preview
+const posterInput = document.getElementById('poster_input');
+const posterPreview = document.getElementById('posterPreview');
+
+if (posterInput) {
+  posterInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      posterPreview.innerHTML = '<i class="fas fa-check-circle" style="color: #2ecc71;"></i> New poster selected: ' + file.name;
+    } else {
+      posterPreview.innerHTML = '';
+    }
+  });
+}
 
 function confirmDelete() {
   if (confirm('⚠️ WARNING: This will permanently delete the video and ALL its files. This action cannot be undone. Are you sure?')) {
