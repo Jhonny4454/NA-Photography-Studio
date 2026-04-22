@@ -242,7 +242,7 @@ body::before {
   gap: 15px;
 }
 
-/* Current Video Info */
+/* Current Video Preview */
 .current-video {
   margin-bottom: 20px;
   padding: 15px;
@@ -253,14 +253,22 @@ body::before {
 
 .current-video p {
   color: #666;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 13px;
+  font-weight: 500;
 }
 
 .current-video video {
   max-width: 100%;
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  background: #000;
+}
+
+.video-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #888;
 }
 
 /* File Upload */
@@ -511,17 +519,24 @@ body::before {
         <small style="color: #999;">Enable for Instagram Reels / Shorts style videos</small>
       </div>
 
-      <!-- Current Video Preview -->
+      <!-- Current Video Preview (PLAYABLE) -->
       {% if video and video.formats and video.formats|length > 0 %}
       <div class="current-video">
-        <p><i class="fas fa-video"></i> Current Video:</p>
-        <video controls style="max-width: 100%; border-radius: 12px;">
+        <p><i class="fas fa-play-circle"></i> Current Video Preview</p>
+        <video controls style="max-width: 100%; border-radius: 12px;" preload="metadata">
           <source src="{{ video.formats[0].file_url }}" type="video/{{ video.formats[0].format }}">
           Your browser does not support the video tag.
         </video>
-        <p style="margin-top: 8px; font-size: 12px;">Format: {{ video.formats[0].format|upper }}</p>
+        <div class="video-info">
+          <i class="fas fa-file-video"></i> Format: {{ video.formats[0].format|upper }} | 
+          <i class="fas fa-database"></i> Size: {% if video.formats[0].file_size_bytes %}{{ (video.formats[0].file_size_bytes / 1048576)|round(2) }} MB{% else %}Unknown{% endif %}
+        </div>
         <input type="hidden" name="existing_video_url" value="{{ video.formats[0].file_url }}">
         <input type="hidden" name="existing_format_id" value="{{ video.formats[0].id }}">
+      </div>
+      {% else %}
+      <div class="current-video">
+        <p><i class="fas fa-exclamation-triangle"></i> No video file uploaded yet</p>
       </div>
       {% endif %}
 
@@ -592,7 +607,8 @@ body::before {
   if (videoInput) {
     videoInput.addEventListener('change', function(e) {
       if (e.target.files.length > 0) {
-        videoPreview.innerHTML = '<i class="fas fa-check-circle"></i> New video selected: ' + e.target.files[0].name;
+        const file = e.target.files[0];
+        videoPreview.innerHTML = '<i class="fas fa-check-circle"></i> New video selected: ' + file.name + ' (' + (file.size / 1048576).toFixed(2) + ' MB)';
       } else {
         videoPreview.innerHTML = '';
       }
