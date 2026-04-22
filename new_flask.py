@@ -225,7 +225,7 @@ def signup():
             if request.form["username"].lower() == "admin":
                 flash("Username not available", "error")
                 return redirect("/signup")
-            cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", 
+            cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s",
                           (request.form["username"], request.form["email"]))
             if cursor.fetchone():
                 flash("Username or email already exists. Please choose another.", "error")
@@ -296,7 +296,7 @@ def home():
         cursor.execute("SELECT * FROM packages")
         packages = cursor.fetchall()
         cursor.execute("""
-            SELECT 
+            SELECT
                 p.package_name,
                 CONCAT(u.first_name, ' ', u.last_name) AS user_full_name,
                 r.rating,
@@ -310,7 +310,7 @@ def home():
         """)
         package_reviews = cursor.fetchall()
         cursor.execute("""
-            SELECT 
+            SELECT
                 o.order_id,
                 o.total_price,
                 o.status,
@@ -342,7 +342,7 @@ def get_portfolio():
         if not cursor.fetchone():
             return jsonify([])
         cursor.execute("""
-            SELECT 
+            SELECT
                 p.id as photographer_id,
                 p.first_name,
                 p.last_name,
@@ -394,9 +394,8 @@ def admin_portfolio():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     try:
-        # Include video count per photographer
         cursor.execute("""
-            SELECT p.*, 
+            SELECT p.*,
                    COUNT(DISTINCT pi.id) AS image_count,
                    COUNT(DISTINCT v.id) AS video_count
             FROM photographers p
@@ -413,12 +412,13 @@ def admin_portfolio():
         cursor.close()
     return render_template("admin_portfolio.html", photographers=photographers)
 
+# ✅ FIX 1: Added id to SELECT so photographer.id works in template buttons
 @app.route("/admin/portfolio/images/<int:photographer_id>")
 @admin_required
 def admin_portfolio_images(photographer_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
     photographer = cursor.fetchone()
     if not photographer:
         flash("Photographer not found!", "error")
@@ -453,7 +453,7 @@ def admin_add_portfolio_image(photographer_id):
             cursor.close()
         return redirect("/admin/portfolio")
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
     photographer = cursor.fetchone()
     cursor.close()
     if not photographer:
@@ -473,7 +473,7 @@ def admin_edit_portfolio_image(image_id):
         description = request.form.get("description")
         try:
             cursor.execute("""
-                UPDATE portfolio_images 
+                UPDATE portfolio_images
                 SET image_url = %s, location = %s, shoot_date = %s, description = %s
                 WHERE id = %s
             """, (image_url, location, shoot_date, description, image_id))
@@ -496,7 +496,7 @@ def admin_edit_portfolio_image(image_id):
         flash("Image not found!", "error")
         cursor.close()
         return redirect("/admin/portfolio")
-    cursor.execute("SELECT first_name, last_name FROM photographers WHERE id = %s", (image['photographer_id'],))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (image['photographer_id'],))
     photographer = cursor.fetchone()
     cursor.close()
     return render_template("admin_edit_portfolio_image.html", image=image, photographer=photographer)
@@ -530,7 +530,7 @@ def admin_videos():
     cursor = db.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT v.*, 
+            SELECT v.*,
                    CONCAT(p.first_name, ' ', p.last_name) AS photographer_name
             FROM videos v
             JOIN photographers p ON v.photographer_id = p.id
@@ -569,7 +569,7 @@ def admin_add_video():
         cursor = db.cursor()
         try:
             cursor.execute("""
-                INSERT INTO videos (photographer_id, title, description, duration_seconds, 
+                INSERT INTO videos (photographer_id, title, description, duration_seconds,
                                     poster_image_url, is_short_loop, sort_order)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (photographer_id, title, description, duration_seconds, poster_url, is_short_loop, sort_order))
@@ -698,12 +698,10 @@ def admin_delete_video(video_id):
     db = get_db()
     cursor = db.cursor()
     try:
-        # Get photographer_id for redirect after deletion
         cursor.execute("SELECT photographer_id FROM videos WHERE id = %s", (video_id,))
         result = cursor.fetchone()
         photographer_id = result[0] if result else None
 
-        # Delete physical files
         cursor.execute("SELECT poster_image_url FROM videos WHERE id = %s", (video_id,))
         poster = cursor.fetchone()
         if poster and poster[0]:
@@ -739,7 +737,7 @@ def get_videos():
     cursor = db.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT v.*, 
+            SELECT v.*,
                    CONCAT(p.first_name, ' ', p.last_name) AS photographer_name,
                    (SELECT file_url FROM video_files WHERE video_id = v.id AND is_default = TRUE LIMIT 1) AS video_url
             FROM videos v
@@ -757,6 +755,7 @@ def get_videos():
 
 # ==================== PER-PHOTOGRAPHER VIDEO MANAGEMENT ====================
 
+# ✅ FIX 2: Added id to SELECT so photographer.id works in template buttons
 @app.route("/admin/photographer_videos/<int:photographer_id>")
 @admin_required
 def admin_photographer_videos(photographer_id):
@@ -766,13 +765,13 @@ def admin_photographer_videos(photographer_id):
         return redirect("/admin/photographers")
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+        cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
         photographer = cursor.fetchone()
         if not photographer:
             flash("Photographer not found", "error")
             return redirect("/admin/photographers")
         cursor.execute("""
-            SELECT v.*, 
+            SELECT v.*,
                    (SELECT GROUP_CONCAT(format) FROM video_files WHERE video_id = v.id) as formats
             FROM videos v
             WHERE v.photographer_id = %s
@@ -808,7 +807,7 @@ def admin_add_photographer_video(photographer_id):
         cursor = db.cursor()
         try:
             cursor.execute("""
-                INSERT INTO videos (photographer_id, title, description, duration_seconds, 
+                INSERT INTO videos (photographer_id, title, description, duration_seconds,
                                     poster_image_url, is_short_loop, sort_order)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (photographer_id, title, description, duration_seconds, poster_url, is_short_loop, sort_order))
@@ -838,7 +837,7 @@ def admin_add_photographer_video(photographer_id):
             cursor.close()
     # GET request
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
     photographer = cursor.fetchone()
     cursor.close()
     if not photographer:
@@ -857,12 +856,12 @@ def edit_photographer(id):
         flash("Database error", "error")
         return redirect("/admin/photographers")
     cursor = db.cursor(dictionary=True)
-    
+
     if request.method == "POST":
         try:
             cursor.execute("""
-                UPDATE photographers 
-                SET first_name=%s, last_name=%s, email=%s, phone=%s, 
+                UPDATE photographers
+                SET first_name=%s, last_name=%s, email=%s, phone=%s,
                     experience=%s, rating=%s, status=%s, profile_image=%s
                 WHERE id=%s
             """, (
@@ -1212,11 +1211,8 @@ def admin_dashboard():
         total_users = cursor.fetchone()["count"]
         cursor.execute("SELECT COUNT(*) as count FROM photographers")
         total_photographers = cursor.fetchone()["count"]
-        
-        # Get total videos count
         cursor.execute("SELECT COUNT(*) as count FROM videos")
         total_videos = cursor.fetchone()["count"]
-        
         cursor.execute("""
             SELECT o.order_id, o.total_price, o.status, o.created_at, u.first_name, u.last_name
             FROM orders o JOIN users u ON o.user_id = u.id
@@ -1236,7 +1232,7 @@ def admin_dashboard():
         applications = []
     finally:
         cursor.close()
-    return render_template("admin_dashboard.html", 
+    return render_template("admin_dashboard.html",
                          total_orders=total_orders,
                          revenue=revenue,
                          total_users=total_users,
