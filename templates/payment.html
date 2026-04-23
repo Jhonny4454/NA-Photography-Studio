@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Payment - SnapHire</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(145deg, #f5f7fa 0%, #e9ecf2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .payment-container {
+      max-width: 550px;
+      width: 100%;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e2b3c, #2c3e50);
+      color: white;
+      padding: 25px 30px;
+    }
+    .header h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+    .secure-badge {
+      font-size: 13px;
+      margin-top: 8px;
+      opacity: 0.9;
+    }
+    .order-summary {
+      padding: 25px 30px;
+      border-bottom: 1px solid #edf2f7;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .total-row {
+      font-weight: 700;
+      font-size: 18px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px dashed #cbd5e0;
+    }
+    .payment-methods {
+      padding: 20px 30px;
+    }
+    .method-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    .method-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      background: #f8fafc;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .method-tab.active {
+      border-color: #ff7f50;
+      background: #fff5f2;
+    }
+    .method-tab i {
+      margin-right: 8px;
+      color: #ff7f50;
+    }
+    .payment-form {
+      padding: 0 30px 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 15px;
+      transition: border 0.2s;
+    }
+    input:focus {
+      border-color: #ff7f50;
+      outline: none;
+    }
+    .card-row {
+      display: grid;
+      grid-template-columns: 1fr 100px;
+      gap: 12px;
+    }
+    .btn-pay {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff7f50, #ff6347);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+    .btn-pay:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(255,99,71,0.25);
+    }
+    .test-hint {
+      background: #fef9e7;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      color: #b45309;
+      margin: 20px 30px;
+      border-left: 4px solid #f59e0b;
+    }
+    .test-hint i {
+      margin-right: 6px;
+    }
+    .footer-note {
+      text-align: center;
+      padding: 20px 30px;
+      color: #64748b;
+      font-size: 13px;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color: #64748b;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      color: #ff7f50;
+    }
+  </style>
+</head>
+<body>
+<div class="payment-container">
+  <div class="header">
+    <h2><i class="fas fa-lock"></i> Secure Checkout</h2>
+    <div class="secure-badge"><i class="fas fa-shield-alt"></i> 256-bit SSL encrypted · Demo Mode</div>
+  </div>
+  
+  <div class="order-summary">
+    <div class="summary-row"><span>Package total:</span><span>₹{{ "%.2f"|format(intent.total) }}</span></div>
+    <div class="summary-row"><span>GST (18%):</span><span>₹{{ "%.2f"|format(intent.total * 0.18) }}</span></div>
+    <div class="summary-row total-row"><span>Amount Payable:</span><span>₹{{ "%.2f"|format(intent.total * 1.18) }}</span></div>
+  </div>
+  
+  <div class="payment-methods">
+    <div class="method-tabs">
+      <div class="method-tab active" data-method="card"><i class="far fa-credit-card"></i> Card</div>
+      <div class="method-tab" data-method="upi"><i class="fas fa-mobile-alt"></i> UPI</div>
+    </div>
+  </div>
+  
+  <form method="POST" class="payment-form" id="paymentForm">
+    <input type="hidden" name="payment_method" id="paymentMethodInput" value="card">
+    
+    <div id="cardFields">
+      <div class="form-group">
+        <label>Card Number</label>
+        <input type="text" name="card_number" placeholder="4242 4242 4242 4242" value="4242424242424242">
+      </div>
+      <div class="card-row">
+        <div class="form-group"><label>Expiry</label><input type="text" placeholder="MM/YY" value="12/28"></div>
+        <div class="form-group"><label>CVV</label><input type="text" placeholder="123" value="123"></div>
+      </div>
+      <div class="form-group"><label>Cardholder Name</label><input type="text" placeholder="John Doe" value="Test User"></div>
+    </div>
+    
+    <div id="upiFields" style="display: none;">
+      <div class="form-group"><label>UPI ID / VPA</label><input type="text" name="upi_id" placeholder="mobilenumber@okhdfcbank" value="test@okaxis"></div>
+    </div>
+    
+    <div class="test-hint">
+      <i class="fas fa-info-circle"></i>
+      <strong>Demo Mode:</strong> Use card <strong>4242 4242 4242 4242</strong> for success.<br>
+      Any other number may simulate failure (try "4000 0000 0000 0002").
+    </div>
+    
+    <button type="submit" class="btn-pay"><i class="fas fa-lock"></i> Pay ₹{{ "%.2f"|format(intent.total * 1.18) }}</button>
+  </form>
+  
+  <a href="/cart" class="back-link"><i class="fas fa-arrow-left"></i> Back to Cart</a>
+  <div class="footer-note"><i class="far fa-clock"></i> This is a simulated payment – no real money will be charged.</div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.method-tab');
+  const cardFields = document.getElementById('cardFields');
+  const upiFields = document.getElementById('upiFields');
+  const methodInput = document.getElementById('paymentMethodInput');
+  
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const method = tab.dataset.method;
+      methodInput.value = method;
+      if (method === 'card') {
+        cardFields.style.display = 'block';
+        upiFields.style.display = 'none';
+      } else {
+        cardFields.style.display = 'none';
+        upiFields.style.display = 'block';
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1580,80 +1580,119 @@ def order_success():
     total = request.args.get("total")
     return render_template("order_success.html", order_id=order_id, total=total)
 
-@app.route("/checkout", methods=["GET", "POST"])
+# ---------------- FAKE PAYMENT GATEWAY (REPLACES OLD CHECKOUT) ----------------
+@app.route("/checkout", methods=["GET"])
 @login_required
 def checkout():
+    """Save cart details and redirect to payment page."""
     db = get_db()
     if not db:
         flash("Database error", "error")
         return redirect("/cart")
     cursor = db.cursor(dictionary=True)
-    if request.method == "GET":
-        try:
-            cursor.execute("""
-                SELECT up.id AS cart_id, up.quantity, up.location, up.scheduled_date,
-                       p.package_name, p.package_price, p.duration,
-                       CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
-                       up.photographer_id
-                FROM user_packages up
-                JOIN packages p ON up.package_id = p.package_id
-                LEFT JOIN photographers ph ON up.photographer_id = ph.id
-                WHERE up.user_id = %s
-            """, (session["user_id"],))
-            items = cursor.fetchall()
-            for item in items:
-                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
-                    flash("⚠️ Please complete all package details before checkout!", "error")
-                    return redirect("/cart")
-            total = sum(item["package_price"] * item["quantity"] for item in items)
-        except Exception as e:
-            print("Checkout GET Error:", e)
-            items = []
-            total = 0
-        finally:
-            cursor.close()
-        return render_template("checkout.html", items=items, total=total)
+    
+    cursor.execute("""
+        SELECT up.id AS cart_id, up.quantity, up.location, up.scheduled_date,
+               p.package_name, p.package_price, p.duration,
+               CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+               up.photographer_id
+        FROM user_packages up
+        JOIN packages p ON up.package_id = p.package_id
+        LEFT JOIN photographers ph ON up.photographer_id = ph.id
+        WHERE up.user_id = %s
+    """, (session["user_id"],))
+    items = cursor.fetchall()
+    cursor.close()
+    
+    for item in items:
+        if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
+            flash("⚠️ Please complete all package details before checkout!", "error")
+            return redirect("/cart")
+    
+    if not items:
+        flash("Your cart is empty!", "error")
+        return redirect("/cart")
+    
+    total = sum(item["package_price"] * item["quantity"] for item in items)
+    
+    # Store checkout intent in session
+    session["checkout_intent"] = {
+        "items": items,
+        "total": total,
+        "location": items[0]["location"],
+        "scheduled_date": items[0]["scheduled_date"].strftime("%Y-%m-%d") if items[0]["scheduled_date"] else None
+    }
+    return redirect("/payment")
+
+
+@app.route("/payment", methods=["GET", "POST"])
+@login_required
+def payment():
+    """Fake payment page."""
+    intent = session.get("checkout_intent")
+    if not intent:
+        flash("No pending checkout. Please add items to cart.", "error")
+        return redirect("/cart")
+    
     if request.method == "POST":
-        payment_method = request.form.get("payment")
+        # Simulate payment processing
+        payment_method = request.form.get("payment_method", "card")
+        card_number = request.form.get("card_number", "").replace(" ", "")
+        
+        # Demo logic: success only with test card 4242 4242 4242 4242
+        if card_number != "4242424242424242":
+            flash("❌ Payment declined. Please use test card: 4242 4242 4242 4242", "error")
+            return redirect("/payment")
+        
+        # Payment "successful" – create the order
+        db = get_db()
+        cursor = db.cursor()
         try:
-            cursor.execute("""
-                SELECT up.*, p.package_name, p.package_price, p.duration
-                FROM user_packages up
-                JOIN packages p ON up.package_id = p.package_id
-                WHERE up.user_id = %s
-            """, (session["user_id"],))
-            cart_items = cursor.fetchall()
-            if not cart_items:
-                flash("Your cart is empty!", "error")
-                return redirect("/cart")
-            for item in cart_items:
-                if not item["photographer_id"] or not item["location"] or not item["scheduled_date"]:
-                    flash("⚠️ Please complete all package details before placing order!", "error")
-                    return redirect("/cart")
-            total = sum(item["package_price"] * item["quantity"] for item in cart_items)
-            location = cart_items[0]["location"]
-            scheduled_date = cart_items[0]["scheduled_date"]
             order_code = str(uuid.uuid4())[:8]
             cursor.execute("""
                 INSERT INTO orders (user_id, total_price, location, payment_method, status, order_id, scheduled_date)
                 VALUES (%s,%s,%s,%s,%s,%s,%s)
-            """, (session["user_id"], total, location, payment_method, "Confirmed", order_code, scheduled_date))
-            for item in cart_items:
+            """, (
+                session["user_id"],
+                intent["total"],
+                intent["location"],
+                payment_method,
+                "Confirmed",
+                order_code,
+                intent["scheduled_date"]
+            ))
+            # Insert order items from intent
+            for item in intent["items"]:
                 cursor.execute("""
                     INSERT INTO order_items (order_id, package_name, price, duration, location, quantity, photographer_id)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (order_code, item["package_name"], item["package_price"], item["duration"], item["location"], item["quantity"], item["photographer_id"]))
+                """, (
+                    order_code,
+                    item["package_name"],
+                    item["package_price"],
+                    item["duration"],
+                    item["location"],
+                    item["quantity"],
+                    item["photographer_id"]
+                ))
+            # Clear cart
             cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
             db.commit()
-            cursor.close()
-            flash("🎉 Order placed successfully!", "success")
-            return redirect(f"/order-success?order_id={order_code}&total={total}")
+            # Clear checkout intent
+            session.pop("checkout_intent", None)
+            flash("🎉 Payment successful! Order placed.", "success")
+            return redirect(f"/order-success?order_id={order_code}&total={intent['total']}")
         except Exception as e:
-            print("Checkout POST Error:", e)
             db.rollback()
-            flash("❌ Error processing checkout", "error")
-            cursor.close()
+            print("Payment order creation error:", e)
+            flash("❌ Error creating order. Please try again.", "error")
             return redirect("/cart")
+        finally:
+            cursor.close()
+    
+    # GET request – show payment form
+    return render_template("payment.html", intent=intent)
+
 
 @app.route("/logout")
 def logout():
