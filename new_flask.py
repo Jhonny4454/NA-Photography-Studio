@@ -1634,6 +1634,18 @@ def payment():
         flash("No pending checkout. Please add items to cart.", "error")
         return redirect("/cart")
     
+    # Convert stored values to appropriate types (session stores strings)
+    try:
+        intent["total"] = float(intent["total"])
+        # Ensure each item's price is float
+        for item in intent["items"]:
+            item["package_price"] = float(item["package_price"])
+    except (ValueError, TypeError, KeyError) as e:
+        print(f"Intent data error: {e}")
+        session.pop("checkout_intent", None)
+        flash("Checkout data corrupted. Please try again.", "error")
+        return redirect("/cart")
+    
     if request.method == "POST":
         # Simulate payment processing
         payment_method = request.form.get("payment_method", "card")
@@ -1646,12 +1658,16 @@ def payment():
         
         # Payment "successful" – create the order
         db = get_db()
+        if not db:
+            flash("Database connection error", "error")
+            return redirect("/cart")
+            
         cursor = db.cursor()
         try:
             order_code = str(uuid.uuid4())[:8]
             cursor.execute("""
                 INSERT INTO orders (user_id, total_price, location, payment_method, status, order_id, scheduled_date)
-                VALUES (%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (
                 session["user_id"],
                 intent["total"],
@@ -1676,7 +1692,7 @@ def payment():
                     item["photographer_id"]
                 ))
             # Clear cart
-            cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
+            cursor.execute("DELETE FROM user_packages WHERE user_id = %s", (session["user_id"],))
             db.commit()
             # Clear checkout intent
             session.pop("checkout_intent", None)
@@ -1692,7 +1708,6 @@ def payment():
     
     # GET request – show payment form
     return render_template("payment.html", intent=intent)
-
 
 @app.route("/logout")
 def logout():

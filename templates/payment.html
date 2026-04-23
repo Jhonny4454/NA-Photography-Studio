@@ -157,6 +157,28 @@
     .back-link:hover {
       color: #ff7f50;
     }
+    .flash-messages {
+      padding: 0 30px;
+    }
+    .flash {
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    .flash-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-left: 4px solid #dc2626;
+    }
+    .flash-success {
+      background: #dcfce7;
+      color: #166534;
+      border-left: 4px solid #16a34a;
+    }
   </style>
 </head>
 <body>
@@ -165,11 +187,26 @@
     <h2><i class="fas fa-lock"></i> Secure Checkout</h2>
     <div class="secure-badge"><i class="fas fa-shield-alt"></i> 256-bit SSL encrypted · Demo Mode</div>
   </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
   
   <div class="order-summary">
-    <div class="summary-row"><span>Package total:</span><span>₹{{ "%.2f"|format(intent.total) }}</span></div>
-    <div class="summary-row"><span>GST (18%):</span><span>₹{{ "%.2f"|format(intent.total * 0.18) }}</span></div>
-    <div class="summary-row total-row"><span>Amount Payable:</span><span>₹{{ "%.2f"|format(intent.total * 1.18) }}</span></div>
+    {% set total = intent.total|float %}
+    <div class="summary-row"><span>Package total:</span><span>₹{{ "%.2f"|format(total) }}</span></div>
+    <div class="summary-row"><span>GST (18%):</span><span>₹{{ "%.2f"|format(total * 0.18) }}</span></div>
+    <div class="summary-row total-row"><span>Amount Payable:</span><span>₹{{ "%.2f"|format(total * 1.18) }}</span></div>
   </div>
   
   <div class="payment-methods">
@@ -201,10 +238,10 @@
     <div class="test-hint">
       <i class="fas fa-info-circle"></i>
       <strong>Demo Mode:</strong> Use card <strong>4242 4242 4242 4242</strong> for success.<br>
-      Any other number may simulate failure (try "4000 0000 0000 0002").
+      Any other number will be declined.
     </div>
     
-    <button type="submit" class="btn-pay"><i class="fas fa-lock"></i> Pay ₹{{ "%.2f"|format(intent.total * 1.18) }}</button>
+    <button type="submit" class="btn-pay"><i class="fas fa-lock"></i> Pay ₹{{ "%.2f"|format(total * 1.18) }}</button>
   </form>
   
   <a href="/cart" class="back-link"><i class="fas fa-arrow-left"></i> Back to Cart</a>
