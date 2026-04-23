@@ -91,7 +91,8 @@ def get_db():
                     'connection_timeout': 30
                 }
                 if ON_RENDER:
-                    config['ssl_disabled'] = True
+                    # Use SSL for cloud databases (required by Render MySQL)
+                    config['ssl_ca'] = '/etc/ssl/certs/ca-certificates.crt'
                 g.db = mysql.connector.connect(**config)
                 print("✅ Database connected successfully")
                 break
@@ -196,17 +197,33 @@ def test_db():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# ---------------- ADMIN LOGIN ----------------
+# ---------------- ADMIN LOGIN (Database-based) ----------------
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form["username"] == "admin" and request.form["password"] == "admin123":
-            session["admin_id"] = 1
-            session["admin_username"] = "admin"
+        db = get_db()
+        if not db:
+            flash("Database connection error", "error")
+            return render_template("admin_login.html", error="System error")
+        cursor = db.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "SELECT * FROM users WHERE username=%s AND password=%s AND role='admin'",
+                (request.form["username"], hash_password(request.form["password"]))
+            )
+            admin = cursor.fetchone()
+        except Exception as e:
+            print("Admin login error:", e)
+            admin = None
+        finally:
+            cursor.close()
+        if admin:
+            session["admin_id"] = admin["id"]
+            session["admin_username"] = admin["username"]
             flash("Welcome back, Admin!", "success")
             return redirect("/admin/dashboard")
         else:
-            return render_template("admin_login.html", error="Invalid credentials")
+            return render_template("admin_login.html", error="Invalid admin credentials")
     return render_template("admin_login.html")
 
 # ---------------- SIGNUP ----------------
@@ -602,7 +619,6 @@ def admin_add_video():
     cursor.close()
     return render_template("admin_add_video.html", photographers=photographers)
 
-# ---------------- FIXED: ADMIN EDIT VIDEO (REPLACE SINGLE FILE) ----------------
 @app.route("/admin/videos/edit/<int:video_id>", methods=["GET", "POST"])
 @admin_required
 def admin_edit_video(video_id):
@@ -610,13 +626,6 @@ def admin_edit_video(video_id):
     cursor = db.cursor(dictionary=True)
     
     if request.method == "POST":
-        print("=" * 50)
-        print("EDIT VIDEO POST REQUEST RECEIVED")
-        print(f"Video ID: {video_id}")
-        print(f"Form data: {dict(request.form)}")
-        print(f"Files: {request.files}")
-        print(f"Video file in request: {'video_file' in request.files}")
-        
         title = request.form.get("title")
         description = request.form.get("description")
         duration_seconds = request.form.get("duration_seconds") or None
@@ -624,62 +633,45 @@ def admin_edit_video(video_id):
         sort_order = request.form.get("sort_order", 0)
         
         try:
-            # Update video metadata
             cursor.execute("""
                 UPDATE videos SET title=%s, description=%s, duration_seconds=%s,
                     is_short_loop=%s, sort_order=%s, updated_at=NOW()
                 WHERE id=%s
             """, (title, description, duration_seconds, is_short_loop, sort_order, video_id))
-            print("✅ Metadata updated")
             
-            # Check if a new video file was uploaded
             if 'video_file' in request.files:
                 video_file = request.files['video_file']
-                print(f"Video file present: {video_file.filename if video_file else 'None'}")
-                
                 if video_file and video_file.filename != '' and allowed_video_file(video_file.filename):
-                    print(f"✅ Video file valid: {video_file.filename}")
-                    
-                    # Get existing video files to delete
+                    # Get existing files to delete later (after successful upload)
                     cursor.execute("SELECT file_url FROM video_files WHERE video_id = %s", (video_id,))
                     existing_files = cursor.fetchall()
-                    print(f"Existing files to delete: {len(existing_files)}")
                     
-                    for file_row in existing_files:
-                        file_path = file_row['file_url'].lstrip('/')
-                        if os.path.exists(file_path):
-                            os.remove(file_path)
-                            print(f"Deleted: {file_path}")
-                    
-                    # Delete existing video_files records
-                    cursor.execute("DELETE FROM video_files WHERE video_id = %s", (video_id,))
-                    
-                    # Save new video file
                     ext = video_file.filename.rsplit('.', 1)[1].lower()
                     filename = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
                     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                     video_file.save(filepath)
                     file_url = f"/static/uploads/videos/{filename}"
                     file_size = os.path.getsize(filepath)
-                    print(f"✅ New file saved: {filepath}")
                     
-                    # Insert new video file record
+                    # Delete old records and files
+                    cursor.execute("DELETE FROM video_files WHERE video_id = %s", (video_id,))
+                    for file_row in existing_files:
+                        file_path = file_row['file_url'].lstrip('/')
+                        if os.path.exists(file_path):
+                            os.remove(file_path)
+                    
+                    # Insert new record
                     cursor.execute("""
                         INSERT INTO video_files (video_id, format, file_url, file_size_bytes, is_default)
                         VALUES (%s, %s, %s, %s, %s)
                     """, (video_id, ext, file_url, file_size, True))
-                    print("✅ New video file record inserted")
-                else:
-                    print(f"❌ Invalid video file: {video_file.filename if video_file else 'None'}")
-            else:
-                print("❌ No 'video_file' in request.files")
             
             db.commit()
             flash("✅ Video updated successfully!", "success")
             return redirect("/admin/videos")
             
         except Exception as e:
-            print(f"❌ Edit Video Error: {e}")
+            print(f"Edit Video Error: {e}")
             db.rollback()
             flash(f"❌ Error updating video: {str(e)}", "error")
         finally:
@@ -880,8 +872,6 @@ def admin_add_photographer_video(photographer_id):
         flash("Photographer not found", "error")
         return redirect("/admin/photographers")
     return render_template("admin_add_photographer_video.html", photographer=photographer)
-
-# ==================== END VIDEO MANAGEMENT ====================
 
 # ==================== EDIT PHOTOGRAPHER ====================
 @app.route("/admin/edit_photographer/<int:id>", methods=["GET", "POST"])

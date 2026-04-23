@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes" />
 <title>SnapHire · Secure Login</title>
 
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <style>
@@ -416,42 +417,42 @@ h2 {
   </div>
 
   {% if error %}
-    <div class="error">
-      <i class="fas fa-exclamation-triangle"></i>
+    <div class="error" role="alert">
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
       {{ error }}
     </div>
   {% endif %}
 
   <form method="POST" action="/">
     <div class="input-group">
-      <i class="fas fa-user-circle"></i>
+      <i class="fas fa-user-circle" aria-hidden="true"></i>
       <input type="text" name="username" placeholder="Username or email" required autofocus>
     </div>
 
     <div class="input-group" id="passwordGroup">
-      <i class="fas fa-lock"></i>
+      <i class="fas fa-lock" aria-hidden="true"></i>
       <input type="password" id="password" name="password" placeholder="Password" required>
       <!-- eye toggle will be inserted here via JS -->
     </div>
 
     <div class="forgot-link">
-      <a href="#"><i class="fas fa-key"></i> Forgot password?</a>
+      <a href="#"><i class="fas fa-key" aria-hidden="true"></i> Forgot password?</a>
     </div>
 
     <button type="submit" class="login-btn">
-      <i class="fas fa-arrow-right-to-bracket"></i> Sign in
+      <i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i> Sign in
     </button>
   </form>
 
   <div class="signup-link">
     <a href="/signup">
-      <i class="fas fa-user-plus"></i> Create new account
+      <i class="fas fa-user-plus" aria-hidden="true"></i> Create new account
     </a>
   </div>
 </div>
 
 <div class="footer-note">
-  <i class="fas fa-briefcase"></i> New to SnapHire? <a href="/get-hired">Join our talent pool →</a>
+  <i class="fas fa-briefcase" aria-hidden="true"></i> New to SnapHire? <a href="/get-hired">Join our talent pool →</a>
 </div>
 
 <script>
@@ -466,40 +467,56 @@ h2 {
         const eyeIcon = document.createElement('i');
         eyeIcon.classList.add('fas', 'fa-eye', 'toggle-password');
         eyeIcon.setAttribute('aria-label', 'Show password');
+        eyeIcon.setAttribute('role', 'button');
+        eyeIcon.setAttribute('tabindex', '0');  // make it focusable for keyboard users
         
         // Append the eye toggle to the input group (right side)
         parentGroup.appendChild(eyeIcon);
         
-        // Toggle functionality
-        eyeIcon.addEventListener('click', function(e) {
-          e.preventDefault();
+        // Toggle functionality (click + keyboard)
+        const togglePassword = () => {
           const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
           passwordInput.setAttribute('type', type);
           // toggle eye / eye-slash icons
-          this.classList.toggle('fa-eye');
-          this.classList.toggle('fa-eye-slash');
-          // maintain focus on input after click
+          eyeIcon.classList.toggle('fa-eye');
+          eyeIcon.classList.toggle('fa-eye-slash');
+          // update aria-label
+          eyeIcon.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+          // maintain focus on input after toggle
           passwordInput.focus();
+        };
+        
+        eyeIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          togglePassword();
+        });
+        
+        eyeIcon.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePassword();
+          }
         });
       }
     }
 
-    // ---------- ensure no layout shifts & avoid text under eye icon (double check) ----------
-    // additional safeguard: if any dynamic resizing, the right padding is already applied by CSS (#password)
-    // also handle when password input becomes type="text" — same padding remains.
+    // Ensure no layout shifts & avoid text under eye icon (double check)
+    // Also handle when password input becomes type="text" — same padding remains.
     
     // Optional: small extra fix for touch devices to avoid accidental zoom on double tap eye
     const toggleBtns = document.querySelectorAll('.toggle-password');
     toggleBtns.forEach(btn => {
       btn.addEventListener('touchstart', (e) => {
+        // Prevent default only if it's a direct touch on the icon, but allow click to fire
         e.preventDefault();
         btn.click();
-      });
+      }, { passive: false });
     });
 
     // ---------- floating particles (subtle background magic) ----------
     function createParticles() {
-      const particleCount = Math.min(28, window.innerWidth / 35);
+      // Reduce particle count on small devices for performance
+      const particleCount = window.innerWidth < 500 ? 12 : Math.min(28, Math.floor(window.innerWidth / 35));
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.classList.add('particle');
@@ -518,7 +535,7 @@ h2 {
 
     // small improvement: ensure that when user interacts with password, no misalignment
     // also fix for browsers that recalc on zoom
-    const styleCheck = () => {
+    const enforcePasswordPadding = () => {
       if (passwordInput) {
         const computedRightPadding = window.getComputedStyle(passwordInput).paddingRight;
         if (parseInt(computedRightPadding) < 38) {
@@ -527,23 +544,14 @@ h2 {
         }
       }
     };
-    window.addEventListener('resize', styleCheck);
-    styleCheck();
+    window.addEventListener('resize', enforcePasswordPadding);
+    enforcePasswordPadding();
+
+    // Prevent form resubmission on page refresh (if any)
+    if (window.history.replaceState) {
+      window.history.replaceState(null, null, window.location.href);
+    }
   })();
 </script>
-
-<!-- 
-  FIX EXPLANATION:
-  - The glitch was caused by the password input's text overlapping the eye icon because 
-    there was no right-padding reserved for the toggle icon. The user saw "mashed up" characters 
-    under the eye icon while typing.
-  - SOLUTION:
-      1. Added explicit padding-right: 52px to #password in CSS.
-      2. Kept left lock icon intact with left padding.
-      3. Eye toggle icon positioned absolutely with right: 18px, top: 50% — never overlaps text anymore.
-      4. Responsive breakpoints reduce padding on small devices but still keep clear separation.
-      5. Improved hover, touch events, and visual feedback.
-  - Now password text flows beautifully inside the field, never collides with lock or eye icon.
--->
 </body>
 </html>
