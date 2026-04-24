@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------- #
 #  SnapHire – Photography Booking & Portfolio Platform                        #
 #  Flask backend with MySQL (Railway), Cloudinary (media), and Render hosting #
+#  SECURED VERSION: Server-side session tokens stored in MySQL                #
 # ---------------------------------------------------------------------------- #
 
 from flask import Flask, render_template, request, redirect, session, g, jsonify, flash
@@ -12,7 +13,7 @@ import cloudinary.api
 import hashlib
 import uuid
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from functools import wraps
 from werkzeug.utils import secure_filename
@@ -22,32 +23,38 @@ app = Flask(__name__)
 # =============================================================================
 #  SECURITY: Secret Key & Session Cookie Configuration
 # =============================================================================
-# A strong secret key is required to sign session cookies.
-# In production, always set the SECRET_KEY environment variable on Render.
-app.secret_key = os.getenv("SECRET_KEY", "secret_key_123")  # fallback for local dev only
+# CRITICAL: Always set a strong SECRET_KEY environment variable on Render.
+# Never use the fallback in production — it is only a safety net for local dev.
+_secret = os.getenv("SECRET_KEY")
+if not _secret:
+    import secrets
+    _secret = secrets.token_hex(32)   # random each restart (local dev only)
+    print("⚠️  WARNING: SECRET_KEY env var not set. Using a random key (local dev only).")
+app.secret_key = _secret
 
 # Determine if we are running on Render (production)
 ON_RENDER = os.getenv("DB_HOST") is not None
 
+# Session lifetime – token expires after this duration
+SESSION_LIFETIME_HOURS = int(os.getenv("SESSION_LIFETIME_HOURS", "24"))
+
 # Enforce secure session cookies
 app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,                # JavaScript cannot access the cookie
-    SESSION_COOKIE_SECURE=ON_RENDER,              # cookie sent only over HTTPS on Render
-    SESSION_COOKIE_SAMESITE='Lax',               # protects against CSRF attacks
-    # Use a __Host- prefix when secure (requires Secure flag, so only on Render)
-    SESSION_COOKIE_NAME='__Host-session' if ON_RENDER else 'session'
+    SESSION_COOKIE_HTTPONLY=True,                          # JS cannot read the cookie
+    SESSION_COOKIE_SECURE=ON_RENDER,                       # HTTPS only on Render
+    SESSION_COOKIE_SAMESITE='Lax',                         # CSRF mitigation
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=SESSION_LIFETIME_HOURS),
+    SESSION_COOKIE_NAME='__Host-sn' if ON_RENDER else 'sn'  # __Host- forces Secure+path=/
 )
 # -----------------------------------------------------------------------------
 
 # =============================================================================
-#  Cloudinary Configuration (for permanent video/image storage)
+#  Cloudinary Configuration
 # =============================================================================
-# CLOUDINARY_URL must be set in Render environment:
-#   cloudinary://api_key:api_secret@cloud_name
 cloudinary.config(cloudinary_url=os.getenv("CLOUDINARY_URL"))
 
 # -----------------------------------------------------------------------------
-#  Local Upload Folders (used only as a fallback when Cloudinary is unavailable)
+#  Local Upload Folders (fallback when Cloudinary is unavailable)
 # -----------------------------------------------------------------------------
 UPLOAD_FOLDER = 'static/uploads/videos'
 POSTER_FOLDER = 'static/uploads/posters'
@@ -61,7 +68,7 @@ os.makedirs(POSTER_FOLDER, exist_ok=True)
 
 
 # -----------------------------------------------------------------------------
-#  Helper: validate file extensions
+#  Helpers: file validation & Cloudinary upload
 # -----------------------------------------------------------------------------
 def allowed_video_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_VIDEO_EXTENSIONS
@@ -71,9 +78,6 @@ def allowed_image_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
 
 
-# -----------------------------------------------------------------------------
-#  Helper: upload a file to Cloudinary and return its secure URL
-# -----------------------------------------------------------------------------
 def upload_to_cloudinary(file, folder="videos", resource_type="video"):
     """Upload a file to Cloudinary. Returns the secure URL or None on failure."""
     try:
@@ -99,9 +103,8 @@ DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 DB_PORT = os.getenv("DB_PORT")
 
-# Fallback for local development (if no env vars are set)
 if not all([DB_HOST, DB_NAME, DB_USER, DB_PASS]):
-    print("⚠️ Running locally (MySQL localhost)")
+    print("⚠️  Running locally (MySQL localhost)")
     DB_HOST = "localhost"
     DB_NAME = "sumedh"
     DB_USER = "root"
@@ -114,33 +117,8 @@ else:
 
 
 # =============================================================================
-#  Decorators for Access Control
+#  Password Hashing  (SHA-256 kept for backward compat — migrate to bcrypt later)
 # =============================================================================
-def login_required(f):
-    """Redirect to login if the user is not signed in."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "user_id" not in session:
-            flash("Please login to access this page", "error")
-            return redirect("/")
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def admin_required(f):
-    """Redirect to admin login if the admin is not logged in."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "admin_id" not in session:
-            flash("Please login as admin to access this page", "error")
-            return redirect("/admin/login")
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-# -----------------------------------------------------------------------------
-#  Password Hashing (SHA-256 – consider upgrading to bcrypt in production)
-# -----------------------------------------------------------------------------
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -166,7 +144,6 @@ def get_db():
                     'connection_timeout': 30
                 }
                 if ON_RENDER:
-                    # TLS/SSL is required for cloud databases like Railway
                     config['ssl_ca'] = '/etc/ssl/certs/ca-certificates.crt'
                 g.db = mysql.connector.connect(**config)
                 print("✅ Database connected successfully")
@@ -186,15 +163,167 @@ def get_db():
 
 @app.teardown_appcontext
 def close_db(exception):
-    """Close the database connection at the end of a request."""
     db = g.pop("db", None)
     if db is not None and db.is_connected():
         db.close()
 
 
-# -----------------------------------------------------------------------------
-#  Auto-create Admin User on Startup
-# -----------------------------------------------------------------------------
+# =============================================================================
+#  SERVER-SIDE SESSION HELPERS
+#  Every login mints a cryptographically random token stored in MySQL.
+#  Logout deletes the row — the old cookie is useless even if someone kept it.
+# =============================================================================
+
+def _generate_token():
+    """Return a 64-character hex token (256 bits of entropy)."""
+    return uuid.uuid4().hex + uuid.uuid4().hex   # 64 hex chars
+
+
+def _create_db_session(user_id, role='user'):
+    """
+    Insert a new session row and return the token.
+    Cleans up any expired sessions for this user on the way in.
+    """
+    db = get_db()
+    if not db:
+        return None
+    token = _generate_token()
+    expires_at = datetime.now() + timedelta(hours=SESSION_LIFETIME_HOURS)
+    ip = request.remote_addr or 'unknown'
+    ua = (request.user_agent.string or '')[:512]
+    cursor = db.cursor()
+    try:
+        # Remove expired sessions for this user (housekeeping)
+        cursor.execute(
+            "DELETE FROM user_sessions WHERE user_id=%s AND role=%s AND expires_at < NOW()",
+            (user_id, role)
+        )
+        cursor.execute(
+            """INSERT INTO user_sessions
+               (user_id, role, session_token, expires_at, ip_address, user_agent, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, NOW())""",
+            (user_id, role, token, expires_at, ip, ua)
+        )
+        db.commit()
+        return token
+    except Exception as e:
+        print(f"Create session error: {e}")
+        db.rollback()
+        return None
+    finally:
+        cursor.close()
+
+
+def _validate_db_session(token, role='user'):
+    """
+    Return True if the token exists in the DB, matches the role, and is not expired.
+    Also deletes expired rows lazily.
+    """
+    if not token:
+        return False
+    db = get_db()
+    if not db:
+        return False
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            """SELECT id FROM user_sessions
+               WHERE session_token=%s AND role=%s AND expires_at > NOW()""",
+            (token, role)
+        )
+        row = cursor.fetchone()
+        return row is not None
+    except Exception as e:
+        print(f"Validate session error: {e}")
+        return False
+    finally:
+        cursor.close()
+
+
+def _destroy_db_session(token, role='user'):
+    """Delete a specific session token from the DB (logout)."""
+    if not token:
+        return
+    db = get_db()
+    if not db:
+        return
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            "DELETE FROM user_sessions WHERE session_token=%s AND role=%s",
+            (token, role)
+        )
+        db.commit()
+    except Exception as e:
+        print(f"Destroy session error: {e}")
+        db.rollback()
+    finally:
+        cursor.close()
+
+
+def _destroy_all_user_sessions(user_id, role='user'):
+    """Invalidate ALL active sessions for a user (useful for forced logout)."""
+    db = get_db()
+    if not db:
+        return
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            "DELETE FROM user_sessions WHERE user_id=%s AND role=%s",
+            (user_id, role)
+        )
+        db.commit()
+    except Exception as e:
+        print(f"Destroy all sessions error: {e}")
+        db.rollback()
+    finally:
+        cursor.close()
+
+
+# =============================================================================
+#  Decorators for Access Control
+#  Both decorators now ALSO verify the DB-side session token.
+# =============================================================================
+
+def login_required(f):
+    """Redirect to login if the user is not signed in OR if their token is invalid."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user_id = session.get("user_id")
+        token   = session.get("session_token")
+        if not user_id or not token:
+            flash("Please login to access this page", "error")
+            return redirect("/")
+        # Validate against DB — catches logout-then-replay attacks
+        if not _validate_db_session(token, role='user'):
+            session.clear()
+            flash("Your session has expired or been logged out. Please login again.", "error")
+            return redirect("/")
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def admin_required(f):
+    """Redirect to admin login if admin is not logged in OR token is invalid."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        admin_id = session.get("admin_id")
+        token    = session.get("admin_session_token")
+        if not admin_id or not token:
+            flash("Please login as admin to access this page", "error")
+            return redirect("/admin/login")
+        if not _validate_db_session(token, role='admin'):
+            session.clear()
+            flash("Your admin session has expired. Please login again.", "error")
+            return redirect("/admin/login")
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+# =============================================================================
+#  Startup: create tables if they don't exist
+# =============================================================================
+
 def create_admin_user():
     """Insert default admin account if it doesn't exist."""
     db = get_db()
@@ -206,20 +335,17 @@ def create_admin_user():
         if not cursor.fetchone():
             cursor.execute("""
                 INSERT INTO users (first_name, last_name, email, mobile, gender, username, password, role, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, ('Admin', 'User', 'admin@snaphire.com', '0000000000', 'other',
                   'admin', hash_password('admin123'), 'admin', datetime.now()))
             db.commit()
-            print("✅ Admin user created successfully")
+            print("✅ Admin user created")
     except Exception as e:
         print("Admin creation error:", e)
     finally:
         cursor.close()
 
 
-# -----------------------------------------------------------------------------
-#  Auto-create Video Tables on Startup
-# -----------------------------------------------------------------------------
 def create_video_tables():
     """Ensure the videos and video_files tables exist."""
     db = get_db()
@@ -269,11 +395,44 @@ def create_video_tables():
         cursor.close()
 
 
+def create_sessions_table():
+    """
+    Create the server-side session tracking table.
+    This is the core of the security upgrade: every login mints a row here;
+    logout deletes it so replaying an old cookie is impossible.
+    """
+    db = get_db()
+    if not db:
+        return
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_sessions (
+                id            INT PRIMARY KEY AUTO_INCREMENT,
+                user_id       INT NOT NULL,
+                role          ENUM('user','admin') NOT NULL DEFAULT 'user',
+                session_token VARCHAR(128) NOT NULL,
+                created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at    TIMESTAMP NOT NULL,
+                ip_address    VARCHAR(45),
+                user_agent    TEXT,
+                UNIQUE KEY uq_token (session_token),
+                INDEX idx_user_role (user_id, role),
+                INDEX idx_expires  (expires_at)
+            )
+        """)
+        db.commit()
+        print("✅ user_sessions table created/verified")
+    except Exception as e:
+        print("Sessions table creation error:", e)
+    finally:
+        cursor.close()
+
+
 # =============================================================================
 #  ROUTES – Public & Authentication
 # =============================================================================
 
-# ---------- Test Database Connection ----------
 @app.route("/test-db")
 def test_db():
     try:
@@ -289,10 +448,9 @@ def test_db():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-# ---------- Admin Login (database-backed) ----------
+# ---------- Admin Login ----------
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
-    """Admin login: checks credentials against the users table (role='admin')."""
     if request.method == "POST":
         db = get_db()
         if not db:
@@ -310,9 +468,20 @@ def admin_login():
             admin = None
         finally:
             cursor.close()
+
         if admin:
-            session["admin_id"] = admin["id"]
-            session["admin_username"] = admin["username"]
+            # 1. Wipe any existing Flask session (prevents session fixation)
+            session.clear()
+            # 2. Create a fresh server-side token
+            token = _create_db_session(admin["id"], role='admin')
+            if not token:
+                flash("Session creation failed. Please try again.", "error")
+                return render_template("admin_login.html", error="System error")
+            # 3. Store only non-sensitive identifiers + the token in the cookie
+            session["admin_id"]           = admin["id"]
+            session["admin_username"]     = admin["username"]
+            session["admin_session_token"] = token
+            session.permanent = True
             flash("Welcome back, Admin!", "success")
             return redirect("/admin/dashboard")
         else:
@@ -320,10 +489,20 @@ def admin_login():
     return render_template("admin_login.html")
 
 
+# ---------- Admin Logout ----------
+@app.route("/admin/logout")
+def admin_logout():
+    token = session.get("admin_session_token")
+    if token:
+        _destroy_db_session(token, role='admin')
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect("/admin/login")
+
+
 # ---------- User Signup ----------
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    """Register a new regular user."""
     if request.method == "POST":
         db = get_db()
         if not db:
@@ -337,16 +516,14 @@ def signup():
             if request.form["username"].lower() == "admin":
                 flash("Username not available", "error")
                 return redirect("/signup")
-            # Check for existing username/email
-            cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s",
+            cursor.execute("SELECT id FROM users WHERE username=%s OR email=%s",
                            (request.form["username"], request.form["email"]))
             if cursor.fetchone():
                 flash("Username or email already exists. Please choose another.", "error")
                 return redirect("/signup")
-            # Insert new user
             cursor.execute("""
                 INSERT INTO users (first_name, last_name, email, mobile, gender, username, password, role)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, 'user')
+                VALUES (%s,%s,%s,%s,%s,%s,%s,'user')
             """, (
                 request.form["first_name"],
                 request.form["last_name"],
@@ -372,7 +549,6 @@ def signup():
 # ---------- User Login ----------
 @app.route("/", methods=["GET", "POST"])
 def login():
-    """Handle user login and set session."""
     if request.method == "POST":
         db = get_db()
         if not db:
@@ -390,23 +566,52 @@ def login():
             user = None
         finally:
             cursor.close()
+
         if user:
-            # Clear old session and create a fresh one (prevents fixation)
+            # 1. Destroy any previously stored token for this user (single-session policy)
+            #    Remove the line below if you want to allow multi-device logins.
+            #    Keep it if you want old sessions invalidated when the user logs in again.
+            _destroy_all_user_sessions(user["id"], role='user')
+
+            # 2. Wipe the old Flask session entirely (prevents session fixation)
             session.clear()
-            session["user_id"] = user["id"]
-            session["username"] = user["username"]
-            session["user_name"] = f"{user['first_name']} {user['last_name']}"
+
+            # 3. Mint a brand-new server-side token
+            token = _create_db_session(user["id"], role='user')
+            if not token:
+                flash("Session creation failed. Please try again.", "error")
+                return render_template("login.html", error="System error. Please try again.")
+
+            # 4. Populate the cookie with only identifiers + the opaque token
+            session["user_id"]       = user["id"]
+            session["username"]      = user["username"]
+            session["user_name"]     = f"{user['first_name']} {user['last_name']}"
+            session["session_token"] = token
+            session.permanent = True   # honour PERMANENT_SESSION_LIFETIME
+
             flash(f"Welcome back, {user['first_name']}!", "success")
             return redirect("/home")
+
         return render_template("login.html", error="Invalid username or password")
     return render_template("login.html")
 
 
-# ---------- Home Page (after login) ----------
+# ---------- Logout ----------
+@app.route("/logout")
+def logout():
+    # Invalidate the server-side token so the cookie is useless even if someone kept it
+    token = session.get("session_token")
+    if token:
+        _destroy_db_session(token, role='user')
+    session.clear()
+    flash("You have been logged out successfully.", "success")
+    return redirect("/")
+
+
+# ---------- Home Page ----------
 @app.route("/home")
 @login_required
 def home():
-    """Display packages, reviews, and recent orders for the logged-in user."""
     db = get_db()
     if not db:
         flash("Database connection error", "error")
@@ -416,28 +621,21 @@ def home():
         cursor.execute("SELECT * FROM packages")
         packages = cursor.fetchall()
         cursor.execute("""
-            SELECT
-                p.package_name,
-                CONCAT(u.first_name, ' ', u.last_name) AS user_full_name,
-                r.rating,
-                r.comment,
-                r.created_at
+            SELECT p.package_name,
+                   CONCAT(u.first_name,' ',u.last_name) AS user_full_name,
+                   r.rating, r.comment, r.created_at
             FROM package_reviews r
-            JOIN users u ON r.user_id = u.id
-            JOIN packages p ON r.package_id = p.package_id
+            JOIN users     u ON r.user_id    = u.id
+            JOIN packages  p ON r.package_id = p.package_id
             ORDER BY r.created_at DESC
             LIMIT 10
         """)
         package_reviews = cursor.fetchall()
         cursor.execute("""
-            SELECT
-                o.order_id,
-                o.total_price,
-                o.status,
-                o.created_at
-            FROM orders o
-            WHERE o.user_id = %s
-            ORDER BY o.created_at DESC
+            SELECT order_id, total_price, status, created_at
+            FROM orders
+            WHERE user_id=%s
+            ORDER BY created_at DESC
             LIMIT 5
         """, (session["user_id"],))
         orders = cursor.fetchall()
@@ -451,12 +649,12 @@ def home():
     return render_template("home.html", packages=packages, package_reviews=package_reviews, orders=orders)
 
 
-# ========================  PORTFOLIO (IMAGES)  ==============================
-# (These routes accept direct image URLs – no file uploads needed.)
+# =============================================================================
+#  PORTFOLIO (IMAGES)
+# =============================================================================
 
 @app.route("/api/portfolio")
 def get_portfolio():
-    """API endpoint: returns a list of photographers with their portfolio images."""
     db = get_db()
     if not db:
         return jsonify([])
@@ -466,17 +664,10 @@ def get_portfolio():
         if not cursor.fetchone():
             return jsonify([])
         cursor.execute("""
-            SELECT
-                p.id as photographer_id,
-                p.first_name,
-                p.last_name,
-                p.profile_image,
-                p.rating,
-                pi.id as image_id,
-                pi.image_url,
-                pi.location,
-                pi.shoot_date,
-                pi.description
+            SELECT p.id AS photographer_id, p.first_name, p.last_name,
+                   p.profile_image, p.rating,
+                   pi.id AS image_id, pi.image_url, pi.location,
+                   pi.shoot_date, pi.description
             FROM photographers p
             JOIN portfolio_images pi ON p.id = pi.photographer_id
             WHERE p.status = 'active'
@@ -523,10 +714,10 @@ def admin_portfolio():
         cursor.execute("""
             SELECT p.*,
                    COUNT(DISTINCT pi.id) AS image_count,
-                   COUNT(DISTINCT v.id) AS video_count
+                   COUNT(DISTINCT v.id)  AS video_count
             FROM photographers p
             LEFT JOIN portfolio_images pi ON p.id = pi.photographer_id
-            LEFT JOIN videos v ON p.id = v.photographer_id
+            LEFT JOIN videos           v  ON p.id = v.photographer_id
             GROUP BY p.id
             ORDER BY p.id DESC
         """)
@@ -544,12 +735,15 @@ def admin_portfolio():
 def admin_portfolio_images(photographer_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id=%s", (photographer_id,))
     photographer = cursor.fetchone()
     if not photographer:
         flash("Photographer not found!", "error")
         return redirect("/admin/portfolio")
-    cursor.execute("SELECT * FROM portfolio_images WHERE photographer_id = %s ORDER BY shoot_date DESC, created_at DESC", (photographer_id,))
+    cursor.execute(
+        "SELECT * FROM portfolio_images WHERE photographer_id=%s ORDER BY shoot_date DESC, created_at DESC",
+        (photographer_id,)
+    )
     images = cursor.fetchall()
     cursor.close()
     return render_template("admin_portfolio_images.html", photographer=photographer, images=images)
@@ -560,15 +754,15 @@ def admin_portfolio_images(photographer_id):
 def admin_add_portfolio_image(photographer_id):
     db = get_db()
     if request.method == "POST":
-        image_url = request.form.get("image_url")
-        location = request.form.get("location")
-        shoot_date = request.form.get("shoot_date")
+        image_url   = request.form.get("image_url")
+        location    = request.form.get("location")
+        shoot_date  = request.form.get("shoot_date")
         description = request.form.get("description")
         cursor = db.cursor()
         try:
             cursor.execute("""
                 INSERT INTO portfolio_images (photographer_id, image_url, location, shoot_date, description)
-                VALUES (%s, %s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s,%s)
             """, (photographer_id, image_url, location, shoot_date, description))
             db.commit()
             flash("✅ Image added to portfolio!", "success")
@@ -580,7 +774,7 @@ def admin_add_portfolio_image(photographer_id):
             cursor.close()
         return redirect("/admin/portfolio")
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id=%s", (photographer_id,))
     photographer = cursor.fetchone()
     cursor.close()
     if not photographer:
@@ -595,19 +789,19 @@ def admin_edit_portfolio_image(image_id):
     db = get_db()
     cursor = db.cursor(dictionary=True)
     if request.method == "POST":
-        image_url = request.form.get("image_url")
-        location = request.form.get("location")
-        shoot_date = request.form.get("shoot_date")
+        image_url   = request.form.get("image_url")
+        location    = request.form.get("location")
+        shoot_date  = request.form.get("shoot_date")
         description = request.form.get("description")
         try:
             cursor.execute("""
                 UPDATE portfolio_images
-                SET image_url = %s, location = %s, shoot_date = %s, description = %s
-                WHERE id = %s
+                SET image_url=%s, location=%s, shoot_date=%s, description=%s
+                WHERE id=%s
             """, (image_url, location, shoot_date, description, image_id))
             db.commit()
-            flash("✅ Portfolio image updated successfully!", "success")
-            cursor.execute("SELECT photographer_id FROM portfolio_images WHERE id = %s", (image_id,))
+            flash("✅ Portfolio image updated!", "success")
+            cursor.execute("SELECT photographer_id FROM portfolio_images WHERE id=%s", (image_id,))
             result = cursor.fetchone()
             if result:
                 return redirect(f"/admin/portfolio/images/{result['photographer_id']}")
@@ -618,13 +812,13 @@ def admin_edit_portfolio_image(image_id):
         finally:
             cursor.close()
         return redirect("/admin/portfolio")
-    cursor.execute("SELECT * FROM portfolio_images WHERE id = %s", (image_id,))
+    cursor.execute("SELECT * FROM portfolio_images WHERE id=%s", (image_id,))
     image = cursor.fetchone()
     if not image:
         flash("Image not found!", "error")
         cursor.close()
         return redirect("/admin/portfolio")
-    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (image['photographer_id'],))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id=%s", (image['photographer_id'],))
     photographer = cursor.fetchone()
     cursor.close()
     return render_template("admin_edit_portfolio_image.html", image=image, photographer=photographer)
@@ -636,7 +830,7 @@ def admin_delete_portfolio_image(image_id):
     db = get_db()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM portfolio_images WHERE id = %s", (image_id,))
+        cursor.execute("DELETE FROM portfolio_images WHERE id=%s", (image_id,))
         db.commit()
         flash("🗑️ Image deleted successfully", "success")
     except Exception as e:
@@ -648,12 +842,13 @@ def admin_delete_portfolio_image(image_id):
     return redirect("/admin/portfolio")
 
 
-# ========================  VIDEO MANAGEMENT (CLOUDINARY)  ===================
+# =============================================================================
+#  VIDEO MANAGEMENT (CLOUDINARY)
+# =============================================================================
 
 @app.route("/admin/videos")
 @admin_required
 def admin_videos():
-    """List all videos in admin panel."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -661,15 +856,17 @@ def admin_videos():
     cursor = db.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT v.*,
-                   CONCAT(p.first_name, ' ', p.last_name) AS photographer_name
+            SELECT v.*, CONCAT(p.first_name,' ',p.last_name) AS photographer_name
             FROM videos v
             JOIN photographers p ON v.photographer_id = p.id
             ORDER BY v.sort_order ASC, v.created_at DESC
         """)
         videos = cursor.fetchall()
         for video in videos:
-            cursor.execute("SELECT format, file_url, is_default FROM video_files WHERE video_id = %s", (video['id'],))
+            cursor.execute(
+                "SELECT format, file_url, is_default FROM video_files WHERE video_id=%s",
+                (video['id'],)
+            )
             video['formats'] = cursor.fetchall()
     except Exception as e:
         print("Admin Videos Error:", e)
@@ -682,18 +879,16 @@ def admin_videos():
 @app.route("/admin/videos/add", methods=["GET", "POST"])
 @admin_required
 def admin_add_video():
-    """Add a new video (uploads video & poster to Cloudinary, fallback to local)."""
     db = get_db()
     if request.method == "POST":
-        photographer_id = request.form.get("photographer_id")
-        title = request.form.get("title")
-        description = request.form.get("description")
+        photographer_id  = request.form.get("photographer_id")
+        title            = request.form.get("title")
+        description      = request.form.get("description")
         duration_seconds = request.form.get("duration_seconds") or None
-        is_short_loop = 1 if request.form.get("is_short_loop") else 0
-        sort_order = request.form.get("sort_order", 0)
-        poster_url = None
+        is_short_loop    = 1 if request.form.get("is_short_loop") else 0
+        sort_order       = request.form.get("sort_order", 0)
+        poster_url       = None
 
-        # Upload poster image
         if 'poster_image' in request.files:
             file = request.files['poster_image']
             if file and allowed_image_file(file.filename):
@@ -701,9 +896,8 @@ def admin_add_video():
                 if cloud_url:
                     poster_url = cloud_url
                 else:
-                    # local fallback
-                    filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
-                    filepath = os.path.join(app.config['POSTER_FOLDER'], filename)
+                    filename  = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+                    filepath  = os.path.join(app.config['POSTER_FOLDER'], filename)
                     file.save(filepath)
                     poster_url = f"/static/uploads/posters/{filename}"
 
@@ -712,31 +906,28 @@ def admin_add_video():
             cursor.execute("""
                 INSERT INTO videos (photographer_id, title, description, duration_seconds,
                                     poster_image_url, is_short_loop, sort_order)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
             """, (photographer_id, title, description, duration_seconds, poster_url, is_short_loop, sort_order))
             video_id = cursor.lastrowid
 
-            # Upload video files
             video_files = request.files.getlist("video_files")
             for idx, vfile in enumerate(video_files):
                 if vfile and allowed_video_file(vfile.filename):
                     ext = vfile.filename.rsplit('.', 1)[1].lower()
                     cloud_url = upload_to_cloudinary(vfile, folder="videos", resource_type="video")
                     if cloud_url:
-                        file_url = cloud_url
-                        file_size = 0  # exact size not retrieved from Cloudinary in this simplified version
+                        file_url  = cloud_url
+                        file_size = 0
                     else:
-                        # local fallback
-                        filename = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
-                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        filename  = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
+                        filepath  = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         vfile.save(filepath)
-                        file_url = f"/static/uploads/videos/{filename}"
+                        file_url  = f"/static/uploads/videos/{filename}"
                         file_size = os.path.getsize(filepath)
-                    is_default = (idx == 0)
                     cursor.execute("""
                         INSERT INTO video_files (video_id, format, file_url, file_size_bytes, is_default)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (video_id, ext, file_url, file_size, is_default))
+                        VALUES (%s,%s,%s,%s,%s)
+                    """, (video_id, ext, file_url, file_size, idx == 0))
             db.commit()
             flash("✅ Video added successfully!", "success")
             return redirect("/admin/videos")
@@ -746,6 +937,7 @@ def admin_add_video():
             flash(f"❌ Error adding video: {str(e)}", "error")
         finally:
             cursor.close()
+
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT id, first_name, last_name FROM photographers ORDER BY first_name")
     photographers = cursor.fetchall()
@@ -756,19 +948,17 @@ def admin_add_video():
 @app.route("/admin/videos/edit/<int:video_id>", methods=["GET", "POST"])
 @admin_required
 def admin_edit_video(video_id):
-    """Edit video metadata and optionally replace the file."""
     db = get_db()
     cursor = db.cursor(dictionary=True)
 
     if request.method == "POST":
-        title = request.form.get("title")
-        description = request.form.get("description")
+        title            = request.form.get("title")
+        description      = request.form.get("description")
         duration_seconds = request.form.get("duration_seconds") or None
-        is_short_loop = 1 if request.form.get("is_short_loop") else 0
-        sort_order = request.form.get("sort_order", 0)
+        is_short_loop    = 1 if request.form.get("is_short_loop") else 0
+        sort_order       = request.form.get("sort_order", 0)
+        poster_url       = None
 
-        # optional poster update
-        poster_url = None
         if 'poster_image' in request.files:
             file = request.files['poster_image']
             if file and allowed_image_file(file.filename):
@@ -776,13 +966,12 @@ def admin_edit_video(video_id):
                 if cloud_url:
                     poster_url = cloud_url
                 else:
-                    filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
-                    filepath = os.path.join(app.config['POSTER_FOLDER'], filename)
+                    filename  = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+                    filepath  = os.path.join(app.config['POSTER_FOLDER'], filename)
                     file.save(filepath)
                     poster_url = f"/static/uploads/posters/{filename}"
 
         try:
-            # update metadata
             if poster_url:
                 cursor.execute("""
                     UPDATE videos SET title=%s, description=%s, duration_seconds=%s,
@@ -796,35 +985,32 @@ def admin_edit_video(video_id):
                     WHERE id=%s
                 """, (title, description, duration_seconds, is_short_loop, sort_order, video_id))
 
-            # replace video file if a new one is uploaded
             if 'video_file' in request.files:
                 video_file = request.files['video_file']
                 if video_file and video_file.filename != '' and allowed_video_file(video_file.filename):
-                    # delete only old local files (Cloudinary files are kept)
-                    cursor.execute("SELECT file_url FROM video_files WHERE video_id = %s", (video_id,))
-                    existing_files = cursor.fetchall()
-                    for f_row in existing_files:
+                    cursor.execute("SELECT file_url FROM video_files WHERE video_id=%s", (video_id,))
+                    for f_row in cursor.fetchall():
                         if not f_row['file_url'].startswith('http'):
                             local_path = f_row['file_url'].lstrip('/')
                             if os.path.exists(local_path):
                                 os.remove(local_path)
-                    cursor.execute("DELETE FROM video_files WHERE video_id = %s", (video_id,))
+                    cursor.execute("DELETE FROM video_files WHERE video_id=%s", (video_id,))
 
                     ext = video_file.filename.rsplit('.', 1)[1].lower()
                     cloud_url = upload_to_cloudinary(video_file, folder="videos", resource_type="video")
                     if cloud_url:
-                        file_url = cloud_url
+                        file_url  = cloud_url
                         file_size = 0
                     else:
-                        filename = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
-                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        filename  = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
+                        filepath  = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         video_file.save(filepath)
-                        file_url = f"/static/uploads/videos/{filename}"
+                        file_url  = f"/static/uploads/videos/{filename}"
                         file_size = os.path.getsize(filepath)
 
                     cursor.execute("""
                         INSERT INTO video_files (video_id, format, file_url, file_size_bytes, is_default)
-                        VALUES (%s, %s, %s, %s, %s)
+                        VALUES (%s,%s,%s,%s,%s)
                     """, (video_id, ext, file_url, file_size, True))
 
             db.commit()
@@ -839,14 +1025,14 @@ def admin_edit_video(video_id):
             cursor.close()
         return redirect(f"/admin/videos/edit/{video_id}")
 
-    # GET request – show form with current data
+    # GET
     try:
-        cursor.execute("SELECT * FROM videos WHERE id = %s", (video_id,))
+        cursor.execute("SELECT * FROM videos WHERE id=%s", (video_id,))
         video = cursor.fetchone()
         if not video:
             flash("Video not found", "error")
             return redirect("/admin/videos")
-        cursor.execute("SELECT * FROM video_files WHERE video_id = %s", (video_id,))
+        cursor.execute("SELECT * FROM video_files WHERE video_id=%s", (video_id,))
         video['formats'] = cursor.fetchall()
         cursor.execute("SELECT id, first_name, last_name FROM photographers ORDER BY first_name")
         photographers = cursor.fetchall()
@@ -856,18 +1042,16 @@ def admin_edit_video(video_id):
         photographers = []
     finally:
         cursor.close()
-
     return render_template("admin_edit_video.html", video=video, photographers=photographers)
 
 
 @app.route("/admin/videos/delete_format/<int:file_id>", methods=["POST"])
 @admin_required
 def admin_delete_video_format(file_id):
-    """Remove a specific video format (e.g., a lower-quality file)."""
     db = get_db()
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT file_url FROM video_files WHERE id = %s", (file_id,))
+        cursor.execute("SELECT file_url FROM video_files WHERE id=%s", (file_id,))
         result = cursor.fetchone()
         if result:
             file_path = result[0]
@@ -875,7 +1059,7 @@ def admin_delete_video_format(file_id):
                 local_path = file_path.lstrip('/')
                 if os.path.exists(local_path):
                     os.remove(local_path)
-        cursor.execute("DELETE FROM video_files WHERE id = %s", (file_id,))
+        cursor.execute("DELETE FROM video_files WHERE id=%s", (file_id,))
         db.commit()
         flash("Video format deleted", "success")
     except Exception as e:
@@ -890,41 +1074,33 @@ def admin_delete_video_format(file_id):
 @app.route("/admin/videos/delete/<int:video_id>", methods=["POST"])
 @admin_required
 def admin_delete_video(video_id):
-    """Delete a video and its local files (Cloudinary files remain unless manually removed)."""
     db = get_db()
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT photographer_id FROM videos WHERE id = %s", (video_id,))
+        cursor.execute("SELECT photographer_id FROM videos WHERE id=%s", (video_id,))
         result = cursor.fetchone()
         photographer_id = result[0] if result else None
 
-        # Delete poster (local only)
-        cursor.execute("SELECT poster_image_url FROM videos WHERE id = %s", (video_id,))
+        cursor.execute("SELECT poster_image_url FROM videos WHERE id=%s", (video_id,))
         poster = cursor.fetchone()
-        if poster and poster[0]:
-            poster_path = poster[0]
-            if not poster_path.startswith('http'):
-                local_path = poster_path.lstrip('/')
+        if poster and poster[0] and not poster[0].startswith('http'):
+            local_path = poster[0].lstrip('/')
+            if os.path.exists(local_path):
+                os.remove(local_path)
+
+        cursor.execute("SELECT file_url FROM video_files WHERE video_id=%s", (video_id,))
+        for row in cursor.fetchall():
+            if not row[0].startswith('http'):
+                local_path = row[0].lstrip('/')
                 if os.path.exists(local_path):
                     os.remove(local_path)
 
-        # Delete video files (local only)
-        cursor.execute("SELECT file_url FROM video_files WHERE video_id = %s", (video_id,))
-        files = cursor.fetchall()
-        for row in files:
-            file_path = row[0]
-            if not file_path.startswith('http'):
-                local_path = file_path.lstrip('/')
-                if os.path.exists(local_path):
-                    os.remove(local_path)
-
-        cursor.execute("DELETE FROM videos WHERE id = %s", (video_id,))
+        cursor.execute("DELETE FROM videos WHERE id=%s", (video_id,))
         db.commit()
         flash("🗑️ Video deleted permanently", "success")
         if photographer_id:
             return redirect(f"/admin/photographer_videos/{photographer_id}")
-        else:
-            return redirect("/admin/videos")
+        return redirect("/admin/videos")
     except Exception as e:
         print("Delete Video Error:", e)
         db.rollback()
@@ -936,7 +1112,6 @@ def admin_delete_video(video_id):
 
 @app.route("/api/videos")
 def get_videos():
-    """API: return active videos (used by frontend sliders)."""
     db = get_db()
     if not db:
         return jsonify([])
@@ -944,11 +1119,11 @@ def get_videos():
     try:
         cursor.execute("""
             SELECT v.*,
-                   CONCAT(p.first_name, ' ', p.last_name) AS photographer_name,
-                   (SELECT file_url FROM video_files WHERE video_id = v.id AND is_default = TRUE LIMIT 1) AS video_url
+                   CONCAT(p.first_name,' ',p.last_name) AS photographer_name,
+                   (SELECT file_url FROM video_files WHERE video_id=v.id AND is_default=TRUE LIMIT 1) AS video_url
             FROM videos v
             JOIN photographers p ON v.photographer_id = p.id
-            WHERE v.is_active = 1
+            WHERE v.is_active=1
             ORDER BY v.sort_order, v.created_at DESC
         """)
         videos = cursor.fetchall()
@@ -960,28 +1135,29 @@ def get_videos():
     return jsonify(videos)
 
 
-# ====================  PER-PHOTOGRAPHER VIDEO MANAGEMENT  ====================
+# =============================================================================
+#  PER-PHOTOGRAPHER VIDEO MANAGEMENT
+# =============================================================================
 
 @app.route("/admin/photographer_videos/<int:photographer_id>")
 @admin_required
 def admin_photographer_videos(photographer_id):
-    """List videos for a specific photographer."""
     db = get_db()
     if not db:
         flash("Database error", "error")
         return redirect("/admin/photographers")
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+        cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id=%s", (photographer_id,))
         photographer = cursor.fetchone()
         if not photographer:
             flash("Photographer not found", "error")
             return redirect("/admin/photographers")
         cursor.execute("""
             SELECT v.*,
-                   (SELECT GROUP_CONCAT(format) FROM video_files WHERE video_id = v.id) as formats
+                   (SELECT GROUP_CONCAT(format) FROM video_files WHERE video_id=v.id) AS formats
             FROM videos v
-            WHERE v.photographer_id = %s
+            WHERE v.photographer_id=%s
             ORDER BY v.sort_order ASC, v.created_at DESC
         """, (photographer_id,))
         videos = cursor.fetchall()
@@ -997,15 +1173,14 @@ def admin_photographer_videos(photographer_id):
 @app.route("/admin/photographer_videos/add/<int:photographer_id>", methods=["GET", "POST"])
 @admin_required
 def admin_add_photographer_video(photographer_id):
-    """Add a video for a specific photographer (similar to admin_add_video)."""
     db = get_db()
     if request.method == "POST":
-        title = request.form.get("title")
-        description = request.form.get("description")
+        title            = request.form.get("title")
+        description      = request.form.get("description")
         duration_seconds = request.form.get("duration_seconds") or None
-        is_short_loop = 1 if request.form.get("is_short_loop") else 0
-        sort_order = request.form.get("sort_order", 0)
-        poster_url = None
+        is_short_loop    = 1 if request.form.get("is_short_loop") else 0
+        sort_order       = request.form.get("sort_order", 0)
+        poster_url       = None
 
         if 'poster_image' in request.files:
             file = request.files['poster_image']
@@ -1014,8 +1189,8 @@ def admin_add_photographer_video(photographer_id):
                 if cloud_url:
                     poster_url = cloud_url
                 else:
-                    filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
-                    filepath = os.path.join(app.config['POSTER_FOLDER'], filename)
+                    filename  = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+                    filepath  = os.path.join(app.config['POSTER_FOLDER'], filename)
                     file.save(filepath)
                     poster_url = f"/static/uploads/posters/{filename}"
 
@@ -1024,7 +1199,7 @@ def admin_add_photographer_video(photographer_id):
             cursor.execute("""
                 INSERT INTO videos (photographer_id, title, description, duration_seconds,
                                     poster_image_url, is_short_loop, sort_order)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
             """, (photographer_id, title, description, duration_seconds, poster_url, is_short_loop, sort_order))
             video_id = cursor.lastrowid
 
@@ -1034,19 +1209,18 @@ def admin_add_photographer_video(photographer_id):
                     ext = vfile.filename.rsplit('.', 1)[1].lower()
                     cloud_url = upload_to_cloudinary(vfile, folder="videos", resource_type="video")
                     if cloud_url:
-                        file_url = cloud_url
+                        file_url  = cloud_url
                         file_size = 0
                     else:
-                        filename = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
-                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        filename  = secure_filename(f"video_{video_id}_{uuid.uuid4().hex}.{ext}")
+                        filepath  = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         vfile.save(filepath)
-                        file_url = f"/static/uploads/videos/{filename}"
+                        file_url  = f"/static/uploads/videos/{filename}"
                         file_size = os.path.getsize(filepath)
-                    is_default = (idx == 0)
                     cursor.execute("""
                         INSERT INTO video_files (video_id, format, file_url, file_size_bytes, is_default)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (video_id, ext, file_url, file_size, is_default))
+                        VALUES (%s,%s,%s,%s,%s)
+                    """, (video_id, ext, file_url, file_size, idx == 0))
             db.commit()
             flash("✅ Video added successfully!", "success")
             return redirect(f"/admin/photographer_videos/{photographer_id}")
@@ -1056,9 +1230,9 @@ def admin_add_photographer_video(photographer_id):
             flash(f"❌ Error adding video: {str(e)}", "error")
         finally:
             cursor.close()
-    # GET request
+
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id = %s", (photographer_id,))
+    cursor.execute("SELECT id, first_name, last_name FROM photographers WHERE id=%s", (photographer_id,))
     photographer = cursor.fetchone()
     cursor.close()
     if not photographer:
@@ -1068,12 +1242,12 @@ def admin_add_photographer_video(photographer_id):
 
 
 # =============================================================================
-#  Photographer Editing
+#  PHOTOGRAPHER EDITING
 # =============================================================================
+
 @app.route("/admin/edit_photographer/<int:id>", methods=["GET", "POST"])
 @admin_required
 def edit_photographer(id):
-    """Edit photographer details."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1088,14 +1262,10 @@ def edit_photographer(id):
                     experience=%s, rating=%s, status=%s, profile_image=%s
                 WHERE id=%s
             """, (
-                request.form.get("first_name"),
-                request.form.get("last_name"),
-                request.form.get("email"),
-                request.form.get("phone"),
-                request.form.get("experience"),
-                request.form.get("rating") or None,
-                request.form.get("status"),
-                request.form.get("profile_image"),
+                request.form.get("first_name"), request.form.get("last_name"),
+                request.form.get("email"),      request.form.get("phone"),
+                request.form.get("experience"), request.form.get("rating") or None,
+                request.form.get("status"),     request.form.get("profile_image"),
                 id
             ))
             db.commit()
@@ -1124,10 +1294,10 @@ def edit_photographer(id):
 # =============================================================================
 #  CART & ORDER ROUTES
 # =============================================================================
+
 @app.route("/cart", methods=["GET", "POST"])
 @login_required
 def cart():
-    """View and update the shopping cart."""
     user_id = session.get("user_id")
     db = get_db()
     if not db:
@@ -1135,13 +1305,12 @@ def cart():
         return redirect("/home")
     cursor = db.cursor(dictionary=True)
     if request.method == "POST":
-        # Bulk update cart items (photographer, location, date)
         try:
             for key, value in request.form.items():
                 if key.startswith("photographer_"):
-                    cart_item_id = int(key.split("_")[1])
+                    cart_item_id   = int(key.split("_")[1])
                     photographer_id = int(value) if value else None
-                    location = request.form.get(f"location_{cart_item_id}", "")
+                    location       = request.form.get(f"location_{cart_item_id}", "")
                     scheduled_date = request.form.get(f"date_{cart_item_id}", None)
                     cursor.execute("""
                         UPDATE user_packages
@@ -1157,24 +1326,22 @@ def cart():
         finally:
             cursor.close()
         return redirect("/cart")
-    # GET: display cart
+
     try:
         cursor.execute("""
             SELECT up.*, p.package_name, p.package_price, p.duration,
                    ph.id AS photographer_id,
-                   CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+                   CONCAT(ph.first_name,' ',ph.last_name) AS photographer_name,
                    ph.rating AS photographer_rating
             FROM user_packages up
             JOIN packages p ON up.package_id = p.package_id
             LEFT JOIN photographers ph ON up.photographer_id = ph.id
-            WHERE up.user_id = %s
+            WHERE up.user_id=%s
         """, (user_id,))
         cart_items = cursor.fetchall()
         cursor.execute("""
-            SELECT id, CONCAT(first_name, ' ', last_name) AS name, rating, status
-            FROM photographers
-            WHERE status = 'active'
-            ORDER BY rating DESC
+            SELECT id, CONCAT(first_name,' ',last_name) AS name, rating, status
+            FROM photographers WHERE status='active' ORDER BY rating DESC
         """)
         photographers = cursor.fetchall()
         total = sum(item["package_price"] * item["quantity"] for item in cart_items)
@@ -1192,7 +1359,6 @@ def cart():
 @app.route("/add_package/<int:package_id>", methods=["POST"])
 @login_required
 def add_package(package_id):
-    """AJAX endpoint: add a package to the cart."""
     db = get_db()
     if not db:
         return jsonify({"status": "error", "message": "Database error"})
@@ -1202,11 +1368,15 @@ def add_package(package_id):
                        (session["user_id"], package_id))
         existing = cursor.fetchone()
         if existing:
-            cursor.execute("UPDATE user_packages SET quantity = quantity + 1 WHERE user_id=%s AND package_id=%s",
-                           (session["user_id"], package_id))
+            cursor.execute(
+                "UPDATE user_packages SET quantity=quantity+1 WHERE user_id=%s AND package_id=%s",
+                (session["user_id"], package_id)
+            )
         else:
-            cursor.execute("INSERT INTO user_packages (user_id, package_id, quantity) VALUES (%s,%s,1)",
-                           (session["user_id"], package_id))
+            cursor.execute(
+                "INSERT INTO user_packages (user_id, package_id, quantity) VALUES (%s,%s,1)",
+                (session["user_id"], package_id)
+            )
         db.commit()
         return jsonify({"status": "success", "message": "Package added to cart"})
     except Exception as e:
@@ -1220,7 +1390,6 @@ def add_package(package_id):
 @app.route("/remove/<int:id>", methods=["POST"])
 @login_required
 def remove(id):
-    """Remove one item from cart (decrement quantity or delete)."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1232,8 +1401,10 @@ def remove(id):
         item = cursor.fetchone()
         if item:
             if item["quantity"] > 1:
-                cursor.execute("UPDATE user_packages SET quantity = quantity - 1 WHERE id=%s AND user_id=%s",
-                               (id, session["user_id"]))
+                cursor.execute(
+                    "UPDATE user_packages SET quantity=quantity-1 WHERE id=%s AND user_id=%s",
+                    (id, session["user_id"])
+                )
             else:
                 cursor.execute("DELETE FROM user_packages WHERE id=%s AND user_id=%s",
                                (id, session["user_id"]))
@@ -1251,7 +1422,6 @@ def remove(id):
 @app.route("/empty_cart", methods=["POST"])
 @login_required
 def empty_cart():
-    """Delete all items from the cart."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1273,7 +1443,6 @@ def empty_cart():
 @app.route("/update_item/<int:item_id>", methods=["POST"])
 @login_required
 def update_item(item_id):
-    """Update a single cart item's details (photographer, location, date)."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1281,8 +1450,8 @@ def update_item(item_id):
     cursor = db.cursor()
     try:
         photographer_id = request.form.get(f"photographer_{item_id}")
-        location = request.form.get(f"location_{item_id}")
-        scheduled_date = request.form.get(f"date_{item_id}")
+        location        = request.form.get(f"location_{item_id}")
+        scheduled_date  = request.form.get(f"date_{item_id}")
         photographer_id = int(photographer_id) if photographer_id and photographer_id != "" else None
         cursor.execute("""
             UPDATE user_packages
@@ -1303,7 +1472,6 @@ def update_item(item_id):
 @app.route("/edit-profile", methods=["GET", "POST"])
 @login_required
 def edit_profile():
-    """Allow user to update their profile."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1312,12 +1480,13 @@ def edit_profile():
     if request.method == "POST":
         try:
             cursor.execute("""
-                UPDATE users
-                SET first_name=%s, last_name=%s, email=%s, mobile=%s, gender=%s
+                UPDATE users SET first_name=%s, last_name=%s, email=%s, mobile=%s, gender=%s
                 WHERE id=%s
-            """, (request.form["first_name"], request.form["last_name"],
-                  request.form["email"], request.form["mobile"],
-                  request.form["gender"], session["user_id"]))
+            """, (
+                request.form["first_name"], request.form["last_name"],
+                request.form["email"],      request.form["mobile"],
+                request.form["gender"],     session["user_id"]
+            ))
             db.commit()
             flash("✅ Profile updated successfully!", "success")
             return redirect("/home")
@@ -1360,17 +1529,21 @@ def get_hired():
 # =============================================================================
 #  ORDER MANAGEMENT (User)
 # =============================================================================
+
 @app.route("/orders")
 @login_required
 def orders():
-    """List all orders for the logged-in user."""
     db = get_db()
     if not db:
         flash("Database error", "error")
         return redirect("/home")
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT order_id, total_price, status, created_at, location, scheduled_date FROM orders WHERE user_id = %s ORDER BY created_at DESC", (session["user_id"],))
+        cursor.execute(
+            "SELECT order_id, total_price, status, created_at, location, scheduled_date "
+            "FROM orders WHERE user_id=%s ORDER BY created_at DESC",
+            (session["user_id"],)
+        )
         orders = cursor.fetchall()
     except Exception as e:
         print("Orders Error:", e)
@@ -1383,7 +1556,6 @@ def orders():
 @app.route("/order_details/<string:order_id>")
 @login_required
 def order_details(order_id):
-    """Show details of a single order with tax/charge breakdown."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1392,44 +1564,44 @@ def order_details(order_id):
     try:
         cursor.execute("""
             SELECT order_id, total_price, location, scheduled_date, payment_method, status, created_at
-            FROM orders WHERE order_id = %s AND user_id = %s
+            FROM orders WHERE order_id=%s AND user_id=%s
         """, (order_id, session["user_id"]))
         order = cursor.fetchone()
         if not order:
             cursor.close()
-            return render_template("order_details.html", order=None, items=[], subtotal=0, gst_amount=0, service_charge=0, grand_total=0)
+            return render_template("order_details.html", order=None, items=[],
+                                   subtotal=0, gst_amount=0, service_charge=0, grand_total=0)
         cursor.execute("""
             SELECT oi.package_name, oi.price, oi.duration, oi.quantity, oi.location,
-                   CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+                   CONCAT(ph.first_name,' ',ph.last_name) AS photographer_name,
                    ph.rating AS photographer_rating
             FROM order_items oi
             LEFT JOIN photographers ph ON oi.photographer_id = ph.id
-            WHERE oi.order_id = %s
+            WHERE oi.order_id=%s
         """, (order_id,))
-        items = cursor.fetchall()
-        subtotal = sum(float(item["price"]) * int(item["quantity"]) for item in items)
-        gst_amount = subtotal * 0.18
+        items         = cursor.fetchall()
+        subtotal      = sum(float(i["price"]) * int(i["quantity"]) for i in items)
+        gst_amount    = subtotal * 0.18
         service_charge = subtotal * 0.05
-        grand_total = subtotal + gst_amount + service_charge
+        grand_total   = subtotal + gst_amount + service_charge
     except Exception as e:
         print("Order Details Error:", e)
         order = None
         items = []
-        subtotal = 0
-        gst_amount = 0
-        service_charge = 0
-        grand_total = 0
+        subtotal = gst_amount = service_charge = grand_total = 0
     finally:
         cursor.close()
-    return render_template("order_details.html", order=order, items=items, subtotal=subtotal, gst_amount=gst_amount, service_charge=service_charge, grand_total=grand_total)
+    return render_template("order_details.html", order=order, items=items,
+                           subtotal=subtotal, gst_amount=gst_amount,
+                           service_charge=service_charge, grand_total=grand_total)
 
 
 # =============================================================================
 #  PHOTOGRAPHER APPLICATION
 # =============================================================================
+
 @app.route("/photographer/apply", methods=["POST"])
 def apply_photographer():
-    """Handle photographer job application."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1437,11 +1609,15 @@ def apply_photographer():
     cursor = db.cursor()
     try:
         cursor.execute("""
-            INSERT INTO photographers_applications (first_name, last_name, email, phone, address, years_exp, months_exp)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """, (request.form["first_name"], request.form["last_name"],
-              request.form["email"], request.form["phone"],
-              request.form["address"], request.form["years"], request.form["months"]))
+            INSERT INTO photographers_applications
+                (first_name, last_name, email, phone, address, years_exp, months_exp)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            request.form["first_name"], request.form["last_name"],
+            request.form["email"],      request.form["phone"],
+            request.form["address"],    request.form["years"],
+            request.form["months"]
+        ))
         db.commit()
         flash("🎉 Your application has been submitted successfully!", "success")
     except Exception as e:
@@ -1459,47 +1635,44 @@ def photographer_submitted():
 
 
 # =============================================================================
-#  ADMIN ROUTES (Dashboard, Order Management, Users, Packages, Photographers)
+#  ADMIN ROUTES
 # =============================================================================
 
 @app.route("/admin/dashboard")
 @admin_required
 def admin_dashboard():
-    """Admin dashboard with summary statistics."""
     db = get_db()
     if not db:
         flash("Database error", "error")
         return redirect("/admin/login")
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT COUNT(*) as count FROM orders")
+        cursor.execute("SELECT COUNT(*) AS count FROM orders")
         total_orders = cursor.fetchone()["count"]
-        cursor.execute("SELECT COALESCE(SUM(total_price), 0) as total FROM orders WHERE status = 'Confirmed'")
-        revenue_result = cursor.fetchone()
-        revenue = revenue_result["total"] if revenue_result["total"] else 0
-        cursor.execute("SELECT COUNT(*) as count FROM users")
+        cursor.execute("SELECT COALESCE(SUM(total_price),0) AS total FROM orders WHERE status='Confirmed'")
+        revenue = cursor.fetchone()["total"] or 0
+        cursor.execute("SELECT COUNT(*) AS count FROM users")
         total_users = cursor.fetchone()["count"]
-        cursor.execute("SELECT COUNT(*) as count FROM photographers")
+        cursor.execute("SELECT COUNT(*) AS count FROM photographers")
         total_photographers = cursor.fetchone()["count"]
-        cursor.execute("SELECT COUNT(*) as count FROM videos")
+        cursor.execute("SELECT COUNT(*) AS count FROM videos")
         total_videos = cursor.fetchone()["count"]
         cursor.execute("""
             SELECT o.order_id, o.total_price, o.status, o.created_at, u.first_name, u.last_name
-            FROM orders o JOIN users u ON o.user_id = u.id
+            FROM orders o JOIN users u ON o.user_id=u.id
             ORDER BY o.created_at DESC LIMIT 10
         """)
         recent_orders = cursor.fetchall()
-        cursor.execute("SELECT id, first_name, last_name, email, phone, years_exp, months_exp FROM photographers_applications ORDER BY id DESC")
+        cursor.execute(
+            "SELECT id, first_name, last_name, email, phone, years_exp, months_exp "
+            "FROM photographers_applications ORDER BY id DESC"
+        )
         applications = cursor.fetchall()
     except Exception as e:
         print("Admin Dashboard Error:", e)
-        total_orders = 0
-        revenue = 0
-        total_users = 0
-        total_photographers = 0
-        total_videos = 0
+        total_orders = revenue = total_users = total_photographers = total_videos = 0
         recent_orders = []
-        applications = []
+        applications  = []
     finally:
         cursor.close()
     return render_template("admin_dashboard.html",
@@ -1515,7 +1688,6 @@ def admin_dashboard():
 @app.route("/admin/order_details/<string:order_id>")
 @admin_required
 def admin_order_details(order_id):
-    """Admin view of a single order."""
     db = get_db()
     if not db:
         flash("Database error", "error")
@@ -1523,20 +1695,20 @@ def admin_order_details(order_id):
     cursor = db.cursor(dictionary=True)
     try:
         cursor.execute("""
-            SELECT o.order_id, o.total_price, o.location, o.scheduled_date, o.payment_method, o.status, o.created_at,
-                   u.first_name, u.last_name, u.email, u.mobile
-            FROM orders o JOIN users u ON o.user_id = u.id WHERE o.order_id = %s
+            SELECT o.order_id, o.total_price, o.location, o.scheduled_date, o.payment_method,
+                   o.status, o.created_at, u.first_name, u.last_name, u.email, u.mobile
+            FROM orders o JOIN users u ON o.user_id=u.id WHERE o.order_id=%s
         """, (order_id,))
         order = cursor.fetchone()
         items = []
         if order:
             cursor.execute("""
                 SELECT oi.package_name, oi.price, oi.duration, oi.quantity,
-                       CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+                       CONCAT(ph.first_name,' ',ph.last_name) AS photographer_name,
                        ph.rating AS photographer_rating
                 FROM order_items oi
-                LEFT JOIN photographers ph ON oi.photographer_id = ph.id
-                WHERE oi.order_id = %s
+                LEFT JOIN photographers ph ON oi.photographer_id=ph.id
+                WHERE oi.order_id=%s
             """, (order_id,))
             items = cursor.fetchall()
     except Exception as e:
@@ -1547,8 +1719,6 @@ def admin_order_details(order_id):
         cursor.close()
     return render_template("admin_order_details.html", order=order, items=items)
 
-
-# ... (remaining admin routes for photographers, packages, users are mostly unchanged)
 
 @app.route("/admin/photographers")
 @admin_required
@@ -1585,7 +1755,7 @@ def approve_photographer(id):
         """, (id,))
         cursor.execute("DELETE FROM photographers_applications WHERE id=%s", (id,))
         db.commit()
-        flash("✅ Photographer approved successfully!", "success")
+        flash("✅ Photographer approved!", "success")
     except Exception as e:
         print("Approve Error:", e)
         db.rollback()
@@ -1606,7 +1776,7 @@ def reject_photographer(id):
     try:
         cursor.execute("DELETE FROM photographers_applications WHERE id=%s", (id,))
         db.commit()
-        flash("❌ Application rejected!", "error")
+        flash("Application rejected.", "error")
     except Exception as e:
         print("Reject Error:", e)
         db.rollback()
@@ -1627,7 +1797,7 @@ def admin_orders():
     try:
         cursor.execute("""
             SELECT o.order_id, o.total_price, o.status, o.created_at, u.first_name, u.last_name
-            FROM orders o JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC
+            FROM orders o JOIN users u ON o.user_id=u.id ORDER BY o.created_at DESC
         """)
         orders = cursor.fetchall()
     except Exception as e:
@@ -1648,7 +1818,7 @@ def update_order_status(order_id):
         return redirect("/admin/dashboard")
     cursor = db.cursor()
     try:
-        cursor.execute("UPDATE orders SET status = %s WHERE order_id = %s", (new_status, order_id))
+        cursor.execute("UPDATE orders SET status=%s WHERE order_id=%s", (new_status, order_id))
         db.commit()
         flash(f"✅ Order status updated to {new_status}!", "success")
     except Exception as e:
@@ -1670,11 +1840,13 @@ def admin_packages():
     cursor = db.cursor(dictionary=True)
     if request.method == "POST":
         try:
-            cursor.execute("INSERT INTO packages (package_name, package_price, duration, image_filename) VALUES (%s, %s, %s, %s)",
-                           (request.form.get("package_name"), request.form.get("package_price"),
-                            request.form.get("duration"), request.form.get("image_filename")))
+            cursor.execute(
+                "INSERT INTO packages (package_name, package_price, duration, image_filename) VALUES (%s,%s,%s,%s)",
+                (request.form.get("package_name"), request.form.get("package_price"),
+                 request.form.get("duration"), request.form.get("image_filename"))
+            )
             db.commit()
-            flash("✅ Package added successfully!", "success")
+            flash("✅ Package added!", "success")
         except Exception as e:
             print("Add Package Error:", e)
             db.rollback()
@@ -1703,7 +1875,7 @@ def delete_package(id):
         cursor.execute("DELETE FROM user_packages WHERE package_id=%s", (id,))
         cursor.execute("DELETE FROM packages WHERE package_id=%s", (id,))
         db.commit()
-        flash("🗑️ Package deleted successfully!", "success")
+        flash("🗑️ Package deleted!", "success")
     except Exception as e:
         print("Delete Error:", e)
         db.rollback()
@@ -1723,11 +1895,13 @@ def edit_package(id):
     cursor = db.cursor(dictionary=True)
     if request.method == "POST":
         try:
-            cursor.execute("UPDATE packages SET package_name=%s, package_price=%s, duration=%s, image_filename=%s WHERE package_id=%s",
-                           (request.form.get("package_name"), request.form.get("package_price"),
-                            request.form.get("duration"), request.form.get("image_filename"), id))
+            cursor.execute(
+                "UPDATE packages SET package_name=%s, package_price=%s, duration=%s, image_filename=%s WHERE package_id=%s",
+                (request.form.get("package_name"), request.form.get("package_price"),
+                 request.form.get("duration"), request.form.get("image_filename"), id)
+            )
             db.commit()
-            flash("✏️ Package updated successfully!", "success")
+            flash("✏️ Package updated!", "success")
             return redirect("/admin/packages")
         except Exception as e:
             print("Update Error:", e)
@@ -1754,7 +1928,10 @@ def admin_users():
         return redirect("/admin/dashboard")
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, first_name, last_name, email, mobile, username, role, created_at FROM users ORDER BY id DESC")
+        cursor.execute(
+            "SELECT id, first_name, last_name, email, mobile, username, role, created_at "
+            "FROM users ORDER BY id DESC"
+        )
         users = cursor.fetchall()
     except Exception as e:
         print("Admin Users Error:", e)
@@ -1773,11 +1950,13 @@ def delete_user(id):
         return redirect("/admin/users")
     cursor = db.cursor()
     try:
+        # Destroy all active sessions for this user before deleting the account
+        _destroy_all_user_sessions(id, role='user')
         cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (id,))
         cursor.execute("DELETE FROM orders WHERE user_id=%s", (id,))
         cursor.execute("DELETE FROM users WHERE id=%s", (id,))
         db.commit()
-        flash("✅ User deleted successfully!", "success")
+        flash("✅ User deleted!", "success")
     except Exception as e:
         db.rollback()
         print("Delete Error:", e)
@@ -1796,12 +1975,12 @@ def delete_photographer(id):
         return redirect("/admin/photographers")
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT first_name, last_name FROM photographers WHERE id=%s", (id,))
+        cursor.execute("SELECT first_name FROM photographers WHERE id=%s", (id,))
         photographer = cursor.fetchone()
         if photographer:
             cursor.execute("DELETE FROM photographers WHERE id=%s", (id,))
             db.commit()
-            flash(f"✅ Photographer deleted successfully!", "success")
+            flash("✅ Photographer deleted!", "success")
         else:
             flash("❌ Photographer not found!", "error")
     except Exception as e:
@@ -1822,12 +2001,16 @@ def view_user(user_id):
         return redirect('/admin/users')
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT * FROM users WHERE id=%s", (user_id,))
         user = cursor.fetchone()
         if not user:
             flash("User not found", "error")
             return redirect('/admin/users')
-        cursor.execute("SELECT order_id, total_price, status, created_at FROM orders WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+        cursor.execute(
+            "SELECT order_id, total_price, status, created_at FROM orders "
+            "WHERE user_id=%s ORDER BY created_at DESC",
+            (user_id,)
+        )
         user['orders'] = cursor.fetchall()
     except Exception as e:
         print("View User Error:", e)
@@ -1838,27 +2021,26 @@ def view_user(user_id):
 
 
 # =============================================================================
-#  FAKE PAYMENT GATEWAY (DEMO MODE)
+#  CHECKOUT & FAKE PAYMENT GATEWAY
 # =============================================================================
+
 @app.route("/checkout", methods=["GET"])
 @login_required
 def checkout():
-    """Validate cart, store checkout intent in session, redirect to fake payment."""
     db = get_db()
     if not db:
         flash("Database error", "error")
         return redirect("/cart")
     cursor = db.cursor(dictionary=True)
-
     cursor.execute("""
         SELECT up.id AS cart_id, up.quantity, up.location, up.scheduled_date,
                p.package_name, p.package_price, p.duration,
-               CONCAT(ph.first_name, ' ', ph.last_name) AS photographer_name,
+               CONCAT(ph.first_name,' ',ph.last_name) AS photographer_name,
                up.photographer_id
         FROM user_packages up
-        JOIN packages p ON up.package_id = p.package_id
-        LEFT JOIN photographers ph ON up.photographer_id = ph.id
-        WHERE up.user_id = %s
+        JOIN packages p ON up.package_id=p.package_id
+        LEFT JOIN photographers ph ON up.photographer_id=ph.id
+        WHERE up.user_id=%s
     """, (session["user_id"],))
     items = cursor.fetchall()
     cursor.close()
@@ -1873,8 +2055,6 @@ def checkout():
         return redirect("/cart")
 
     total = sum(item["package_price"] * item["quantity"] for item in items)
-
-    # Store checkout intent (includes all needed data to create the order later)
     session["checkout_intent"] = {
         "items": items,
         "total": total,
@@ -1887,13 +2067,10 @@ def checkout():
 @app.route("/payment", methods=["GET", "POST"])
 @login_required
 def payment():
-    """Fake payment page. Card validation only for 'card' method; other methods always succeed."""
     intent = session.get("checkout_intent")
     if not intent:
         flash("No pending checkout. Please add items to cart.", "error")
         return redirect("/cart")
-
-    # Session stores values as strings; convert to appropriate numeric types
     try:
         intent["total"] = float(intent["total"])
         for item in intent["items"]:
@@ -1906,50 +2083,36 @@ def payment():
 
     if request.method == "POST":
         payment_method = request.form.get("payment_method", "card")
-
-        # Demo: only card payments require the test card number
         if payment_method == "card":
             card_number = request.form.get("card_number", "").replace(" ", "")
             if card_number != "4242424242424242":
-                flash("❌ Payment declined. Please use test card: 4242 4242 4242 4242", "error")
+                flash("❌ Payment declined. Use test card: 4242 4242 4242 4242", "error")
                 return redirect("/payment")
 
-        # Create order
         db = get_db()
         if not db:
             flash("Database connection error", "error")
             return redirect("/cart")
-
         cursor = db.cursor()
         try:
             order_code = str(uuid.uuid4())[:8]
             cursor.execute("""
                 INSERT INTO orders (user_id, total_price, location, payment_method, status, order_id, scheduled_date)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s)
             """, (
-                session["user_id"],
-                intent["total"],
-                intent["location"],
-                payment_method,
-                "Confirmed",
-                order_code,
-                intent["scheduled_date"]
+                session["user_id"], intent["total"], intent["location"],
+                payment_method, "Confirmed", order_code, intent["scheduled_date"]
             ))
             for item in intent["items"]:
                 cursor.execute("""
-                    INSERT INTO order_items (order_id, package_name, price, duration, location, quantity, photographer_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO order_items
+                        (order_id, package_name, price, duration, location, quantity, photographer_id)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s)
                 """, (
-                    order_code,
-                    item["package_name"],
-                    item["package_price"],
-                    item["duration"],
-                    item["location"],
-                    item["quantity"],
-                    item["photographer_id"]
+                    order_code, item["package_name"], item["package_price"],
+                    item["duration"], item["location"], item["quantity"], item["photographer_id"]
                 ))
-            # Clear user's cart
-            cursor.execute("DELETE FROM user_packages WHERE user_id = %s", (session["user_id"],))
+            cursor.execute("DELETE FROM user_packages WHERE user_id=%s", (session["user_id"],))
             db.commit()
             session.pop("checkout_intent", None)
             flash("🎉 Payment successful! Order placed.", "success")
@@ -1962,33 +2125,23 @@ def payment():
         finally:
             cursor.close()
 
-    # GET: render payment form
     return render_template("payment.html", intent=intent)
 
 
 @app.route("/order-success")
 def order_success():
     order_id = request.args.get("order_id")
-    total = request.args.get("total")
+    total    = request.args.get("total")
     return render_template("order_success.html", order_id=order_id, total=total)
 
 
 # =============================================================================
-#  Logout – clear session completely
-# =============================================================================
-@app.route("/logout")
-def logout():
-    session.clear()
-    flash("You have been logged out successfully.", "success")
-    return redirect("/")
-
-
-# =============================================================================
-#  Startup: create admin user & video tables if needed
+#  App startup
 # =============================================================================
 with app.app_context():
     create_admin_user()
     create_video_tables()
+    create_sessions_table()   # ← NEW: create server-side session table
 
 
 if __name__ == "__main__":
