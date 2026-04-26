@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Application Submitted - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(15px, 4vw, 20px);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 600px;
+  width: min(95%, 600px);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: clamp(35px, 8vw, 50px) clamp(25px, 6vw, 40px);
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  animation: slideUp 0.6s ease;
+  z-index: 1;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Success Icon */
+.success-icon {
+  width: clamp(80px, 20vw, 100px);
+  height: clamp(80px, 20vw, 100px);
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 25px;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.success-icon i {
+  font-size: clamp(40px, 10vw, 50px);
+  color: white;
+  animation: checkBounce 0.6s ease;
+}
+
+@keyframes checkBounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Headings */
+h1 {
+  color: #27ae60;
+  font-size: clamp(28px, 7vw, 32px);
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.subtitle {
+  color: #666;
+  font-size: clamp(14px, 4vw, 16px);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* Info Card */
+.info-card {
+  background: rgba(248,249,250,0.9);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  padding: clamp(18px, 4vw, 25px);
+  margin: 25px 0;
+  text-align: left;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.info-card h3 {
+  color: #ff7f50;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(16px, 4.5vw, 18px);
+  flex-wrap: wrap;
+}
+
+.info-card p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+}
+
+.info-list li {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #555;
+  font-size: clamp(13px, 3.5vw, 14px);
+  border-bottom: 1px solid rgba(224,224,224,0.5);
+  flex-wrap: wrap;
+  transition: all 0.3s ease;
+}
+
+.info-list li:hover {
+  transform: translateX(5px);
+  color: #ff7f50;
+}
+
+.info-list li:last-child {
+  border-bottom: none;
+}
+
+.info-list li i {
+  color: #ff7f50;
+  width: 22px;
+}
+
+/* Next Steps */
+.next-steps {
+  background: linear-gradient(135deg, #fff5f2, #fff);
+  border-radius: 16px;
+  padding: clamp(15px, 4vw, 20px);
+  margin: 20px 0;
+  text-align: left;
+  border-left: 4px solid #ff7f50;
+  transition: all 0.3s ease;
+}
+
+.next-steps:hover {
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.next-steps h4 {
+  color: #ff7f50;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(15px, 4vw, 16px);
+  flex-wrap: wrap;
+}
+
+.next-steps p {
+  color: #666;
+  font-size: clamp(13px, 3.5vw, 14px);
+  line-height: 1.6;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 28px);
+  border: none;
+  border-radius: 30px;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-home {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+}
+
+.btn-home:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(255,127,80,0.4);
+}
+
+.btn-website {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.btn-website:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(52,152,219,0.4);
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(224,224,224,0.5);
+  font-size: clamp(11px, 3vw, 12px);
+  color: #999;
+}
+
+.footer i {
+  color: #ff7f50;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 600px) {
+  .container {
+    padding: 35px 25px;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  .success-icon {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .success-icon i {
+    font-size: 40px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 25px 20px;
+  }
+  
+  .info-list li {
+    flex-direction: column;
+    text-align: center;
+    gap: 5px;
+  }
+  
+  .info-list li i {
+    width: auto;
+  }
+  
+  .next-steps {
+    text-align: center;
+  }
+  
+  .next-steps h4 {
+    justify-content: center;
+  }
+}
+
+/* Landscape Mode */
+@media (max-width: 768px) and (orientation: landscape) {
+  body {
+    padding: 15px;
+  }
+  
+  .container {
+    padding: 30px 25px;
+  }
+  
+  .info-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .info-list li {
+    border-bottom: none;
+    background: rgba(255,255,255,0.8);
+    border-radius: 8px;
+    padding: 10px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body::before, body::after, .particle {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .container {
+    background: white;
+    backdrop-filter: none;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .btn {
+    display: none;
+  }
+  
+  .success-icon {
+    background: #2ecc71;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="success-icon">
+    <i class="fas fa-check"></i>
+  </div>
+  
+  <h1>Application Submitted!</h1>
+  <p class="subtitle">Thank you for your interest in joining SnapHire</p>
+
+  <div class="info-card">
+    <h3>
+      <i class="fas fa-info-circle"></i>
+      What happens next?
+    </h3>
+    <p>We have received your application to become a photographer with SnapHire. Our team will review your application carefully.</p>
+    
+    <ul class="info-list">
+      <li><i class="fas fa-clock"></i> Review time: 3-5 business days</li>
+      <li><i class="fas fa-envelope"></i> We'll contact you via email</li>
+      <li><i class="fas fa-phone"></i> Shortlisted candidates will receive a call</li>
+      <li><i class="fas fa-camera"></i> Portfolio review may be required</li>
+    </ul>
+  </div>
+
+  <div class="next-steps">
+    <h4>
+      <i class="fas fa-lightbulb"></i>
+      Quick Tip
+    </h4>
+    <p>While you wait, you can browse our website to understand our style and packages. This will help you prepare for the next steps!</p>
+  </div>
+
+  <div class="button-group">
+    <a href="/home" class="btn btn-home">
+      <i class="fas fa-home"></i> Back to Home
+    </a>
+    <a href="/" class="btn btn-website">
+      <i class="fas fa-camera"></i> Visit Website
+    </a>
+  </div>
+
+  <div class="footer">
+    <i class="fas fa-heart"></i> SnapHire - Capturing your special moments
+  </div>
+</div>
+
+<script>
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Your Orders - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+
+/* BASE */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* HEADER - Glass morphism */
+header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(15px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: clamp(18px, 6vw, 24px);
+  font-weight: bold;
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: clamp(20px, 6vw, 26px);
+}
+
+/* BACK BUTTON - Animation KEPT */
+.back-btn {
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: clamp(8px, 2.5vw, 12px) clamp(15px, 4vw, 22px);
+  border-radius: 25px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(255,127,80,0.3);
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.back-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(255,127,80,0.5);
+}
+
+.back-btn:active {
+  transform: scale(0.95);
+}
+
+/* CONTAINER - Responsive */
+.container {
+  max-width: 1000px;
+  width: min(90%, 1000px);
+  margin: clamp(20px, 6vw, 40px) auto;
+  padding: clamp(15px, 4vw, 20px);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: clamp(25px, 6vw, 35px);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: clamp(24px, 6vw, 32px);
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+h1 i {
+  color: #ff7f50;
+  font-size: clamp(28px, 7vw, 36px);
+}
+
+/* ORDER CARD - Glass Morphism */
+.order {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(18px, 4vw, 25px);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.order:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* glow effect - KEPT */
+.order::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: -100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+  pointer-events: none;
+}
+.order:hover::after {
+  left: 100%;
+  transition: 0.6s;
+}
+
+.order h3 {
+  margin-bottom: 12px;
+  color: #333;
+  font-size: clamp(16px, 4.5vw, 20px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order h3 i {
+  color: #ff7f50;
+}
+
+.order p {
+  margin: 8px 0;
+  color: #555;
+  font-size: clamp(13px, 3.5vw, 15px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.order p i {
+  color: #ff7f50;
+  width: 20px;
+}
+
+/* STATUS COLORS */
+.status {
+  display: inline-block;
+  padding: clamp(4px, 2vw, 6px) clamp(10px, 3vw, 14px);
+  border-radius: 20px;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.status.pending {
+  background: #fff4e5;
+  color: #f39c12;
+}
+
+.status.approved {
+  background: #e6f7ee;
+  color: #2ecc71;
+}
+
+.status.completed {
+  background: #e8f0fe;
+  color: #3498db;
+}
+
+.status.cancelled {
+  background: #fdecea;
+  color: #e74c3c;
+}
+
+.status.confirmed {
+  background: #e6f7ee;
+  color: #2ecc71;
+}
+
+/* VIEW BUTTON - Animation KEPT */
+.view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  text-decoration: none;
+  background: linear-gradient(135deg, #333, #555);
+  color: white;
+  padding: clamp(8px, 2.5vw, 10px) clamp(14px, 4vw, 18px);
+  border-radius: 25px;
+  font-size: clamp(12px, 3.5vw, 14px);
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.view-btn:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  transform: translateX(5px) translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* empty state - Glass Morphism */
+.empty {
+  text-align: center;
+  margin-top: clamp(40px, 10vw, 80px);
+  padding: clamp(30px, 8vw, 60px) 20px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.empty i {
+  font-size: clamp(60px, 15vw, 80px);
+  color: #ff7f50;
+  margin-bottom: 20px;
+}
+
+.empty h3 {
+  font-size: clamp(20px, 5vw, 24px);
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.empty p {
+  color: #999;
+  font-size: clamp(14px, 4vw, 18px);
+  margin-top: 15px;
+}
+
+/* SHOP LINK - Animation KEPT */
+.shop-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 25px;
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: clamp(10px, 3vw, 14px) clamp(20px, 5vw, 28px);
+  border-radius: 30px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+.shop-link:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,0.8);
+  margin-top: 40px;
+  font-size: clamp(11px, 3vw, 14px);
+  background: rgba(0,0,0,0.2);
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .order h3 {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .order p {
+    justify-content: center;
+  }
+  
+  .view-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: 95%;
+  }
+  
+  .order {
+    text-align: center;
+  }
+  
+  .order p {
+    justify-content: center;
+  }
+}
+
+/* LANDSCAPE MODE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .container {
+    margin: 20px auto;
+  }
+  
+  .order {
+    padding: 15px;
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  body::before, .particle, .back-btn, footer {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .order {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+    background: white;
+    backdrop-filter: none;
+  }
+  
+  .status {
+    border: 1px solid #ccc;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </div>
+
+  <a href="/home" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+</header>
+
+<div class="container">
+  <h1>
+    <i class="fas fa-shopping-bag"></i>
+    Your Orders
+  </h1>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order">
+        <h3>
+          <i class="fas fa-hashtag"></i>
+          Order #{{ order.order_id }}
+        </h3>
+
+        <p>
+          <i class="fas fa-rupee-sign"></i>
+          <strong>Total:</strong> ₹{{ "%.2f"|format(order.total_price) }}
+        </p>
+
+        <p>
+          <i class="fas fa-tag"></i>
+          <strong>Status:</strong> 
+          <span class="status 
+            {% if order.status == 'Pending' %}pending
+            {% elif order.status == 'Approved' %}approved
+            {% elif order.status == 'Completed' %}completed
+            {% elif order.status == 'Confirmed' %}confirmed
+            {% else %}cancelled{% endif %}
+          ">
+            {{ order.status }}
+          </span>
+        </p>
+
+        <p>
+          <i class="fas fa-calendar-alt"></i>
+          <strong>Date:</strong> 
+          {% if order.created_at %}
+            {% if order.created_at.strftime %}
+              {{ order.created_at.strftime('%d %B %Y at %I:%M %p') }}
+            {% else %}
+              {{ order.created_at }}
+            {% endif %}
+          {% else %}
+            Date not available
+          {% endif %}
+        </p>
+
+        {% if order.location %}
+        <p>
+          <i class="fas fa-map-marker-alt"></i>
+          <strong>Location:</strong> {{ order.location }}
+        </p>
+        {% endif %}
+
+        {% if order.scheduled_date %}
+        <p>
+          <i class="fas fa-calendar-day"></i>
+          <strong>Scheduled:</strong> {{ order.scheduled_date }}
+        </p>
+        {% endif %}
+
+        <a href="/order_details/{{ order.order_id }}" class="view-btn">
+          View Details <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">
+      <i class="fas fa-box-open"></i>
+      <h3>No Orders Yet</h3>
+      <p>You haven't placed any orders yet.</p>
+      <a href="/home" class="shop-link">
+        <i class="fas fa-camera"></i> Browse Packages
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+<footer>
+  <p>&copy; 2026 SnapHire. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
+
+<script>
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+</script>
+
+</body>
+</html>

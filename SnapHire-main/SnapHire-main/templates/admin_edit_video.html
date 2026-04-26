@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Edit Video - SnapHire Admin</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      background: linear-gradient(145deg, #1a1f2e 0%, #2c3e50 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(20, 30, 50, 0.25);
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 35px 40px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      color: #ff6b4a;
+      font-weight: 700;
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1 i {
+      background: linear-gradient(135deg, #ff7f50, #ff6347);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: #6c7a89;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .flash-messages {
+      margin-bottom: 25px;
+    }
+
+    .flash {
+      padding: 14px 18px;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      background: white;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.05);
+      animation: slideDown 0.3s ease;
+    }
+
+    .flash-success {
+      border-left: 5px solid #2ecc71;
+      color: #1e7e34;
+    }
+
+    .flash-error {
+      border-left: 5px solid #e74c3c;
+      color: #b02a1a;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #2d4059;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    label i {
+      color: #ff7f50;
+      width: 20px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 2px solid #e0e7f0;
+      background: white;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #ff7f50;
+      box-shadow: 0 0 0 4px rgba(255, 127, 80, 0.2);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .video-preview-box {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 2px dashed #cbd5e1;
+    }
+
+    .preview-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    video {
+      width: 100%;
+      max-height: 280px;
+      border-radius: 16px;
+      background: #000;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 15px 0;
+    }
+
+    .file-upload-area:hover {
+      border-color: #ff7f50;
+      background: rgba(255, 127, 80, 0.04);
+    }
+
+    .file-upload-area i {
+      font-size: 36px;
+      color: #ff7f50;
+      margin-bottom: 12px;
+    }
+
+    .file-upload-area p {
+      color: #475569;
+      margin: 5px 0;
+    }
+
+    .file-upload-area .hint {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .file-upload-area input {
+      display: none;
+    }
+
+    .file-name {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #2ecc71;
+      font-weight: 500;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 35px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(145deg, #ff7f50, #ff6347);
+      color: white;
+      box-shadow: 0 10px 20px rgba(255, 99, 71, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 30px rgba(255, 99, 71, 0.4);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .btn i {
+      font-size: 16px;
+    }
+
+    small {
+      display: block;
+      margin-top: 6px;
+      color: #6c7a89;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px 20px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .full-width {
+        grid-column: span 1;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>
+    <i class="fas fa-video"></i>
+    Edit Video
+  </h1>
+  <div class="subtitle">
+    Update video metadata or replace the video file
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Form -->
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin_edit_video', video_id=video.id) }}">
+    <div class="form-grid">
+      <!-- Photographer (readonly display, can't change photographer here) -->
+      <div class="form-group full-width">
+        <label><i class="fas fa-user"></i> Photographer</label>
+        <input type="text" value="{{ video.photographer_name if video else '' }}" readonly disabled style="background:#f1f5f9;">
+        <small>Photographer cannot be changed after creation</small>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-heading"></i> Title</label>
+        <input type="text" name="title" value="{{ video.title if video else '' }}" required>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-clock"></i> Duration (seconds)</label>
+        <input type="number" step="0.1" name="duration_seconds" value="{{ video.duration_seconds if video else '' }}" placeholder="e.g., 45.5">
+      </div>
+
+      <div class="form-group full-width">
+        <label><i class="fas fa-align-left"></i> Description</label>
+        <textarea name="description">{{ video.description if video else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-sort-numeric-down"></i> Sort Order</label>
+        <input type="number" name="sort_order" value="{{ video.sort_order if video else 0 }}">
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-infinity"></i> Short Loop</label>
+        <select name="is_short_loop">
+          <option value="0" {% if video and not video.is_short_loop %}selected{% endif %}>No (normal video)</option>
+          <option value="1" {% if video and video.is_short_loop %}selected{% endif %}>Yes (auto-loop, muted)</option>
+        </select>
+        <small>Enable for Instagram Reels / Shorts style</small>
+      </div>
+    </div>
+
+    <!-- Current Video Preview -->
+    <div class="video-preview-box">
+      <div class="preview-title">
+        <i class="fas fa-play-circle"></i> Current Video
+      </div>
+      {% if video and video.formats and video.formats|length > 0 %}
+        <video controls preload="metadata" id="currentVideo">
+          <source src="{{ video.formats[0].file_url }}" type="video/{{ video.formats[0].format }}">
+          Your browser does not support the video tag.
+        </video>
+        <div style="margin-top: 12px; font-size: 14px; color: #475569;">
+          <i class="fas fa-file-video"></i> Format: {{ video.formats[0].format|upper }} ·
+          <i class="fas fa-weight-hanging"></i>
+          {% if video.formats[0].file_size_bytes %}
+            {{ (video.formats[0].file_size_bytes / 1048576)|round(2) }} MB
+          {% else %}Unknown size{% endif %}
+        </div>
+      {% else %}
+        <p style="color: #64748b;"><i class="fas fa-exclamation-triangle"></i> No video file uploaded yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- File Upload Area (Replace Video) -->
+    <div class="form-group">
+      <label><i class="fas fa-cloud-upload-alt"></i> Replace Video File (optional)</label>
+      <div class="file-upload-area" id="dropZone">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p><strong>Click to select a new video</strong> or drag & drop</p>
+        <p class="hint">MP4, WebM, OGG, MOV (max 500MB)</p>
+        <input type="file" id="videoFileInput" name="video_file" accept="video/mp4,video/webm,video/ogg,video/quicktime">
+      </div>
+      <div id="filePreview" class="file-name"></div>
+      <small>Leave empty to keep the current video. Selecting a new file will <strong>replace</strong> the existing one upon saving.</small>
+    </div>
+
+    <!-- New Video Preview (if selected) -->
+    <div id="newVideoPreview" style="display: none;" class="video-preview-box">
+      <div class="preview-title">
+        <i class="fas fa-eye"></i> New Video Preview
+      </div>
+      <video id="previewVideo" controls style="width:100%; border-radius:16px;"></video>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Save Changes
+      </button>
+      <a href="/admin/videos" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Cancel
+      </a>
+      {% if video and video.id %}
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+          <i class="fas fa-trash-alt"></i> Delete Video
+        </button>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Hidden Delete Form -->
+  {% if video and video.id %}
+  <form id="deleteForm" action="{{ url_for('admin_delete_video', video_id=video.id) }}" method="POST" style="display: none;"></form>
+  {% endif %}
+</div>
+
+<script>
+  (function() {
+    // ----- File input handling with preview -----
+    const fileInput = document.getElementById('videoFileInput');
+    const dropZone = document.getElementById('dropZone');
+    const filePreviewDiv = document.getElementById('filePreview');
+    const newVideoPreviewBox = document.getElementById('newVideoPreview');
+    const previewVideo = document.getElementById('previewVideo');
+
+    // Click on dropzone triggers file input
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Drag & drop visual feedback
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+    dropZone.addEventListener('dragover', () => dropZone.style.borderColor = '#ff7f50');
+    dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = '#cbd5e1');
+    dropZone.addEventListener('drop', (e) => {
+      dropZone.style.borderColor = '#cbd5e1';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect(files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        handleFileSelect(fileInput.files[0]);
+      } else {
+        clearFilePreview();
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (!file) return;
+      // Check file type
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid video file (MP4, WebM, OGG, MOV).');
+        fileInput.value = '';
+        clearFilePreview();
+        return;
+      }
+      // Display file name and size
+      const sizeMB = (file.size / 1048576).toFixed(2);
+      filePreviewDiv.innerHTML = `<i class="fas fa-check-circle" style="color:#2ecc71;"></i> New video: ${file.name} (${sizeMB} MB)`;
+
+      // Generate preview
+      const videoURL = URL.createObjectURL(file);
+      previewVideo.src = videoURL;
+      newVideoPreviewBox.style.display = 'block';
+
+      // Clean up old object URL when new one is loaded or on revoke
+      previewVideo.onloadeddata = () => URL.revokeObjectURL(videoURL);
+    }
+
+    function clearFilePreview() {
+      filePreviewDiv.innerHTML = '';
+      newVideoPreviewBox.style.display = 'none';
+      if (previewVideo) {
+        previewVideo.src = '';
+      }
+    }
+
+    // ----- Delete confirmation -----
+    window.confirmDelete = function() {
+      if (confirm('⚠️ This will permanently delete the video and all its files. Are you sure?')) {
+        document.getElementById('deleteForm').submit();
+      }
+    };
+
+    // Auto-hide flash messages after 5 seconds
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(flash => {
+        flash.style.transition = 'opacity 0.4s';
+        flash.style.opacity = '0';
+        setTimeout(() => flash?.remove(), 400);
+      });
+    }, 5000);
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Secure Payment · SnapHire</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(255, 127, 80, 0.12), transparent 50%),
+                  radial-gradient(circle at 90% 70%, rgba(100, 108, 255, 0.12), transparent 60%),
+                  linear-gradient(145deg, #f0f4fa 0%, #d9e2ec 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+      pointer-events: none;
+    }
+    .payment-container {
+      max-width: 640px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 36px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.4s;
+      animation: floatIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    @keyframes floatIn {
+      0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .header {
+      background: linear-gradient(135deg, #1a2533 0%, #2c3e50 100%);
+      color: white;
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::after {
+      content: "🔒";
+      position: absolute;
+      right: 20px;
+      bottom: -10px;
+      font-size: 80px;
+      opacity: 0.06;
+      transform: rotate(10deg);
+    }
+    .header h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: -0.3px;
+    }
+    .secure-badge {
+      font-size: 14px;
+      margin-top: 10px;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .secure-badge i { color: #2ecc71; }
+
+    /* Order Summary */
+    .order-summary {
+      padding: 22px 30px;
+      background: rgba(255,255,255,0.5);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .summary-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .summary-header i { transition: transform 0.3s; }
+    .summary-details {
+      margin-top: 18px;
+      transition: all 0.3s;
+    }
+    .summary-details.collapsed { display: none; }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      color: #334155;
+      font-size: 15px;
+    }
+    .total-row {
+      font-weight: 700;
+      font-size: 20px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 2px dashed #cbd5e1;
+      color: #0f172a;
+    }
+    .savings-badge {
+      background: #dcfce7;
+      color: #15803d;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    /* Payment Methods Tabs */
+    .payment-methods {
+      padding: 24px 30px 10px;
+    }
+    .method-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .method-tab {
+      padding: 12px 4px;
+      text-align: center;
+      background: rgba(255,255,255,0.7);
+      border-radius: 16px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.25s;
+      font-weight: 600;
+      color: #475569;
+      backdrop-filter: blur(4px);
+      font-size: 13px;
+    }
+    .method-tab i {
+      display: block;
+      margin: 0 auto 6px;
+      font-size: 20px;
+    }
+    .method-tab.active {
+      border-color: #ff7f50;
+      background: linear-gradient(145deg, #fff5f2, #ffffff);
+      color: #ff5e3a;
+      box-shadow: 0 6px 14px rgba(255, 127, 80, 0.15);
+      transform: scale(1.02);
+    }
+
+    /* Form */
+    .payment-form {
+      padding: 0 30px 30px;
+    }
+    .form-group {
+      margin-bottom: 22px;
+      position: relative;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    label i { color: #ff7f50; font-size: 16px; }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrapper i {
+      position: absolute;
+      left: 16px;
+      color: #94a3b8;
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .input-wrapper .card-brand-icon {
+      right: 16px;
+      left: auto;
+      font-size: 24px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 16px 16px 16px 48px;
+      border: 2px solid #e2e8f0;
+      border-radius: 18px;
+      font-size: 16px;
+      transition: all 0.2s;
+      background: white;
+      font-weight: 500;
+      font-family: inherit;
+    }
+    textarea {
+      padding: 16px;
+      resize: vertical;
+      min-height: 80px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #ff7f50;
+      box-shadow: 0 0 0 5px rgba(255, 127, 80, 0.15);
+      outline: none;
+    }
+    .card-row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 14px;
+    }
+    .card-brands {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 22px;
+      color: #94a3b8;
+    }
+
+    /* QR Code Styling */
+    .qr-container {
+      text-align: center;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 24px;
+      margin: 15px 0;
+    }
+    .qr-placeholder {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 15px;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .qr-placeholder i {
+      font-size: 120px;
+      color: #1e293b;
+    }
+    .qr-caption {
+      color: #475569;
+      font-size: 14px;
+    }
+    .qr-caption code {
+      background: #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    /* Bank Details */
+    .bank-details {
+      background: #f1f5f9;
+      border-radius: 18px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    .bank-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .bank-detail-row:last-child { border-bottom: none; }
+    .copy-btn {
+      background: none;
+      border: none;
+      color: #ff7f50;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,127,80,0.1); }
+
+    /* Button */
+    .btn-pay {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #ff7f50, #ff4d2e);
+      color: white;
+      border: none;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 15px;
+      box-shadow: 0 12px 28px rgba(255, 79, 46, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-pay::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+    .btn-pay:hover::after { width: 400px; height: 400px; }
+    .btn-pay:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 22px 40px rgba(255, 79, 46, 0.45);
+    }
+    .btn-pay:active { transform: translateY(2px); }
+    .btn-pay:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .btn-pay .spinner {
+      display: none;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-pay.loading .btn-text { display: none; }
+    .btn-pay.loading .spinner { display: inline-block; }
+
+    /* Test hint */
+    .test-hint {
+      background: rgba(254, 243, 199, 0.7);
+      backdrop-filter: blur(4px);
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 14px;
+      color: #92400e;
+      margin: 20px 0 10px;
+      border-left: 5px solid #f59e0b;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .test-hint i { font-size: 20px; }
+
+    .footer-note {
+      text-align: center;
+      padding: 20px 30px;
+      color: #64748b;
+      font-size: 13px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      color: #475569;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #ff7f50; }
+
+    /* Flash */
+    .flash-messages { padding: 0 30px; }
+    .flash {
+      padding: 14px 18px;
+      border-radius: 18px;
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      backdrop-filter: blur(8px);
+      animation: slideDown 0.3s;
+    }
+    .flash-error {
+      background: rgba(254, 226, 226, 0.8);
+      color: #b91c1c;
+      border-left: 5px solid #dc2626;
+    }
+    .flash-success {
+      background: rgba(220, 252, 231, 0.8);
+      color: #166534;
+      border-left: 5px solid #16a34a;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .method-tabs { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      body { padding: 10px; align-items: flex-start; }
+      .payment-container { border-radius: 28px; }
+      .header { padding: 22px 20px; }
+      .order-summary, .payment-methods, .payment-form { padding-left: 20px; padding-right: 20px; }
+      .btn-pay { padding: 16px; font-size: 16px; }
+      .card-row { grid-template-columns: 1fr 100px; }
+      input { padding: 14px 14px 14px 42px; font-size: 15px; }
+    }
+    @media (max-width: 360px) {
+      .method-tabs { grid-template-columns: 1fr; }
+      .card-row { grid-template-columns: 1fr; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="payment-container">
+  <div class="header">
+    <h2><i class="fas fa-shield-alt" style="color:#ff7f50;"></i> Secure Checkout</h2>
+    <div class="secure-badge"><i class="fas fa-lock"></i> 256-bit encryption · Demo Mode</div>
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Order Summary -->
+  {% set total = intent.total|float %}
+  <div class="order-summary">
+    <div class="summary-header" onclick="toggleSummary()">
+      <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+      <i class="fas fa-chevron-down" id="summaryToggleIcon"></i>
+    </div>
+    <div class="summary-details" id="summaryDetails">
+      <div class="summary-row"><span>Package subtotal</span><span>₹{{ "%.2f"|format(total) }}</span></div>
+      <div class="summary-row"><span>GST (18%)</span><span>₹{{ "%.2f"|format(total * 0.18) }}</span></div>
+      <div class="summary-row"><span>Service charge</span><span>₹{{ "%.2f"|format(total * 0.05) }}</span></div>
+      <div class="total-row"><span>Total Payable</span><span>₹{{ "%.2f"|format(total * 1.23) }}</span></div>
+      <div class="savings-badge"><i class="fas fa-tag"></i> You save ₹{{ "%.2f"|format(total * 0.05) }} with promo</div>
+    </div>
+  </div>
+
+  <div class="payment-methods">
+    <div class="method-tabs">
+      <div class="method-tab active" data-method="card"><i class="far fa-credit-card"></i> Card</div>
+      <div class="method-tab" data-method="upi"><i class="fas fa-mobile-alt"></i> UPI</div>
+      <div class="method-tab" data-method="cash"><i class="fas fa-money-bill-wave"></i> Cash</div>
+      <div class="method-tab" data-method="neft"><i class="fas fa-university"></i> NEFT</div>
+    </div>
+  </div>
+
+  <form method="POST" class="payment-form" id="paymentForm">
+    <input type="hidden" name="payment_method" id="paymentMethodInput" value="card">
+
+    <!-- Card Fields -->
+    <div id="cardFields">
+      <div class="form-group">
+        <label><i class="far fa-credit-card"></i> Card Number</label>
+        <div class="input-wrapper">
+          <i class="far fa-credit-card"></i>
+          <input type="text" name="card_number" id="cardNumber" placeholder="4242 4242 4242 4242" value="4242424242424242" maxlength="19" inputmode="numeric">
+          <i class="fab fa-cc-visa card-brand-icon" id="cardBrandIcon" style="position: absolute; right: 16px; left: auto;"></i>
+        </div>
+        <div class="card-brands">
+          <i class="fab fa-cc-visa"></i>
+          <i class="fab fa-cc-mastercard"></i>
+          <i class="fab fa-cc-amex"></i>
+        </div>
+      </div>
+      <div class="card-row">
+        <div class="form-group">
+          <label><i class="far fa-calendar-alt"></i> Expiry</label>
+          <div class="input-wrapper">
+            <i class="far fa-calendar-alt"></i>
+            <input type="text" name="expiry" id="expiry" placeholder="MM/YY" value="12/28" maxlength="5">
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> CVV</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="text" name="cvv" id="cvv" placeholder="123" value="123" maxlength="4" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><i class="far fa-user"></i> Cardholder Name</label>
+        <div class="input-wrapper">
+          <i class="far fa-user"></i>
+          <input type="text" name="cardholder" placeholder="John Doe" value="Test User">
+        </div>
+      </div>
+    </div>
+
+    <!-- UPI Fields with QR -->
+    <div id="upiFields" style="display: none;">
+      <div class="qr-container">
+        <div class="qr-placeholder">
+          <i class="fas fa-qrcode"></i>
+        </div>
+        <div class="qr-caption">
+          Scan QR with any UPI app<br>
+          <code>snaphire@okhdfcbank</code>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-mobile-alt"></i> Or enter UPI ID manually</label>
+        <div class="input-wrapper">
+          <i class="fas fa-at"></i>
+          <input type="text" name="upi_id" placeholder="yourname@okhdfcbank" value="test@okaxis">
+        </div>
+      </div>
+      <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">
+        <i class="fas fa-check-circle" style="color: #2ecc71;"></i> Demo: Click Pay Now to simulate success
+      </p>
+    </div>
+
+    <!-- Cash on Delivery Fields -->
+    <div id="cashFields" style="display: none;">
+      <div class="form-group">
+        <label><i class="fas fa-map-marker-alt"></i> Delivery Address</label>
+        <textarea name="delivery_address" placeholder="Enter your full address">123 Demo Street, Mumbai, Maharashtra - 400001</textarea>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-phone"></i> Contact Number</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone"></i>
+          <input type="tel" name="contact_number" placeholder="9876543210" value="9876543210">
+        </div>
+      </div>
+      <div style="background: #e8f5e9; padding: 15px; border-radius: 16px; margin: 15px 0;">
+        <i class="fas fa-info-circle" style="color: #2e7d32;"></i>
+        <strong>Cash on Delivery</strong><br>
+        <span style="font-size: 14px; color: #1e293b;">Pay ₹{{ "%.2f"|format(total * 1.23) }} when your order is delivered.</span>
+      </div>
+    </div>
+
+    <!-- NEFT / Bank Transfer Fields -->
+    <div id="neftFields" style="display: none;">
+      <div class="bank-details">
+        <h4 style="margin-bottom: 15px; color: #1e293b;"><i class="fas fa-building-columns"></i> Bank Account Details</h4>
+        <div class="bank-detail-row">
+          <span>Account Name:</span>
+          <span><strong>SnapHire Photography</strong> <button type="button" class="copy-btn" onclick="copyText('SnapHire Photography')"><i class="far fa-copy"></i></button></span>
+        </div>
+        <div class="bank-detail-row">
+          <span>Account Number:</span>
+          <span><strong>123456789012</strong> <button type="button" class="copy-btn" onclick="copyText('123456789012')"><i class="far fa-copy"></i></button></span>
+        </div>
+        <div class="bank-detail-row">
+          <span>IFSC Code:</span>
+          <span><strong>SBIN0001234</strong> <button type="button" class="copy-btn" onclick="copyText('SBIN0001234')"><i class="far fa-copy"></i></button></span>
+        </div>
+        <div class="bank-detail-row">
+          <span>Bank:</span>
+          <span><strong>State Bank of India</strong></span>
+        </div>
+        <div class="bank-detail-row">
+          <span>Amount:</span>
+          <span><strong>₹{{ "%.2f"|format(total * 1.23) }}</strong></span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-hashtag"></i> Transaction Reference (optional)</label>
+        <div class="input-wrapper">
+          <i class="fas fa-receipt"></i>
+          <input type="text" name="transaction_ref" placeholder="e.g., NEFT123456">
+        </div>
+      </div>
+      <p style="font-size: 13px; color: #64748b; margin-top: 10px;">
+        <i class="fas fa-clock"></i> Demo: Click Pay Now to simulate successful transfer.
+      </p>
+    </div>
+
+    <div class="test-hint">
+      <i class="fas fa-info-circle"></i>
+      <div><strong>Demo Mode</strong><br>Card: <code>4242 4242 4242 4242</code> succeeds. UPI/Cash/NEFT always succeed.</div>
+    </div>
+
+    <button type="submit" class="btn-pay" id="payButton">
+      <span class="btn-text"><i class="fas fa-lock"></i> Pay ₹{{ "%.2f"|format(total * 1.23) }}</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+
+  <div style="padding: 0 30px 20px; text-align: center;">
+    <a href="/cart" class="back-link"><i class="fas fa-arrow-left"></i> Return to Cart</a>
+  </div>
+  <div class="footer-note">
+    <i class="far fa-clock"></i> 100% secure · No real money will be charged
+  </div>
+</div>
+
+<script>
+  (function(){
+    // Toggle summary
+    window.toggleSummary = function() {
+      const details = document.getElementById('summaryDetails');
+      const icon = document.getElementById('summaryToggleIcon');
+      details.classList.toggle('collapsed');
+      icon.style.transform = details.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0)';
+    };
+
+    // Payment method switching
+    const tabs = document.querySelectorAll('.method-tab');
+    const cardFields = document.getElementById('cardFields');
+    const upiFields = document.getElementById('upiFields');
+    const cashFields = document.getElementById('cashFields');
+    const neftFields = document.getElementById('neftFields');
+    const methodInput = document.getElementById('paymentMethodInput');
+    const payBtn = document.getElementById('payButton');
+
+    function hideAllFields() {
+      cardFields.style.display = 'none';
+      upiFields.style.display = 'none';
+      cashFields.style.display = 'none';
+      neftFields.style.display = 'none';
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const method = tab.dataset.method;
+        methodInput.value = method;
+        hideAllFields();
+        if (method === 'card') cardFields.style.display = 'block';
+        else if (method === 'upi') upiFields.style.display = 'block';
+        else if (method === 'cash') cashFields.style.display = 'block';
+        else if (method === 'neft') neftFields.style.display = 'block';
+        
+        // Update button text based on method
+        const total = {{ total * 1.23 }};
+        if (method === 'cash') {
+          payBtn.querySelector('.btn-text').innerHTML = `<i class="fas fa-truck"></i> Place Order · ₹${total.toFixed(2)}`;
+        } else if (method === 'neft') {
+          payBtn.querySelector('.btn-text').innerHTML = `<i class="fas fa-paper-plane"></i> Confirm Transfer · ₹${total.toFixed(2)}`;
+        } else {
+          payBtn.querySelector('.btn-text').innerHTML = `<i class="fas fa-lock"></i> Pay ₹${total.toFixed(2)}`;
+        }
+      });
+    });
+
+    // Copy helper
+    window.copyText = function(text) {
+      navigator.clipboard?.writeText(text).then(() => {
+        alert('Copied: ' + text);
+      }).catch(() => {
+        prompt('Copy manually:', text);
+      });
+    };
+
+    // Card formatting
+    const cardInput = document.getElementById('cardNumber');
+    const brandIcon = document.getElementById('cardBrandIcon');
+    cardInput.addEventListener('input', function() {
+      let val = this.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+      let formatted = '';
+      for (let i = 0; i < val.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += ' ';
+        formatted += val[i];
+      }
+      this.value = formatted;
+      const firstDigit = val.charAt(0);
+      const firstTwo = val.substring(0,2);
+      brandIcon.className = 'fab card-brand-icon';
+      if (firstDigit === '4') brandIcon.classList.add('fa-cc-visa');
+      else if (firstTwo >= '51' && firstTwo <= '55') brandIcon.classList.add('fa-cc-mastercard');
+      else if (firstDigit === '3') brandIcon.classList.add('fa-cc-amex');
+      else brandIcon.classList.add('fa-cc-visa');
+    });
+
+    // Expiry formatting
+    document.getElementById('expiry').addEventListener('input', function(e) {
+      let val = this.value.replace(/\D/g, '');
+      if (val.length >= 3) val = val.substring(0,2) + '/' + val.substring(2,4);
+      this.value = val;
+    });
+
+    // CVV digits only
+    document.getElementById('cvv').addEventListener('input', function(e) {
+      this.value = this.value.replace(/\D/g, '');
+    });
+
+    // Loading state
+    const form = document.getElementById('paymentForm');
+    form.addEventListener('submit', function() {
+      payBtn.classList.add('loading');
+      payBtn.disabled = true;
+    });
+
+    // Flash auto-dismiss
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(f => {
+        f.style.transition = 'opacity 0.3s';
+        f.style.opacity = '0';
+        setTimeout(() => f?.remove(), 300);
+      });
+    }, 5000);
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard - SnapHire</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-attachment: fixed;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 15s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
+}
+
+.sidebar {
+  width: 260px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  height: 100vh;
+  padding: 25px 20px;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar h2 {
+  color: #ff7f50;
+  margin-bottom: 30px;
+  font-size: clamp(20px, 5vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar h2 i {
+  font-size: clamp(24px, 6vw, 28px);
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  margin: 8px 0;
+  padding: 12px 15px;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.sidebar a i {
+  width: 22px;
+  font-size: clamp(16px, 4vw, 18px);
+}
+
+.sidebar a:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  transform: translateX(5px);
+}
+
+.main {
+  flex: 1;
+  padding: clamp(20px, 5vw, 30px) clamp(20px, 5vw, 30px);
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.top-bar h1 {
+  font-size: clamp(24px, 6vw, 28px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.refresh-btn, .images-btn, .videos-btn {
+  padding: clamp(8px, 2.5vw, 10px) clamp(15px, 4vw, 20px);
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  font-size: clamp(12px, 3.5vw, 14px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.refresh-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.images-btn {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.videos-btn {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.refresh-btn:hover, .images-btn:hover, .videos-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.refresh-btn:active, .images-btn:active, .videos-btn:active {
+  transform: translateY(0);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  color: #333;
+  padding: clamp(20px, 5vw, 25px);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff7f50, #ff6347);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.card:active {
+  transform: translateY(-2px);
+}
+
+.card i {
+  font-size: clamp(35px, 8vw, 40px);
+  color: #ff7f50;
+  margin-bottom: 15px;
+  transition: transform 0.2s ease;
+}
+
+.card:hover i {
+  transform: scale(1.05);
+}
+
+.card h3 {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: #666;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card h1 {
+  font-size: clamp(30px, 8vw, 36px);
+  color: #ff7f50;
+  margin-bottom: 5px;
+}
+
+.section-title {
+  font-size: clamp(20px, 5vw, 22px);
+  margin: 30px 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff7f50;
+  flex-wrap: wrap;
+}
+
+.section-title span {
+  background: #ff7f50;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  color: #333;
+  min-width: 600px;
+}
+
+th, td {
+  padding: clamp(10px, 3vw, 15px) clamp(8px, 2.5vw, 12px);
+  text-align: left;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+th {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  font-weight: 600;
+}
+
+tr:nth-child(even) { 
+  background: rgba(249,249,249,0.8); 
+}
+
+tr:hover { 
+  background: rgba(241,241,241,0.9); 
+  transition: 0.2s;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: clamp(11px, 3vw, 12px);
+  font-weight: bold;
+}
+
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: clamp(11px, 3vw, 12px);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: clamp(11px, 3vw, 12px);
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 3px;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.approve { 
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+.reject { 
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.no-data {
+  padding: clamp(30px, 8vw, 40px);
+  text-align: center;
+  color: #999;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+}
+
+.no-data i {
+  font-size: clamp(40px, 10vw, 48px);
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+.flash {
+  padding: 15px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDown 0.5s ease;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.flash-success {
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+.flash-error {
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+.flash i {
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 15px;
+  }
+  .sidebar a {
+    display: inline-flex;
+    margin: 5px;
+  }
+  .sidebar h2 {
+    margin-bottom: 15px;
+    justify-content: center;
+  }
+  .main {
+    padding: 20px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    flex-direction: column;
+  }
+  .btn-group {
+    width: 100%;
+  }
+  .refresh-btn, .images-btn, .videos-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .sidebar a {
+    width: calc(50% - 10px);
+    justify-content: center;
+  }
+  .sidebar h2 {
+    text-align: center;
+  }
+  .action-btn {
+    margin: 3px;
+    width: calc(50% - 6px);
+  }
+  td:last-child {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .sidebar {
+    padding: 10px;
+  }
+  .sidebar a {
+    padding: 8px 12px;
+  }
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media print {
+  body::before, .particle, .sidebar, .btn-group, .refresh-btn, .images-btn, .videos-btn, .action-btn {
+    display: none;
+  }
+  .main {
+    padding: 0;
+    margin: 0;
+  }
+  .card, .table-wrapper, .no-data {
+    background: white;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  th {
+    background: #ff7f50;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>
+    <i class="fas fa-camera"></i>
+    SnapHire Admin
+  </h2>
+  <a href="/admin/dashboard">
+    <i class="fas fa-tachometer-alt"></i> Dashboard
+  </a>
+  <a href="/admin/orders">
+    <i class="fas fa-shopping-cart"></i> Orders
+  </a>
+  <a href="/admin/packages">
+    <i class="fas fa-box"></i> Packages
+  </a>
+  <a href="/admin/users">
+    <i class="fas fa-users"></i> Users
+  </a>
+  <a href="/admin/photographers">
+    <i class="fas fa-camera-retro"></i> Photographers
+  </a>
+  <a href="/admin/portfolio">
+    <i class="fas fa-images"></i> Portfolio
+  </a>
+  <!-- NEW: Images button (below Portfolio) -->
+  <a href="/admin/portfolio">
+    <i class="fas fa-camera"></i> Images
+  </a>
+  <a href="/admin/videos">
+    <i class="fas fa-video"></i> Videos
+  </a>
+  <a href="/logout">
+    <i class="fas fa-sign-out-alt"></i> Logout
+  </a>
+</div>
+
+<div class="main">
+
+  <div class="top-bar">
+    <h1>
+      <i class="fas fa-tachometer-alt"></i>
+      Dashboard
+    </h1>
+    <div class="btn-group">
+      <a href="/admin/portfolio" class="images-btn">
+        <i class="fas fa-images"></i> Images
+      </a>
+      <a href="/admin/videos" class="videos-btn">
+        <i class="fas fa-video"></i> Videos
+      </a>
+      <a href="/admin/dashboard" class="refresh-btn">
+        <i class="fas fa-sync-alt"></i> Refresh
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div class="cards">
+    <div class="card">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>Total Orders</h3>
+      <h1>{{ total_orders|default(0) }}</h1>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-rupee-sign"></i>
+      <h3>Total Revenue</h3>
+      <h1>₹{{ revenue|default(0) }}</h1>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-users"></i>
+      <h3>Total Users</h3>
+      <h1>{{ total_users|default(0) }}</h1>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-camera-retro"></i>
+      <h3>Photographers</h3>
+      <h1>{{ total_photographers|default(0) }}</h1>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-video"></i>
+      <h3>Total Videos</h3>
+      <h1>{{ total_videos|default(0) }}</h1>
+    </div>
+  </div>
+
+  <!-- RECENT ORDERS SECTION -->
+  <div class="section-title">
+    <i class="fas fa-clock"></i>
+    Recent Orders
+  </div>
+
+  {% if recent_orders and recent_orders|length > 0 %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in recent_orders %}
+        <tr>
+          <td>
+            <i class="fas fa-hashtag"></i> {{ order.order_id|default('N/A') }}
+          </td>
+          <td>
+            <i class="fas fa-user"></i> {{ order.first_name|default('') }} {{ order.last_name|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-rupee-sign"></i> {{ order.total_price|default(0) }}
+          </td>
+          <td>
+            <span class="status-badge status-{{ order.status|lower|default('pending') }}">
+              {{ order.status|default('Pending') }}
+            </span>
+          </td>
+          <td>
+            <i class="fas fa-calendar"></i> {{ order.created_at.strftime('%Y-%m-%d') if order.created_at else 'N/A' }}
+          </td>
+          <td>
+            <a href="/admin/order_details/{{ order.order_id }}" class="btn">
+              <i class="fas fa-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </div>
+  </div>
+  {% else %}
+  <div class="no-data">
+    <i class="fas fa-inbox"></i>
+    <p>No recent orders found</p>
+  </div>
+  {% endif %}
+
+  <!-- PHOTOGRAPHER APPLICATIONS SECTION -->
+  <div class="section-title">
+    <i class="fas fa-user-plus"></i>
+    Photographer Applications
+    {% if applications and applications|length > 0 %}
+      <span>{{ applications|length }} New</span>
+    {% endif %}
+  </div>
+
+  {% if applications and applications|length > 0 %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Experience</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td>#{{ app.id|default('') }}</td>
+          <td>
+            <i class="fas fa-user"></i> {{ app.first_name|default('') }} {{ app.last_name|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-envelope"></i> {{ app.email|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-phone"></i> {{ app.phone|default('') }}
+          </td>
+          <td>
+            <i class="fas fa-calendar-alt"></i> {{ app.years_exp|default(0) }} years {{ app.months_exp|default(0) }} months
+          </td>
+          <td>
+            <form action="/admin/approve/{{ app.id }}" method="POST" style="display:inline;">
+              <button type="submit" class="action-btn approve">
+                <i class="fas fa-check"></i> Approve
+              </button>
+            </form>
+            <form action="/admin/reject/{{ app.id }}" method="POST" style="display:inline;">
+              <button type="submit" class="action-btn reject">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </div>
+  </div>
+  {% else %}
+  <div class="no-data">
+    <i class="fas fa-user-check"></i>
+    <p>No pending photographer applications</p>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 6 + 2;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = Math.random() * 15 + 8 + 's';
+    document.body.appendChild(particle);
+  }
+}
+createParticles();
+
+document.querySelectorAll('.action-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    if (this.classList.contains('approve')) {
+      if (!confirm('Are you sure you want to approve this photographer?')) {
+        e.preventDefault();
+      }
+    } else if (this.classList.contains('reject')) {
+      if (!confirm('Are you sure you want to reject this application?')) {
+        e.preventDefault();
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>

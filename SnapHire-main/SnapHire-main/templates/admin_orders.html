@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Orders</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1f2937, #4b5563);
+  margin: 0;
+  color: white;
+}
+
+/* NAVBAR */
+.navbar {
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  padding: 15px 20px;
+}
+
+.navbar a {
+  color: #ccc;
+  margin-right: 15px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.navbar a:hover {
+  color: #ff7f50;
+}
+
+.logout {
+  float: right;
+  color: #e74c3c;
+}
+
+/* HEADER */
+header {
+  padding: 20px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 18px;
+  color: #ff7f50;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  background: white;
+  color: black;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* SEARCH */
+input {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 8px rgba(255,127,80,0.4);
+}
+
+/* BUTTON */
+.refresh-btn {
+  background: #3498db;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-decoration: none;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.refresh-btn:hover {
+  background: #2980b9;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background: #ff7f50;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+/* STATUS */
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+}
+
+.pending { background: #f39c12; }
+.completed { background: #27ae60; }
+.cancelled { background: #e74c3c; }
+
+/* BUTTON */
+.btn {
+  padding: 6px 12px;
+  background: #ff7f50;
+  color: white;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #ff6347;
+}
+
+/* EMPTY */
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: gray;
+}
+</style>
+
+<script>
+function searchOrders() {
+  let input = document.getElementById("search").value.toLowerCase();
+  let rows = document.querySelectorAll("tbody tr");
+
+  rows.forEach(row => {
+    let text = row.innerText.toLowerCase();
+    row.style.display = text.includes(input) ? "" : "none";
+  });
+}
+</script>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <a href="/admin/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+  <a href="/admin/orders"><i class="fas fa-box"></i> Orders</a>
+  <a href="/admin/packages"><i class="fas fa-camera"></i> Packages</a>
+  <a href="/admin/users"><i class="fas fa-users"></i> Users</a>
+  <a href="/admin/photographers"><i class="fas fa-user-tie"></i> Photographers</a>
+  <a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Admin Panel - Orders</div>
+</header>
+
+<!-- MAIN -->
+<div class="container">
+
+  <div class="top-bar">
+    <h2><i class="fas fa-box"></i> All Orders</h2>
+
+    <div>
+      <input type="text" id="search" placeholder="Search orders..." onkeyup="searchOrders()">
+      <a href="/admin/orders" class="refresh-btn">
+        <i class="fas fa-sync"></i> Refresh
+      </a>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% if orders and orders|length > 0 %}
+        {% for o in orders %}
+        <tr>
+          <td>{{ o.order_id }}</td>
+          <td>{{ o.first_name }} {{ o.last_name }}</td>
+          <td>₹{{ o.total_price }}</td>
+          <td>
+            <span class="status 
+              {% if o.status == 'Pending' %}pending
+              {% elif o.status == 'Completed' %}completed
+              {% else %}cancelled{% endif %}">
+              {{ o.status }}
+            </span>
+          </td>
+          <td>
+            <a href="/admin/order_details/{{ o.order_id }}" class="btn">
+              <i class="fas fa-eye"></i> View
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="5" class="no-data">No orders found</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+</div>
+
+</body>
+</html>

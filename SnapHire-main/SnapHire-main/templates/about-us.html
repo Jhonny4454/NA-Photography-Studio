@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>About Us - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* GLOBAL */
+* {
+  transition: all 0.3s ease;
+}
+
+/* HEADER - Glass morphism */
+header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(15px, 5vw, 40px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: clamp(18px, 6vw, 26px);
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: clamp(20px, 6vw, 28px);
+}
+
+.header-buttons {
+  display: flex;
+  gap: clamp(8px, 3vw, 15px);
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: clamp(6px, 2vw, 10px) clamp(12px, 4vw, 20px);
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* HERO SECTION - Static */
+.hero-section {
+  background: rgba(0,0,0,0.3);
+  color: white;
+  text-align: center;
+  padding: clamp(40px, 10vw, 80px) clamp(15px, 5vw, 30px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1452587925148-ce544e77e70d?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.3;
+}
+
+.hero-section h1 {
+  font-size: clamp(28px, 8vw, 52px);
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 1;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-section p {
+  font-size: clamp(14px, 4vw, 20px);
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+  padding: 0 10px;
+}
+
+/* MAIN CONTAINER - Glass Morphism */
+.about-container {
+  max-width: 1200px;
+  width: 90%;
+  margin: clamp(30px, 8vw, 60px) auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(20px, 5vw, 50px);
+  border-radius: clamp(16px, 5vw, 28px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.6s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* SECTIONS */
+.section {
+  margin-bottom: clamp(25px, 6vw, 50px);
+}
+
+.section h2 {
+  color: #ff7f50;
+  margin-bottom: clamp(15px, 4vw, 25px);
+  font-size: clamp(22px, 6vw, 32px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 4px solid #ff7f50;
+  padding-left: clamp(12px, 4vw, 20px);
+  flex-wrap: wrap;
+}
+
+.section h2 i {
+  font-size: clamp(22px, 6vw, 32px);
+}
+
+.section p {
+  color: #555;
+  line-height: 1.8;
+  font-size: clamp(14px, 4vw, 17px);
+}
+
+/* STATS - Cards */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(15px, 4vw, 30px);
+  margin: clamp(20px, 5vw, 40px) 0;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(5px);
+  padding: clamp(15px, 5vw, 30px);
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+}
+
+.stat-card i {
+  font-size: clamp(30px, 8vw, 45px);
+  color: #ff7f50;
+  margin-bottom: 10px;
+}
+
+.stat-number {
+  font-size: clamp(24px, 6vw, 36px);
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  color: #888;
+  font-size: clamp(12px, 3.5vw, 15px);
+}
+
+/* TEAM - Cards with actual images */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(20px, 5vw, 40px);
+  margin-top: 20px;
+}
+
+.team-member {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.team-member:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+}
+
+.member-image {
+  width: 100%;
+  height: clamp(260px, 45vw, 320px);
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.team-member:hover .member-image img {
+  transform: scale(1.05);
+}
+
+/* Fallback if image fails to load */
+.member-image img.error-img {
+  object-fit: contain;
+  background: #f0f0f0;
+}
+
+.member-info {
+  padding: clamp(15px, 4vw, 25px);
+}
+
+.member-info h3 {
+  font-size: clamp(18px, 5vw, 24px);
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.member-role {
+  color: #ff7f50;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.member-bio {
+  color: #666;
+  font-size: clamp(12px, 3.5vw, 14px);
+  line-height: 1.6;
+}
+
+/* FEATURES LIST */
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(12px, 3vw, 20px);
+  margin-top: 20px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: clamp(10px, 3vw, 15px);
+  background: rgba(248,249,250,0.9);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: linear-gradient(135deg, #fff5f2, #fff);
+  transform: translateX(8px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.feature-item i {
+  font-size: clamp(18px, 5vw, 24px);
+  color: #ff7f50;
+  min-width: 30px;
+}
+
+.feature-item span {
+  color: #555;
+  font-weight: 500;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+/* SOCIAL SECTION */
+.social-section {
+  background: rgba(248,249,250,0.9);
+  backdrop-filter: blur(5px);
+  padding: clamp(20px, 5vw, 40px);
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.social-section h2 {
+  border-left: none;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 4vw, 25px);
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.social-btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: clamp(10px, 3vw, 14px) clamp(20px, 5vw, 32px);
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 15px);
+}
+
+.social-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(255,127,80,0.4);
+}
+
+.social-btn i {
+  font-size: clamp(16px, 4vw, 20px);
+}
+
+/* BACK BUTTON */
+.back-home {
+  text-align: center;
+  margin-top: clamp(30px, 8vw, 50px);
+}
+
+.btn-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+  text-decoration: none;
+  padding: clamp(10px, 3vw, 14px) clamp(20px, 6vw, 35px);
+  border-radius: 30px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: clamp(13px, 4vw, 16px);
+}
+
+.btn-home:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(255,127,80,0.4);
+}
+
+/* FOOTER */
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  text-align: center;
+  padding: clamp(20px, 6vw, 40px);
+  margin-top: clamp(30px, 8vw, 60px);
+}
+
+footer p {
+  color: #888;
+  margin-top: 10px;
+  font-size: clamp(11px, 3vw, 14px);
+}
+
+/* EXTRA SMALL DEVICES (Phones) */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .features-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-section h1 {
+    font-size: 24px;
+  }
+  
+  .section h2 {
+    font-size: 20px;
+  }
+  
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* TABLET DEVICES */
+@media (min-width: 481px) and (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .features-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* LANDSCAPE MODE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    padding: 30px 20px;
+  }
+  
+  .hero-section h1 {
+    font-size: 28px;
+  }
+  
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* LARGE SCREENS */
+@media (min-width: 1400px) {
+  .about-container {
+    max-width: 1400px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  body::before, .particle, .header-buttons, .social-section, .back-home, footer {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .about-container {
+    background: white;
+    backdrop-filter: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .hero-section {
+    background: #667eea;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/cart" class="header-btn">
+      <i class="fas fa-shopping-cart"></i> Cart
+    </a>
+  </div>
+</header>
+
+<div class="hero-section">
+  <h1>📸 About SnapHire</h1>
+  <p>Capturing moments that last a lifetime</p>
+</div>
+
+<div class="about-container">
+  
+  <!-- Mission Section -->
+  <div class="section">
+    <h2>
+      <i class="fas fa-bullseye"></i>
+      Our Mission
+    </h2>
+    <p>
+      SnapHire Photography Studio is dedicated to capturing your most cherished moments with professionalism, creativity, and passion.
+      Established in 2024, we proudly serve clients across Thane and nearby areas with high-quality photography services.
+      Our mission is to create timeless images that tell your unique story and preserve memories for generations to come.
+    </p>
+  </div>
+
+  <!-- Vision Section -->
+  <div class="section">
+    <h2>
+      <i class="fas fa-eye"></i>
+      Our Vision
+    </h2>
+    <p>
+      To become one of the most trusted and creative photography studios in Maharashtra,
+      known for our artistic approach, technical excellence, and unwavering commitment to customer satisfaction.
+      We envision a world where every special moment is beautifully captured and cherished forever.
+    </p>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <i class="fas fa-calendar-alt"></i>
+      <div class="stat-number">2024</div>
+      <div class="stat-label">Year Established</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-smile"></i>
+      <div class="stat-number">500+</div>
+      <div class="stat-label">Happy Clients</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-camera"></i>
+      <div class="stat-number">1000+</div>
+      <div class="stat-label">Photos Captured</div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-star"></i>
+      <div class="stat-number">4.9</div>
+      <div class="stat-label">Client Rating</div>
+    </div>
+  </div>
+
+  <!-- Team Section with actual images from static/images -->
+  <div class="section">
+    <h2>
+      <i class="fas fa-users"></i>
+      Meet Our Team
+    </h2>
+    
+    <div class="team-grid">
+      <!-- Team Member 1: Sumedh -->
+      <div class="team-member">
+        <div class="member-image">
+          <img src="/static/images/sumedh.jpeg" alt="Sumedh - Developer & Lead Photographer" 
+               onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400?text=Sumedh'; this.classList.add('error-img');">
+        </div>
+        <div class="member-info">
+          <h3>Sumedh</h3>
+          <div class="member-role">
+            <i class="fas fa-camera-retro"></i> Developer 
+          </div>
+          <p class="member-bio">
+            “Developer of SnapHire, responsible for building and maintaining a smooth, fast, and user-friendly platform. Focused on system design, performance, and reliability, while turning ideas into a seamless and innovative digital experience.”
+          </p>
+        </div>
+      </div>
+
+      <!-- Team Member 2: Nargis -->
+      <div class="team-member">
+        <div class="member-image">
+          <img src="/static/images/nargis.jpg" alt="Nargis - Founder"
+               onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400?text=Nargis'; this.classList.add('error-img');">
+        </div>
+        <div class="member-info">
+          <h3>Nargis</h3>
+          <div class="member-role">
+            <i class="fas fa-laptop-code"></i> Founder
+          </div>
+          <p class="member-bio">
+            “Founder of SnapHire, leading the vision and creative direction of the platform. Focused on building a trusted and innovative photography service that delivers quality, creativity, and customer satisfaction.”
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Choose Us -->
+  <div class="section">
+    <h2>
+      <i class="fas fa-heart"></i>
+      Why Choose Us?
+    </h2>
+    
+    <div class="features-list">
+      <div class="feature-item">
+        <i class="fas fa-check-circle"></i>
+        <span>Professional & Experienced Team</span>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-tags"></i>
+        <span>Affordable & Custom Packages</span>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-edit"></i>
+        <span>High-Quality Editing</span>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-smile"></i>
+        <span>Friendly & Personalized Service</span>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-rocket"></i>
+        <span>Fast Delivery</span>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-home"></i>
+        <span>Home Service Available</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Media Section -->
+  <div class="social-section">
+    <h2>
+      <i class="fab fa-instagram"></i>
+      Follow Us on Instagram
+    </h2>
+    <p style="margin-bottom: 20px;">Stay updated with our latest work and behind-the-scenes moments</p>
+    
+    <div class="social-links">
+      <a href="https://www.instagram.com/sum_11_1995" target="_blank" class="social-btn">
+        <i class="fab fa-instagram"></i> Follow Sumedh
+      </a>
+      <a href="https://www.instagram.com/n_shaikh_n" target="_blank" class="social-btn">
+        <i class="fab fa-instagram"></i> Follow Nargis
+      </a>
+    </div>
+  </div>
+
+  <!-- Back Button -->
+  <div class="back-home">
+    <a href="/home" class="btn-home">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 SnapHire. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
+
+<script>
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 40; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+
+// Optional: log image paths to console for debugging
+console.log('Images should be loaded from: /static/images/sumedh.jpeg and /static/images/nargis.jpg');
+</script>
+
+</body>
+</html>
