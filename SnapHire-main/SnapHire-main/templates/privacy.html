@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Privacy Policy - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* GLOBAL */
+* {
+  transition: all 0.3s ease;
+}
+
+/* HEADER - Glass morphism */
+header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(15px, 5vw, 40px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: clamp(18px, 6vw, 26px);
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: clamp(20px, 6vw, 28px);
+}
+
+.header-buttons {
+  display: flex;
+  gap: clamp(8px, 3vw, 15px);
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: clamp(6px, 2vw, 10px) clamp(12px, 4vw, 20px);
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* HERO SECTION - Static */
+.hero-section {
+  background: rgba(0,0,0,0.3);
+  color: white;
+  text-align: center;
+  padding: clamp(40px, 10vw, 80px) clamp(15px, 5vw, 30px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.3;
+}
+
+.hero-section h1 {
+  font-size: clamp(28px, 8vw, 52px);
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 1;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-section p {
+  font-size: clamp(14px, 4vw, 20px);
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+  padding: 0 10px;
+}
+
+/* MAIN CONTAINER - Glass Morphism */
+.container {
+  max-width: 1200px;
+  width: 90%;
+  margin: clamp(30px, 8vw, 60px) auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(20px, 5vw, 50px);
+  border-radius: clamp(16px, 5vw, 28px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.6s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* LAST UPDATED */
+.last-updated {
+  text-align: center;
+  color: #888;
+  font-size: clamp(12px, 3.5vw, 14px);
+  margin-bottom: clamp(20px, 5vw, 35px);
+  padding-bottom: clamp(15px, 4vw, 25px);
+  border-bottom: 1px solid rgba(238,238,238,0.5);
+}
+
+.last-updated i {
+  margin-right: 8px;
+  color: #ff7f50;
+}
+
+/* POLICY SECTIONS */
+.policy-section {
+  margin-bottom: clamp(25px, 6vw, 40px);
+  background: rgba(248,249,250,0.9);
+  backdrop-filter: blur(5px);
+  border-radius: 16px;
+  padding: clamp(18px, 4vw, 28px);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.policy-section:hover {
+  transform: translateX(8px) translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.policy-section h2 {
+  color: #ff7f50;
+  margin-bottom: clamp(12px, 3vw, 18px);
+  font-size: clamp(20px, 5vw, 26px);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.policy-section h2 i {
+  font-size: clamp(22px, 5vw, 28px);
+}
+
+.policy-section p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+.policy-section ul {
+  margin-left: 20px;
+  color: #555;
+  line-height: 1.8;
+}
+
+.policy-section li {
+  margin-bottom: 8px;
+  font-size: clamp(13px, 3.5vw, 15px);
+  transition: all 0.3s ease;
+}
+
+.policy-section li:hover {
+  transform: translateX(5px);
+  color: #ff7f50;
+}
+
+/* HIGHLIGHT BOX */
+.highlight-box {
+  background: linear-gradient(135deg, #fff5f2, #fff);
+  border-left: 4px solid #ff7f50;
+  padding: clamp(15px, 4vw, 22px);
+  border-radius: 12px;
+  margin: 20px 0;
+  transition: all 0.3s ease;
+}
+
+.highlight-box:hover {
+  transform: scale(1.01);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.highlight-box i {
+  color: #ff7f50;
+  margin-right: 10px;
+}
+
+.highlight-box strong {
+  color: #333;
+}
+
+/* CONTACT SECTION - Static Gradient */
+.contact-section {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: clamp(20px, 5vw, 35px);
+  border-radius: 16px;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.contact-section h3 {
+  font-size: clamp(18px, 5vw, 24px);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.contact-section p {
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 20px;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+.contact-email {
+  background: rgba(255,255,255,0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: clamp(10px, 3vw, 14px) clamp(18px, 5vw, 28px);
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+.contact-email:hover {
+  background: rgba(255,255,255,0.4);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+.btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  padding: clamp(10px, 3vw, 14px) clamp(20px, 5vw, 28px);
+  color: white;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(255,127,80,0.4);
+  transition: all 0.3s ease;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+.btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 18px 35px rgba(255,127,80,0.5);
+}
+
+/* BACK BUTTON */
+.btn-home {
+  display: block;
+  margin: 30px auto 0;
+  width: fit-content;
+}
+
+/* FOOTER */
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  text-align: center;
+  padding: clamp(20px, 6vw, 40px);
+  margin-top: clamp(30px, 8vw, 60px);
+}
+
+footer p {
+  color: #888;
+  margin-top: 10px;
+  font-size: clamp(11px, 3vw, 14px);
+}
+
+/* EXTRA SMALL DEVICES (Phones) */
+@media (max-width: 480px) {
+  .hero-section h1 {
+    font-size: 24px;
+  }
+  
+  .policy-section h2 {
+    font-size: 18px;
+  }
+  
+  .contact-section h3 {
+    font-size: 18px;
+  }
+  
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .policy-section ul {
+    margin-left: 15px;
+  }
+}
+
+/* TABLET DEVICES */
+@media (min-width: 481px) and (max-width: 768px) {
+  .hero-section h1 {
+    font-size: 32px;
+  }
+  
+  .policy-section h2 {
+    font-size: 22px;
+  }
+}
+
+/* LANDSCAPE MODE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    padding: 30px 20px;
+  }
+  
+  .hero-section h1 {
+    font-size: 28px;
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  body::before, .particle, .header-buttons, .contact-section, .btn-home, footer {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .container {
+    background: white;
+    backdrop-filter: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .hero-section {
+    background: #667eea;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .policy-section {
+    break-inside: avoid;
+    background: white;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/cart" class="header-btn">
+      <i class="fas fa-shopping-cart"></i> Cart
+    </a>
+  </div>
+</header>
+
+<div class="hero-section">
+  <h1>🔒 Privacy Policy</h1>
+  <p>Your privacy matters to us</p>
+</div>
+
+<div class="container">
+  
+  <div class="last-updated">
+    <i class="fas fa-clock"></i> Last Updated: January 2026
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-info-circle"></i>
+      Introduction
+    </h2>
+    <p>
+      At SnapHire, your privacy is extremely important to us. 
+      We are committed to protecting your personal information and ensuring a safe experience on our platform.
+      This Privacy Policy explains how we collect, use, and safeguard your information when you use our services.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-database"></i>
+      Information We Collect
+    </h2>
+    <p>
+      We only collect the necessary details to provide our photography services efficiently:
+    </p>
+    <ul>
+      <li><strong>Personal Information:</strong> Name, email address, phone number, and account credentials</li>
+      <li><strong>Booking Details:</strong> Event date, location, package preferences, and special requests</li>
+      <li><strong>Payment Information:</strong> Transaction details (we do not store full payment credentials)</li>
+      <li><strong>Usage Data:</strong> How you interact with our website and services</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-shield-alt"></i>
+      How We Use Your Data
+    </h2>
+    <p>
+      Your data is used strictly for the following purposes:
+    </p>
+    <ul>
+      <li>Processing and managing your bookings and orders</li>
+      <li>Improving user experience and website functionality</li>
+      <li>Sending important updates about your bookings</li>
+      <li>Responding to your inquiries and support requests</li>
+      <li>Enhancing our services based on user feedback</li>
+    </ul>
+    <div class="highlight-box">
+      <i class="fas fa-check-circle"></i>
+      <strong>We do NOT sell, rent, or share your personal data with third parties for marketing purposes.</strong>
+    </div>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-cookie-bite"></i>
+      Cookies & Tracking
+    </h2>
+    <p>
+      We use cookies and similar tracking technologies to enhance your browsing experience. 
+      Cookies help us understand user behavior, remember your preferences, and improve our website performance.
+    </p>
+    <ul>
+      <li><strong>Essential Cookies:</strong> Required for basic website functionality</li>
+      <li><strong>Analytics Cookies:</strong> Help us understand how visitors use our site</li>
+      <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+    </ul>
+    <p>
+      You can control cookie settings through your browser preferences. However, disabling cookies may affect certain website features.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-lock"></i>
+      Data Security
+    </h2>
+    <p>
+      We implement industry-standard security measures to protect your personal information from unauthorized access, 
+      alteration, disclosure, or destruction. These measures include:
+    </p>
+    <ul>
+      <li>Secure SSL encryption for data transmission</li>
+      <li>Regular security audits and updates</li>
+      <li>Restricted access to personal data</li>
+      <li>Secure password hashing and storage</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-user-check"></i>
+      Your Rights & Choices
+    </h2>
+    <p>
+      You have the following rights regarding your personal information:
+    </p>
+    <ul>
+      <li><strong>Access:</strong> Request a copy of your personal data</li>
+      <li><strong>Correction:</strong> Update or correct inaccurate information</li>
+      <li><strong>Deletion:</strong> Request deletion of your account and data</li>
+      <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
+    </ul>
+    <p>
+      To exercise any of these rights, please contact us using the information provided below.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-child"></i>
+      Children's Privacy
+    </h2>
+    <p>
+      Our services are not directed to individuals under the age of 13. We do not knowingly collect personal information 
+      from children. If you believe a child has provided us with personal information, please contact us immediately.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-gavel"></i>
+      Changes to This Policy
+    </h2>
+    <p>
+      We may update this Privacy Policy from time to time to reflect changes in our practices or for legal compliance. 
+      We will notify you of any material changes by posting the new policy on this page and updating the "Last Updated" date.
+      We encourage you to review this policy periodically.
+    </p>
+  </div>
+
+  <div class="policy-section">
+    <h2>
+      <i class="fas fa-check-circle"></i>
+      Your Consent
+    </h2>
+    <p>
+      By using our website and services, you consent to the terms of this Privacy Policy and agree to our data practices 
+      as described above. If you do not agree with any part of this policy, please do not use our services.
+    </p>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="contact-section">
+    <h3>
+      <i class="fas fa-envelope"></i>
+      Contact Us
+    </h3>
+    <p>
+      If you have any questions about this Privacy Policy or our data practices, please reach out to us:
+    </p>
+    <a href="mailto:privacy@snaphire.com" class="contact-email">
+      <i class="fas fa-envelope"></i> privacy@snaphire.com
+    </a>
+  </div>
+
+  <!-- BACK BUTTON -->
+  <a href="/home" class="btn btn-home">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 SnapHire. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
+
+<script>
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 40; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+</script>
+
+</body>
+</html>

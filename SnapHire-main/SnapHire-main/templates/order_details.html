@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Order Details - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+
+/* BASE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* HEADER - Glass morphism */
+header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(15px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: clamp(18px, 6vw, 26px);
+  font-weight: bold;
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo i {
+  font-size: clamp(20px, 6vw, 28px);
+}
+
+/* BACK BUTTON - Animation KEPT */
+.back-btn {
+  text-decoration: none;
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  padding: clamp(8px, 2.5vw, 12px) clamp(15px, 4vw, 22px);
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.back-btn:hover {
+  transform: translateX(-3px) translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* CONTAINER - Responsive */
+.container {
+  max-width: 1200px;
+  width: min(95%, 1200px);
+  margin: clamp(20px, 6vw, 40px) auto;
+  padding: clamp(15px, 4vw, 20px);
+}
+
+/* CARD - Glass Morphism */
+.card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: clamp(20px, 5vw, 35px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+.card h2 {
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ff7f50;
+  display: inline-block;
+  font-size: clamp(22px, 6vw, 28px);
+}
+
+.card h2 i {
+  color: #ff7f50;
+  margin-right: 10px;
+}
+
+/* ALERT MESSAGES */
+.alert {
+  padding: clamp(12px, 3.5vw, 15px) clamp(15px, 4vw, 20px);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(13px, 3.5vw, 14px);
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.alert i {
+  font-size: 20px;
+}
+
+/* ORDER INFO GRID */
+.order-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.info-section {
+  background: rgba(248,249,250,0.9);
+  padding: clamp(15px, 4vw, 20px);
+  border-radius: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.info-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.info-section h3 {
+  color: #ff7f50;
+  font-size: clamp(16px, 4.5vw, 18px);
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ff7f50;
+  display: inline-block;
+}
+
+.info-section h3 i {
+  margin-right: 8px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+
+.info-item i {
+  color: #ff7f50;
+  font-size: clamp(16px, 4vw, 18px);
+  width: 25px;
+}
+
+.info-item strong {
+  color: #555;
+  min-width: clamp(100px, 25vw, 120px);
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.info-item span {
+  color: #333;
+  font-weight: 500;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+/* STATUS BADGE */
+.status-badge {
+  display: inline-block;
+  padding: clamp(4px, 2vw, 6px) clamp(10px, 3vw, 15px);
+  border-radius: 20px;
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: bold;
+}
+
+.status-confirmed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* TABLE - Responsive */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 25px 0;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 500px;
+}
+
+th {
+  text-align: left;
+  padding: clamp(10px, 3vw, 15px) clamp(8px, 2.5vw, 12px);
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  font-weight: 600;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+td {
+  padding: clamp(10px, 3vw, 15px) clamp(8px, 2.5vw, 12px);
+  border-bottom: 1px solid #eee;
+  color: #555;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+tr:hover {
+  background: #f9f9f9;
+  transition: 0.2s;
+}
+
+.photographer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.photographer-name {
+  font-weight: bold;
+  color: #ff7f50;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.photographer-name i {
+  margin-right: 5px;
+}
+
+.photographer-rating {
+  font-size: clamp(10px, 3vw, 12px);
+  color: #ffc107;
+}
+
+.photographer-rating i {
+  margin-right: 2px;
+}
+
+/* BILL SECTION - Static Gradient */
+.bill-section {
+  margin-top: 30px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 16px;
+  padding: clamp(18px, 4vw, 25px);
+  color: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.bill-header {
+  font-size: clamp(18px, 5vw, 22px);
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+.bill-header i {
+  margin-right: 10px;
+}
+
+.bill-details {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bill-label {
+  font-size: clamp(14px, 4vw, 16px);
+  opacity: 0.9;
+}
+
+.bill-value {
+  font-size: clamp(16px, 4.5vw, 18px);
+  font-weight: bold;
+}
+
+.bill-total {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid rgba(255,255,255,0.3);
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: bold;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bill-total .bill-label {
+  font-size: clamp(18px, 4.5vw, 22px);
+}
+
+.bill-total .bill-value {
+  font-size: clamp(22px, 6vw, 28px);
+  color: #ffd700;
+}
+
+/* BUTTONS - Animations KEPT */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: clamp(10px, 3vw, 12px) clamp(18px, 5vw, 24px);
+  border: none;
+  border-radius: 30px;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(255,127,80,0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: white;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #218838);
+  color: white;
+}
+
+.btn-success:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+}
+
+.btn-info:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: clamp(40px, 10vw, 60px) 20px;
+  color: #888;
+  font-size: clamp(14px, 4vw, 18px);
+}
+
+.empty i {
+  font-size: clamp(50px, 15vw, 64px);
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,0.8);
+  margin-top: 40px;
+  font-size: clamp(11px, 3vw, 14px);
+  background: rgba(0,0,0,0.2);
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  .order-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .info-item strong {
+    min-width: 100px;
+  }
+  
+  .bill-details {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .bill-total {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .logo {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 5px;
+  }
+  
+  .info-item i {
+    width: auto;
+  }
+  
+  .info-section h3 {
+    display: block;
+    text-align: center;
+  }
+}
+
+/* LANDSCAPE MODE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .container {
+    margin: 20px auto;
+  }
+  
+  .order-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  body::before, .particle, .back-btn, .action-buttons, header, footer {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .card {
+    background: white;
+    box-shadow: none;
+    padding: 0;
+  }
+  
+  .bill-section {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  
+  .bill-total .bill-value {
+    color: #ff7f50;
+  }
+  
+  .status-badge {
+    border: 1px solid #ccc;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <i class="fas fa-camera"></i> SnapHire
+  </div>
+  <a href="/orders" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to Orders
+  </a>
+</header>
+
+<div class="container">
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <h2><i class="fas fa-receipt"></i> Order Details</h2>
+
+    {% if order %}
+
+    <!-- Use values passed from Flask (already converted to float) -->
+    {% set final_subtotal = subtotal|float %}
+    {% set final_gst = gst_amount|float %}
+    {% set final_service = service_charge|float %}
+    {% set final_grand = grand_total|float %}
+
+    <!-- Order Information Grid -->
+    <div class="order-info-grid">
+      <!-- Order Details Section -->
+      <div class="info-section">
+        <h3><i class="fas fa-info-circle"></i> Order Information</h3>
+        <div class="info-item">
+          <i class="fas fa-hashtag"></i>
+          <strong>Order ID:</strong>
+          <span>{{ order.order_id }}</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-calendar-alt"></i>
+          <strong>Order Date:</strong>
+          <span>{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else 'Not specified' }}</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-chart-line"></i>
+          <strong>Status:</strong>
+          <span class="status-badge status-{{ order.status|lower }}">
+            <i class="fas fa-{{ 'check-circle' if order.status == 'Confirmed' else 'clock' if order.status == 'Pending' else 'times-circle' }}"></i>
+            {{ order.status }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Event Details Section -->
+      <div class="info-section">
+        <h3><i class="fas fa-calendar-check"></i> Event Details</h3>
+        <div class="info-item">
+          <i class="fas fa-calendar-day"></i>
+          <strong>Scheduled Date:</strong>
+          <span>{{ order.scheduled_date if order.scheduled_date else 'Not scheduled yet' }}</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <strong>Location:</strong>
+          <span>{{ order.location if order.location else 'To be confirmed' }}</span>
+        </div>
+      </div>
+
+      <!-- Payment Details Section -->
+      <div class="info-section">
+        <h3><i class="fas fa-credit-card"></i> Payment Details</h3>
+        <div class="info-item">
+          <i class="fas fa-money-bill-wave"></i>
+          <strong>Payment Method:</strong>
+          <span>{{ order.payment_method|title if order.payment_method else 'Not specified' }}</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-rupee-sign"></i>
+          <strong>Total Amount:</strong>
+          <span style="color: #ff7f50; font-size: clamp(16px, 4.5vw, 18px); font-weight: bold;">
+            ₹{{ "%.2f"|format(final_grand) }}
+            <small style="color: #888; font-size: clamp(10px, 3vw, 12px);">(incl. GST)</small>
+          </span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-receipt"></i>
+          <strong>Payment Status:</strong>
+          <span class="status-badge status-confirmed">Paid</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packages Table with Photographer Details -->
+    {% if items and items|length > 0 %}
+    <h3 style="margin: 20px 0 15px 0; color: #333; font-size: clamp(18px, 5vw, 22px);">
+      <i class="fas fa-box"></i> Packages & Photographers
+    </h3>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Package Name</th>
+            <th>Assigned Photographer</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            {% set item_price = item.price|float %}
+            {% set item_quantity = item.quantity|int %}
+            {% set item_total = item_price * item_quantity %}
+            <tr>
+              <td style="word-break: break-word;">
+                <strong>{{ item.package_name }}</strong>
+                {% if item.duration %}
+                  <br><small style="color: #888;">📅 {{ item.duration }}</small>
+                {% endif %}
+                {% if item.location %}
+                  <br><small style="color: #888;">📍 {{ item.location }}</small>
+                {% endif %}
+              </td>
+              <td>
+                <div class="photographer-info">
+                  {% if item.photographer_name %}
+                    <span class="photographer-name">
+                      <i class="fas fa-camera-retro"></i> {{ item.photographer_name }}
+                    </span>
+                    {% if item.photographer_rating is not none %}
+                      <span class="photographer-rating">
+                        {% set rating = item.photographer_rating|float %}
+                        {% for i in range(rating|int) %}
+                          <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% if rating % 1 >= 0.5 %}
+                          <i class="fas fa-star-half-alt"></i>
+                        {% endif %}
+                        ({{ "%.1f"|format(rating) }})
+                      </span>
+                    {% endif %}
+                  {% else %}
+                    <span style="color: #999;">
+                      <i class="fas fa-user-clock"></i> Photographer not assigned
+                    </span>
+                    <small style="color: #ff7f50;">Will be assigned soon</small>
+                  {% endif %}
+                </div>
+              </td>
+              <td>₹{{ "%.2f"|format(item_price) }}</td>
+              <td>{{ item_quantity }}</td>
+              <td>₹{{ "%.2f"|format(item_total) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bill Section with proper GST calculation -->
+    <div class="bill-section">
+      <div class="bill-header">
+        <i class="fas fa-file-invoice-dollar"></i> Payment Summary
+      </div>
+      <div class="bill-details">
+        <span class="bill-label">Subtotal:</span>
+        <span class="bill-value">₹{{ "%.2f"|format(final_subtotal) }}</span>
+      </div>
+      <div class="bill-details">
+        <span class="bill-label">GST (18%):</span>
+        <span class="bill-value">₹{{ "%.2f"|format(final_gst) }}</span>
+      </div>
+      <div class="bill-details">
+        <span class="bill-label">Service Charge (5%):</span>
+        <span class="bill-value">₹{{ "%.2f"|format(final_service) }}</span>
+      </div>
+      <div class="bill-total">
+        <span class="bill-label">Grand Total:</span>
+        <span class="bill-value">₹{{ "%.2f"|format(final_grand) }}</span>
+      </div>
+      <small style="display: block; margin-top: 15px; text-align: center; opacity: 0.8;">
+        <i class="fas fa-check-circle"></i> Inclusive of all taxes and charges
+      </small>
+    </div>
+
+    {% else %}
+    <div class="empty">
+      <i class="fas fa-box-open"></i>
+      <h3>No Items Found</h3>
+      <p>No packages found for this order.</p>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/home" class="btn btn-primary">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+      <a href="/orders" class="btn btn-secondary">
+        <i class="fas fa-list"></i> View All Orders
+      </a>
+      <button onclick="window.print()" class="btn btn-info">
+        <i class="fas fa-print"></i> Print Invoice
+      </button>
+      <button onclick="downloadInvoice()" class="btn btn-success">
+        <i class="fas fa-download"></i> Download Invoice
+      </button>
+    </div>
+
+    {% else %}
+      <div class="empty">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Order Not Found</h3>
+        <p>The order you're looking for doesn't exist or you don't have permission to view it.</p>
+        <a href="/home" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">
+          <i class="fas fa-home"></i> Back to Home
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<footer>
+  <p>&copy; 2026 SnapHire. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+</footer>
+
+<script>
+function downloadInvoice() {
+  window.print();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const billSection = document.querySelector('.bill-section');
+  if (billSection) {
+    billSection.style.opacity = '0';
+    billSection.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      billSection.style.transition = 'all 0.5s ease';
+      billSection.style.opacity = '1';
+      billSection.style.transform = 'translateY(0)';
+    }, 100);
+  }
+});
+
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Edit Profile - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Simple static background - NO ANIMATION */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Simple static particles - NO ANIMATION */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* HEADER - Glass morphism */
+header {
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: clamp(15px, 4vw, 20px) clamp(20px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+header h1 {
+  color: #ff7f50;
+  font-size: clamp(20px, 6vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header h1 i {
+  font-size: clamp(24px, 6vw, 28px);
+}
+
+.header-buttons {
+  display: flex;
+  gap: clamp(8px, 3vw, 12px);
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  text-decoration: none;
+  padding: clamp(6px, 2vw, 8px) clamp(12px, 4vw, 16px);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+
+.header-btn:hover {
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  transform: translateY(-2px);
+}
+
+/* CONTAINER - Glass Morphism */
+.container {
+  max-width: 550px;
+  width: min(90%, 550px);
+  margin: clamp(30px, 8vw, 60px) auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(25px, 6vw, 40px);
+  border-radius: 28px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: slideUp 0.5s ease;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* HEADER SECTION */
+.profile-header {
+  text-align: center;
+  margin-bottom: clamp(25px, 6vw, 30px);
+}
+
+.profile-icon {
+  width: clamp(60px, 15vw, 80px);
+  height: clamp(60px, 15vw, 80px);
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.profile-icon i {
+  font-size: clamp(30px, 8vw, 40px);
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: clamp(24px, 6vw, 28px);
+}
+
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: clamp(12px, 3.5vw, 14px);
+  margin-bottom: 30px;
+}
+
+/* FORM */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.form-group label i {
+  color: #ff7f50;
+  width: 20px;
+}
+
+input, select {
+  width: 100%;
+  padding: clamp(10px, 3vw, 12px) clamp(12px, 3.5vw, 15px);
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  font-size: clamp(13px, 3.5vw, 14px);
+  transition: all 0.3s ease;
+  font-family: inherit;
+  outline: none;
+  background: white;
+}
+
+input:focus, select:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 0 3px rgba(255,127,80,0.1);
+  transform: translateY(-1px);
+}
+
+input:hover, select:hover {
+  border-color: #ff7f50;
+}
+
+/* NAME ROW */
+.name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* HELPER TEXT */
+.helper {
+  font-size: clamp(10px, 3vw, 11px);
+  color: #999;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.helper i {
+  font-size: 10px;
+  color: #ff7f50;
+}
+
+/* PASSWORD NOTE */
+.password-note {
+  background: rgba(248,249,250,0.8);
+  padding: clamp(8px, 2.5vw, 10px) clamp(12px, 3.5vw, 15px);
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: clamp(11px, 3vw, 12px);
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.password-note i {
+  color: #ff7f50;
+}
+
+/* BUTTONS - Animations KEPT */
+.btn-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+button {
+  flex: 1;
+  padding: clamp(12px, 3.5vw, 14px);
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  font-weight: bold;
+  font-size: clamp(14px, 4vw, 16px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(46,204,113,0.4);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.back-btn {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+  padding: clamp(12px, 3.5vw, 14px);
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: clamp(14px, 4vw, 16px);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(255,127,80,0.4);
+}
+
+/* ALERT MESSAGES */
+.alert {
+  padding: clamp(12px, 3.5vw, 15px) clamp(15px, 4vw, 20px);
+  border-radius: 12px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.5s ease;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #dc3545;
+}
+
+.alert i {
+  font-size: 20px;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 600px) {
+  .container {
+    margin: 30px 20px;
+    padding: 25px;
+  }
+  
+  .name-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  header h1 {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .profile-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .profile-icon i {
+    font-size: 30px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .password-note {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* LANDSCAPE MODE */
+@media (max-width: 768px) and (orientation: landscape) {
+  .container {
+    margin: 20px auto;
+  }
+  
+  .name-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  body::before, .particle, .header-buttons, .btn-group, .back-btn {
+    display: none;
+  }
+  
+  body {
+    background: white;
+  }
+  
+  .container {
+    background: white;
+    backdrop-filter: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .alert {
+    border: 1px solid #ccc;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </h1>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/orders" class="header-btn">
+      <i class="fas fa-shopping-bag"></i> Orders
+    </a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="profile-header">
+    <div class="profile-icon">
+      <i class="fas fa-user-edit"></i>
+    </div>
+    <h2>Edit Profile</h2>
+    <p class="subtitle">Update your personal information</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' }}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" id="profileForm">
+    <!-- NAME ROW -->
+    <div class="name-row">
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          First Name
+        </label>
+        <input type="text" name="first_name" value="{{ user.first_name }}" placeholder="Enter first name" required>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-user"></i>
+          Last Name
+        </label>
+        <input type="text" name="last_name" value="{{ user.last_name }}" placeholder="Enter last name" required>
+      </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-group">
+      <label>
+        <i class="fas fa-envelope"></i>
+        Email Address
+      </label>
+      <input type="email" name="email" value="{{ user.email }}" placeholder="Enter email address" required>
+    </div>
+
+    <!-- MOBILE -->
+    <div class="form-group">
+      <label>
+        <i class="fas fa-phone"></i>
+        Mobile Number
+      </label>
+      <input 
+        type="tel" 
+        name="mobile" 
+        value="{{ user.mobile }}" 
+        placeholder="Enter 10 digit mobile number"
+        pattern="[0-9]{10}"
+        title="Enter 10 digit mobile number"
+        required
+      >
+      <div class="helper">
+        <i class="fas fa-info-circle"></i>
+        Enter 10-digit mobile number
+      </div>
+    </div>
+
+    <!-- GENDER -->
+    <div class="form-group">
+      <label>
+        <i class="fas fa-venus-mars"></i>
+        Gender
+      </label>
+      <select name="gender">
+        <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+        <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+        <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+
+    <!-- USERNAME -->
+    <div class="form-group">
+      <label>
+        <i class="fas fa-user-circle"></i>
+        Username
+      </label>
+      <input 
+        type="text" 
+        name="username" 
+        value="{{ user.username }}" 
+        placeholder="Enter username"
+        pattern="[a-zA-Z0-9]{4,20}"
+        title="4-20 letters or numbers"
+        required
+      >
+      <div class="helper">
+        <i class="fas fa-info-circle"></i>
+        Username must be 4-20 characters (letters or numbers only)
+      </div>
+    </div>
+
+    <!-- PASSWORD (OPTIONAL) -->
+    <div class="form-group">
+      <label>
+        <i class="fas fa-lock"></i>
+        New Password
+      </label>
+      <input 
+        type="password" 
+        name="password" 
+        placeholder="Enter new password (optional)"
+      >
+      <div class="password-note">
+        <i class="fas fa-info-circle"></i>
+        Leave blank if you don't want to change your password
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button type="submit">
+        <i class="fas fa-save"></i> Update Profile
+      </button>
+      <a href="/home" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+// Create static particles (no animation)
+function createParticles() {
+  for (let i = 0; i < 30; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 4 + 1;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.opacity = Math.random() * 0.3;
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+
+// Form validation
+document.getElementById('profileForm')?.addEventListener('submit', function(e) {
+  const mobile = document.querySelector('input[name="mobile"]').value;
+  const mobilePattern = /^[0-9]{10}$/;
+  
+  if (!mobilePattern.test(mobile)) {
+    e.preventDefault();
+    alert('Please enter a valid 10-digit mobile number');
+    return false;
+  }
+  
+  const username = document.querySelector('input[name="username"]').value;
+  const usernamePattern = /^[a-zA-Z0-9]{4,20}$/;
+  
+  if (!usernamePattern.test(username)) {
+    e.preventDefault();
+    alert('Username must be 4-20 characters (letters and numbers only)');
+    return false;
+  }
+  
+  // Show loading state
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+  submitBtn.disabled = true;
+});
+
+// Auto-hide flash messages after 3 seconds
+setTimeout(function() {
+  const alerts = document.querySelectorAll('.alert');
+  alerts.forEach(function(alert) {
+    alert.style.transition = 'opacity 0.5s ease';
+    alert.style.opacity = '0';
+    setTimeout(function() {
+      if (alert.parentNode) {
+        alert.parentNode.removeChild(alert);
+      }
+    }, 500);
+  });
+}, 3000);
+</script>
+
+</body>
+</html>

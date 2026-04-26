@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes" />
+<title>SnapHire · Secure Login</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  min-height: 100vh;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* premium background with overlay */
+body {
+  background: url('https://images.unsplash.com/photo-1542038784456-1ea8e935640e?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop') center/cover no-repeat fixed;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%);
+  pointer-events: none;
+}
+
+/* floating particles - subtle atmosphere */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.25);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 12s infinite ease-in-out;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { transform: translateY(-30px) translateX(20px); opacity: 0.5; }
+  100% { transform: translateY(0) translateX(0); opacity: 0; }
+}
+
+/* glassmorphic card */
+.login-container {
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(14px);
+  padding: clamp(30px, 7vw, 45px);
+  border-radius: 32px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 30px 50px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.3);
+  position: relative;
+  z-index: 10;
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.4);
+}
+
+.login-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 40px 60px rgba(0,0,0,0.3);
+}
+
+/* logo section */
+.logo-section {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.logo-icon {
+  width: 78px;
+  height: 78px;
+  background: linear-gradient(135deg, #ff7f50, #ff4d2e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 12px 24px rgba(255, 99, 71, 0.4);
+}
+
+.logo-icon:hover {
+  transform: scale(1.04);
+}
+
+.logo-icon i {
+  font-size: 36px;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 8px;
+  color: #1e2a3e;
+  font-size: clamp(26px, 6vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #4a5b6e;
+  font-size: 14px;
+  margin-bottom: 32px;
+  font-weight: 450;
+}
+
+/* input groups */
+.input-group {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.input-group i:first-of-type {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  transform: translateY(-50%);
+  color: #8a9bb0;
+  z-index: 2;
+  transition: color 0.25s ease;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 14px 14px 48px;
+  border-radius: 20px;
+  border: 1.5px solid #e9edf2;
+  outline: none;
+  transition: all 0.25s ease;
+  font-size: 15px;
+  background: white;
+  font-weight: 500;
+  color: #111827;
+  letter-spacing: 0.2px;
+}
+
+/* 🔧 FIX: specific right padding for password field to avoid text mashing under eye icon */
+#password {
+  padding-right: 52px;        /* enough space for eye toggle icon */
+}
+
+.input-group input:focus {
+  border-color: #ff7f50;
+  box-shadow: 0 0 0 4px rgba(255, 127, 80, 0.2);
+}
+
+.input-group input:focus + i {
+  color: #ff7f50;
+}
+
+/* eye toggle button styling — clean, no overlap, perfect click zone */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #8f9eb2;
+  z-index: 3;
+  font-size: 18px;
+  transition: color 0.2s ease, transform 0.1s;
+  background: transparent;
+  width: 28px;
+  text-align: center;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  color: #ff7f50;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+/* login button */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 28px;
+  border: none;
+  border-radius: 44px;
+  background: linear-gradient(105deg, #ff7f50, #ff4d2e);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 20px rgba(255, 99, 71, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(255, 99, 71, 0.45);
+  background: linear-gradient(105deg, #ff8c66, #ff5e3a);
+}
+
+.login-btn:active {
+  transform: scale(0.97);
+}
+
+/* helper links */
+.forgot-link {
+  text-align: right;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+
+.forgot-link a {
+  text-decoration: none;
+  color: #6c7f8f;
+  font-size: 12px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-link a:hover {
+  color: #ff7f50;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.signup-link a {
+  text-decoration: none;
+  color: #ff7f50;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.signup-link a:hover {
+  color: #ff4d2e;
+  gap: 12px;
+}
+
+/* error message */
+.error {
+  margin-top: 18px;
+  text-align: center;
+  color: #dc2626;
+  font-size: 13px;
+  background: rgba(220, 38, 38, 0.08);
+  padding: 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  backdrop-filter: blur(2px);
+  font-weight: 500;
+}
+
+/* footer note */
+.footer-note {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+  z-index: 20;
+  font-weight: 450;
+}
+
+.footer-note a {
+  color: #ffbc9a;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-note a:hover {
+  color: #ffae85;
+  text-decoration: underline;
+}
+
+/* responsive refinements */
+@media (max-width: 500px) {
+  html, body {
+    padding: 16px;
+  }
+  .login-container {
+    padding: 26px 22px;
+  }
+  .logo-icon {
+    width: 62px;
+    height: 62px;
+  }
+  .logo-icon i {
+    font-size: 28px;
+  }
+  .input-group input {
+    padding: 12px 12px 12px 44px;
+    font-size: 14px;
+  }
+  #password {
+    padding-right: 48px;
+  }
+  .toggle-password {
+    right: 14px;
+    font-size: 16px;
+  }
+  .login-btn {
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+/* extra small devices: keep icons clean */
+@media (max-width: 380px) {
+  #password {
+    padding-right: 44px;
+  }
+  .toggle-password {
+    right: 12px;
+  }
+  .input-group i:first-of-type {
+    left: 14px;
+  }
+  .input-group input {
+    padding-left: 42px;
+  }
+}
+
+/* landscape mode adjustments */
+@media (max-width: 850px) and (orientation: landscape) {
+  .login-container {
+    padding: 20px 30px;
+  }
+  .logo-section {
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    margin-bottom: 16px;
+  }
+  .input-group {
+    margin-bottom: 18px;
+  }
+}
+
+/* print (no glitches) */
+@media print {
+  body {
+    background: white;
+  }
+  body::before { display: none; }
+  .particle { display: none; }
+  .login-container {
+    background: white;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  .login-btn, .footer-note, .toggle-password {
+    display: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="logo-section">
+    <div class="logo-icon">
+      <i class="fas fa-camera-retro"></i>
+    </div>
+    <h2>
+      <i class="fas fa-camera"></i>
+      SnapHire
+    </h2>
+    <p class="subtitle">Welcome back · secure access</p>
+  </div>
+
+  {% if error %}
+    <div class="error" role="alert">
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <form method="POST" action="/">
+    <div class="input-group">
+      <i class="fas fa-user-circle" aria-hidden="true"></i>
+      <input type="text" name="username" placeholder="Username or email" required autofocus>
+    </div>
+
+    <div class="input-group" id="passwordGroup">
+      <i class="fas fa-lock" aria-hidden="true"></i>
+      <input type="password" id="password" name="password" placeholder="Password" required>
+      <!-- eye toggle will be inserted here via JS -->
+    </div>
+
+    <div class="forgot-link">
+      <a href="#"><i class="fas fa-key" aria-hidden="true"></i> Forgot password?</a>
+    </div>
+
+    <button type="submit" class="login-btn">
+      <i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i> Sign in
+    </button>
+  </form>
+
+  <div class="signup-link">
+    <a href="/signup">
+      <i class="fas fa-user-plus" aria-hidden="true"></i> Create new account
+    </a>
+  </div>
+</div>
+
+<div class="footer-note">
+  <i class="fas fa-briefcase" aria-hidden="true"></i> New to SnapHire? <a href="/get-hired">Join our talent pool →</a>
+</div>
+
+<script>
+  (function() {
+    // ---------- PASSWORD TOGGLE (eye) - with proper spacing fix ----------
+    const passwordInput = document.getElementById('password');
+    if (passwordInput) {
+      const parentGroup = document.getElementById('passwordGroup');
+      
+      // Avoid duplicate toggles if script re-runs
+      if (!parentGroup.querySelector('.toggle-password')) {
+        const eyeIcon = document.createElement('i');
+        eyeIcon.classList.add('fas', 'fa-eye', 'toggle-password');
+        eyeIcon.setAttribute('aria-label', 'Show password');
+        eyeIcon.setAttribute('role', 'button');
+        eyeIcon.setAttribute('tabindex', '0');  // make it focusable for keyboard users
+        
+        // Append the eye toggle to the input group (right side)
+        parentGroup.appendChild(eyeIcon);
+        
+        // Toggle functionality (click + keyboard)
+        const togglePassword = () => {
+          const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordInput.setAttribute('type', type);
+          // toggle eye / eye-slash icons
+          eyeIcon.classList.toggle('fa-eye');
+          eyeIcon.classList.toggle('fa-eye-slash');
+          // update aria-label
+          eyeIcon.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+          // maintain focus on input after toggle
+          passwordInput.focus();
+        };
+        
+        eyeIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          togglePassword();
+        });
+        
+        eyeIcon.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            togglePassword();
+          }
+        });
+      }
+    }
+
+    // Ensure no layout shifts & avoid text under eye icon (double check)
+    // Also handle when password input becomes type="text" — same padding remains.
+    
+    // Optional: small extra fix for touch devices to avoid accidental zoom on double tap eye
+    const toggleBtns = document.querySelectorAll('.toggle-password');
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('touchstart', (e) => {
+        // Prevent default only if it's a direct touch on the icon, but allow click to fire
+        e.preventDefault();
+        btn.click();
+      }, { passive: false });
+    });
+
+    // ---------- floating particles (subtle background magic) ----------
+    function createParticles() {
+      // Reduce particle count on small devices for performance
+      const particleCount = window.innerWidth < 500 ? 12 : Math.min(28, Math.floor(window.innerWidth / 35));
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        const size = Math.random() * 7 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 12 + 's';
+        particle.style.animationDuration = Math.random() * 18 + 8 + 's';
+        particle.style.opacity = Math.random() * 0.5 + 0.1;
+        document.body.appendChild(particle);
+      }
+    }
+    createParticles();
+
+    // small improvement: ensure that when user interacts with password, no misalignment
+    // also fix for browsers that recalc on zoom
+    const enforcePasswordPadding = () => {
+      if (passwordInput) {
+        const computedRightPadding = window.getComputedStyle(passwordInput).paddingRight;
+        if (parseInt(computedRightPadding) < 38) {
+          // fallback in case of weird overrides
+          passwordInput.style.paddingRight = '52px';
+        }
+      }
+    };
+    window.addEventListener('resize', enforcePasswordPadding);
+    enforcePasswordPadding();
+
+    // Prevent form resubmission on page refresh (if any)
+    if (window.history.replaceState) {
+      window.history.replaceState(null, null, window.location.href);
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Shopping Cart - SnapHire</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background-attachment: fixed;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated background overlay */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+  pointer-events: none;
+}
+
+/* Floating particles */
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 15s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { transform: translateY(-50px) translateX(30px); opacity: 0.5; }
+}
+
+/* Header */
+.header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(20px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: clamp(20px, 6vw, 26px);
+  font-weight: bold;
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo i {
+  font-size: clamp(24px, 6vw, 28px);
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  text-decoration: none;
+  padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 20px);
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: clamp(12px, 3.5vw, 14px);
+  font-weight: 500;
+}
+
+.header-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255,127,80,0.4);
+}
+
+/* Container */
+.container {
+  width: min(95%, 1200px);
+  margin: 0 auto;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(20px, 5vw, 30px);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: clamp(24px, 6vw, 32px);
+}
+
+h1 i {
+  color: #ff7f50;
+}
+
+/* Cart Items */
+.cart-items {
+  list-style: none;
+  padding: 0;
+}
+
+.cart-item {
+  background: white;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  padding: clamp(15px, 4vw, 25px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.item-header h3 {
+  font-size: clamp(18px, 5vw, 22px);
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-header h3 i {
+  color: #ff7f50;
+}
+
+.item-header .item-price {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: bold;
+  color: #ff7f50;
+}
+
+/* Form fields */
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #555;
+  min-width: 100px;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.form-group select, 
+.form-group input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: clamp(13px, 3.5vw, 14px);
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 0 3px rgba(255,127,80,0.1);
+}
+
+/* Action buttons inside item */
+.item-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 20px);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: clamp(12px, 3.5vw, 14px);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.update-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.update-btn:hover {
+  box-shadow: 0 5px 15px rgba(52,152,219,0.4);
+}
+
+.remove-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.remove-btn:hover {
+  box-shadow: 0 5px 15px rgba(231,76,60,0.4);
+}
+
+/* Summary section */
+.summary {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #ff7f50;
+  text-align: right;
+}
+
+.summary h3 {
+  font-size: clamp(20px, 5vw, 24px);
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.summary .total {
+  font-size: clamp(24px, 6vw, 28px);
+  font-weight: bold;
+  color: #ff7f50;
+}
+
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.checkout-btn {
+  background: linear-gradient(135deg, #27ae60, #219150);
+  color: white;
+}
+
+.checkout-btn:hover {
+  box-shadow: 0 5px 15px rgba(39,174,96,0.4);
+}
+
+.empty-cart-btn {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+}
+
+/* Empty cart */
+.empty-cart {
+  text-align: center;
+  padding: clamp(40px, 10vw, 60px) 20px;
+}
+
+.empty-cart i {
+  font-size: clamp(60px, 15vw, 80px);
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-cart h3 {
+  font-size: clamp(20px, 5vw, 24px);
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.empty-cart p {
+  color: #999;
+  margin-bottom: 30px;
+  font-size: clamp(13px, 3.5vw, 15px);
+}
+
+/* Flash messages */
+.flash-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.flash-message.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  
+  .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .form-group label {
+    min-width: auto;
+  }
+  
+  .form-group select,
+  .form-group input {
+    width: 100%;
+  }
+  
+  .item-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .summary {
+    text-align: center;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .item-actions {
+    width: 100%;
+  }
+  
+  .item-actions form {
+    width: 100%;
+  }
+  
+  .item-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Print */
+@media print {
+  body::before, .particle, .header-buttons, .item-actions, .action-buttons {
+    display: none;
+  }
+  
+  .container {
+    background: white;
+    box-shadow: none;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <i class="fas fa-camera"></i>
+    SnapHire
+  </div>
+  <div class="header-buttons">
+    <a href="/home" class="header-btn">
+      <i class="fas fa-home"></i> Home
+    </a>
+    <a href="/orders" class="header-btn">
+      <i class="fas fa-shopping-bag"></i> Orders
+    </a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>
+    <i class="fas fa-shopping-cart"></i>
+    Your Shopping Cart
+  </h1>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+          <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if cart_items and cart_items|length > 0 %}
+    <form method="POST" action="{{ url_for('cart') }}" id="cartUpdateForm">
+      <ul class="cart-items">
+        {% for item in cart_items %}
+          <li class="cart-item">
+            <div class="item-header">
+              <h3>
+                <i class="fas fa-camera"></i>
+                {{ item.package_name }}
+              </h3>
+              <div class="item-price">
+                ₹{{ "%.2f"|format(item.package_price * item.quantity) }}
+              </div>
+            </div>
+
+            <!-- Photographer Selection -->
+            <div class="form-group">
+              <label><i class="fas fa-camera-retro"></i> Photographer:</label>
+              <select name="photographer_{{ item.id }}">
+                <option value="">-- Select Photographer --</option>
+                {% for ph in photographers %}
+                  <option value="{{ ph.id }}" {% if item.photographer_id == ph.id %}selected{% endif %}>
+                    {{ ph.name }} {% if ph.rating %}(⭐ {{ ph.rating }}){% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+              <label><i class="fas fa-map-marker-alt"></i> Location:</label>
+              <input type="text" name="location_{{ item.id }}" value="{{ item.location or '' }}" placeholder="Enter shoot location">
+            </div>
+
+            <!-- Scheduled Date -->
+            <div class="form-group">
+              <label><i class="fas fa-calendar-alt"></i> Scheduled Date:</label>
+              <input type="date" name="date_{{ item.id }}" value="{{ item.scheduled_date or '' }}">
+            </div>
+
+            <!-- Quantity (if needed) -->
+            <div class="form-group">
+              <label><i class="fas fa-cubes"></i> Quantity:</label>
+              <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" style="width: 80px;">
+            </div>
+
+            <div class="item-actions">
+              <button type="submit" formaction="{{ url_for('update_item', item_id=item.id) }}" class="btn update-btn">
+                <i class="fas fa-save"></i> Update Details
+              </button>
+              <button type="submit" formaction="{{ url_for('remove', id=item.id) }}" class="btn remove-btn" onclick="return confirm('Remove this package from cart?');">
+                <i class="fas fa-trash-alt"></i> Remove
+              </button>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </form>
+
+    <div class="summary">
+      <h3>Total Amount</h3>
+      <div class="total">₹{{ "%.2f"|format(total) }}</div>
+    </div>
+
+    <div class="action-buttons">
+      <form method="POST" action="{{ url_for('empty_cart') }}" style="display:inline;">
+        <button type="submit" class="btn empty-cart-btn" onclick="return confirm('Empty entire cart?');">
+          <i class="fas fa-trash-alt"></i> Empty Cart
+        </button>
+      </form>
+      <a href="{{ url_for('home') }}" class="btn secondary-btn" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+        <i class="fas fa-plus-circle"></i> Add More Packages
+      </a>
+      <a href="{{ url_for('checkout') }}" class="btn checkout-btn">
+        <i class="fas fa-credit-card"></i> Proceed to Checkout
+      </a>
+    </div>
+  {% else %}
+    <div class="empty-cart">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added any packages to your cart yet.</p>
+      <a href="{{ url_for('home') }}" class="btn checkout-btn">
+        <i class="fas fa-shopping-bag"></i> Browse Packages
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+// Create floating particles
+function createParticles() {
+  for (let i = 0; i < 40; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    const size = Math.random() * 6 + 2;
+    particle.style.width = size + 'px';
+    particle.style.height = size + 'px';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.animationDuration = Math.random() * 15 + 8 + 's';
+    document.body.appendChild(particle);
+  }
+}
+
+createParticles();
+
+// Optional: auto-submit when updating a single item using separate buttons
+// Already handled by formactions above.
+</script>
+
+</body>
+</html>

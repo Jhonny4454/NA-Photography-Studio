@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Home - SnapHire</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+/* ========== BASE & RESET ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ========== HEADER ========== */
+header {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: clamp(12px, 4vw, 20px) clamp(15px, 5vw, 30px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.logo {
+  font-weight: bold;
+  font-size: clamp(18px, 6vw, 24px);
+  color: #ff7f50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo i {
+  font-size: clamp(20px, 6vw, 28px);
+}
+.icon-button {
+  background: white;
+  border: none;
+  font-size: clamp(14px, 4vw, 18px);
+  cursor: pointer;
+  padding: clamp(8px, 2.5vw, 12px) clamp(10px, 3vw, 14px);
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  margin-left: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.icon-button:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 8px 20px rgba(255,127,80,0.4);
+}
+.icon-button:active { transform: scale(0.95); }
+.profile-menu {
+  display: none;
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 200px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  z-index: 1001;
+}
+.profile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #333;
+  padding: 12px 15px;
+  border-radius: 10px;
+  margin: 6px 0;
+  background: #f8f9fa;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+.profile-menu a:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  transform: translateX(5px);
+}
+
+/* ========== HERO ========== */
+.hero {
+  position: relative;
+  background: rgba(0,0,0,0.4);
+  height: clamp(60vh, 70vh, 85vh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1452587925148-ce544e77e70d?ixlib=rb-4.0.3') center/cover no-repeat;
+  opacity: 0.3;
+}
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+.hero-overlay h1 {
+  font-size: clamp(28px, 8vw, 56px);
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.hero-overlay p {
+  font-size: clamp(14px, 4vw, 19px);
+  margin-bottom: 30px;
+  opacity: 0.9;
+  padding: 0 10px;
+}
+.btn {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  padding: clamp(12px, 3.5vw, 16px) clamp(28px, 6vw, 40px);
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255,127,80,0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: clamp(14px, 4vw, 18px);
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 0; height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+.btn:hover::before {
+  width: 300px; height: 300px;
+}
+.btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(255,127,80,0.5);
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ========== SECTIONS ========== */
+section {
+  padding: clamp(40px, 8vw, 60px) clamp(15px, 5vw, 30px);
+  max-width: 1400px;
+  margin: 0 auto 30px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(5px);
+  border-radius: 30px;
+}
+.section-title {
+  text-align: center;
+  font-size: clamp(24px, 6vw, 40px);
+  margin-bottom: 40px;
+  color: #333;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(45deg, #ff7f50, #ff6347);
+  border-radius: 3px;
+}
+.search-bar {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.search-bar input {
+  padding: clamp(12px, 3.5vw, 14px) clamp(15px, 4vw, 20px);
+  width: min(350px, 90%);
+  border-radius: 30px;
+  border: 2px solid #e0e0e0;
+  font-size: clamp(13px, 3.5vw, 16px);
+  transition: all 0.3s ease;
+}
+.search-bar input:focus {
+  outline: none;
+  border-color: #ff7f50;
+  box-shadow: 0 0 15px rgba(255,127,80,0.3);
+  width: min(400px, 90%);
+}
+
+/* ========== SLIDER ========== */
+.slider-container {
+  position: relative;
+  padding: 0 clamp(30px, 8vw, 50px);
+}
+.slider-wrapper {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  border-radius: 20px;
+}
+.slider {
+  display: flex;
+  gap: clamp(20px, 4vw, 30px);
+  transition: transform 0.5s ease;
+  padding: 20px 0;
+}
+.slider-card {
+  flex: 0 0 min(320px, 85vw);
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+.slider-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+.slider-card img {
+  width: 100%;
+  height: clamp(180px, 30vw, 220px);
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.slider-card:hover img {
+  transform: scale(1.05);
+}
+.card-content {
+  padding: clamp(15px, 4vw, 20px);
+}
+.card-content h3 {
+  font-size: clamp(18px, 5vw, 21px);
+  margin-bottom: 10px;
+  color: #333;
+}
+.card-content p {
+  color: #666;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(12px, 3.5vw, 14px);
+}
+.card-content p i {
+  color: #ff7f50;
+  width: 20px;
+}
+.price {
+  font-size: clamp(20px, 5vw, 22px);
+  font-weight: bold;
+  color: #ff7f50;
+  margin: 10px 0;
+}
+.slider-card .btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 15px;
+  padding: clamp(8px, 2.5vw, 12px);
+  font-size: 14px;
+}
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(40px, 8vw, 50px);
+  height: clamp(40px, 8vw, 50px);
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(18px, 4vw, 22px);
+  transition: all 0.3s;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.nav-arrow:hover {
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 8px 25px rgba(255,127,80,0.5);
+}
+.nav-arrow.prev { left: -10px; }
+.nav-arrow.next { right: -10px; }
+
+/* ========== REVIEWS ========== */
+.reviews-slider .slider-card { flex: 0 0 min(300px, 85vw); }
+.reviews-slider .slider-card img { display: none; }
+.review-rating { margin: 10px 0; }
+.star { color: #FFD700; font-size: clamp(12px, 3.5vw, 14px); }
+.review-text {
+  font-style: italic;
+  line-height: 1.6;
+  margin: 15px 0;
+  color: #555;
+}
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  flex-wrap: wrap;
+}
+.review-author i { font-size: clamp(32px, 8vw, 40px); color: #ff7f50; }
+
+/* ========== PORTFOLIO & VIDEO GRIDS ========== */
+.portfolio-grid, .video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+.portfolio-card, .video-card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+}
+.portfolio-card:hover, .video-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+}
+.portfolio-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+.video-card video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #000;
+}
+.portfolio-card-body, .video-card-body { padding: 15px; }
+.photographer-name {
+  font-weight: bold;
+  color: #e91e63;
+  margin-bottom: 8px;
+}
+.video-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+.short-loop-badge {
+  background: #ff7f50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-sm {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-top: 12px;
+  border-radius: 30px;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s;
+}
+.btn-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255,127,80,0.4);
+}
+.spinner {
+  display: inline-block;
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top-color: #ff7f50;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-spinner {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px;
+}
+
+/* ========== TOAST & FOOTER ========== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  z-index: 2000;
+  animation: slideInRight 0.3s ease;
+}
+.toast.error { background: linear-gradient(135deg, #dc3545, #c82333); }
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+footer {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  padding: 40px 30px;
+  margin-top: 60px;
+}
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-left, .footer-right {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 18px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.1);
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+footer a:hover {
+  background: linear-gradient(135deg, #ff7f50, #ff6347);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.work-with-us { background: linear-gradient(135deg, #ff7f50, #ff6347); color: #fff; }
+.copyright {
+  text-align: center;
+  padding-top: 30px;
+  margin-top: 30px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: #888;
+}
+
+/* ========== RESPONSIVE FIXES ========== */
+@media (max-width: 768px) {
+  .slider-container { padding: 0 35px; }
+  .nav-arrow.prev { left: -5px; }
+  .nav-arrow.next { right: -5px; }
+  .portfolio-grid, .video-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+}
+@media (max-width: 480px) {
+  .slider-card { flex: 0 0 260px; }
+  .portfolio-grid, .video-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  body::before, .particle, .icon-button, .nav-arrow, .search-bar, footer { display: none; }
+  body { background: white; }
+  section { background: white; backdrop-filter: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><i class="fas fa-camera"></i> SnapHire</div>
+  <div>
+    <button class="icon-button" id="cartBtn" title="Shopping Cart"><i class="fas fa-shopping-cart"></i></button>
+    <button class="icon-button" id="ordersBtn" title="My Orders"><i class="fas fa-box"></i></button>
+    <div style="position:relative; display:inline-block;">
+      <button class="icon-button" id="profileBtn" title="Profile"><i class="fas fa-user"></i></button>
+      <div class="profile-menu" id="profileMenu">
+        <a href="/edit-profile"><i class="fas fa-user-edit"></i> Edit Profile</a>
+        <a href="/orders"><i class="fas fa-shopping-bag"></i> My Orders</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-overlay">
+    <h1>Capture Your Precious Moments</h1>
+    <p>Professional photography services for every special occasion</p>
+    <a href="#packages" class="btn"><i class="fas fa-camera"></i> Explore Packages <i class="fas fa-arrow-down"></i></a>
+  </div>
+</section>
+
+<section id="packages">
+  <h2 class="section-title">Our Photography Packages</h2>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search packages by name...">
+  </div>
+  <div class="slider-container">
+    <button class="nav-arrow prev" onclick="slidePackages(-1)"><i class="fas fa-chevron-left"></i></button>
+    <div class="slider-wrapper" id="packagesWrapper">
+      <div class="slider" id="packagesSlider">
+        {% for p in packages %}
+        <div class="slider-card package-card" data-package-name="{{ p.package_name|lower }}">
+          <img src="{{ url_for('static', filename='images/' ~ p.image_filename) if p.image_filename else 'https://via.placeholder.com/350x200?text=No+Image' }}" alt="{{ p.package_name }}">
+          <div class="card-content">
+            <h3>{{ p.package_name }}</h3>
+            <p><i class="fas fa-clock"></i> Duration: {{ p.duration }}</p>
+            <p class="price">₹{{ "%.2f"|format(p.package_price) }}</p>
+            <button class="btn add-to-cart-btn" data-id="{{ p.package_id }}" data-name="{{ p.package_name }}">
+              <i class="fas fa-cart-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="nav-arrow next" onclick="slidePackages(1)"><i class="fas fa-chevron-right"></i></button>
+  </div>
+</section>
+
+<section id="reviews">
+  <h2 class="section-title">What Our Clients Say</h2>
+  <div class="slider-container reviews-slider">
+    <button class="nav-arrow prev" onclick="slideReviews(-1)"><i class="fas fa-chevron-left"></i></button>
+    <div class="slider-wrapper" id="reviewsWrapper">
+      <div class="slider" id="reviewsSlider">
+        {% for r in package_reviews %}
+        <div class="slider-card">
+          <div class="card-content">
+            <h3>{{ r.package_name }}</h3>
+            <div class="review-rating">
+              {% for i in range(1,6) %}
+                <i class="{% if i <= r.rating %}fas{% else %}far{% endif %} fa-star star"></i>
+              {% endfor %}
+              <span style="margin-left: 10px; color: #666;">({{ r.rating }}/5)</span>
+            </div>
+            <p class="review-text"><i class="fas fa-quote-left" style="color: #ff7f50; margin-right: 8px;"></i> {{ r.comment|e }}</p>
+            <div class="review-author">
+              <i class="fas fa-user-circle"></i>
+              <div class="review-author-info">
+                <h4>{{ r.user_full_name|e }}</h4>
+                <p><i class="fas fa-calendar-alt"></i> {{ r.created_at.strftime('%d %b %Y') }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="nav-arrow next" onclick="slideReviews(1)"><i class="fas fa-chevron-right"></i></button>
+  </div>
+</section>
+
+<!-- Best Work (Portfolio) -->
+<section id="best-work">
+  <h2 class="section-title">📸 Our Best Work</h2>
+  <p style="text-align: center; margin-bottom: 20px;">Explore stunning captures from our talented photographers</p>
+  <div id="portfolio-grid" class="portfolio-grid">
+    <div class="loading-spinner"><div class="spinner"></div></div>
+  </div>
+  <div style="text-align: center; margin-top: 40px;">
+    <a href="/portfolio" class="btn"><i class="fas fa-images"></i> View Full Portfolio <i class="fas fa-arrow-right"></i></a>
+  </div>
+</section>
+
+<!-- Featured Videos -->
+<section id="featured-videos">
+  <h2 class="section-title">🎬 Featured Videos</h2>
+  <p style="text-align: center; margin-bottom: 20px;">Short cinematic moments captured by our photographers</p>
+  <div id="video-grid" class="video-grid">
+    <div class="loading-spinner"><div class="spinner"></div></div>
+  </div>
+  <div style="text-align: center; margin-top: 40px;">
+    <a href="/portfolio" class="btn"><i class="fas fa-video"></i> View All Videos <i class="fas fa-arrow-right"></i></a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-left">
+      <a href="/about"><i class="fas fa-info-circle"></i> About Us</a>
+      <a href="/privacy"><i class="fas fa-lock"></i> Privacy Policy</a>
+      <a href="/terms"><i class="fas fa-file-contract"></i> Terms & Conditions</a>
+      <a href="/get-hired" class="work-with-us"><i class="fas fa-briefcase"></i> Work With Us</a>
+    </div>
+    <div class="footer-right">
+      <span><i class="fas fa-code"></i> Developers:</span>
+      <a href="https://www.instagram.com/sum_11_1995" target="_blank"><i class="fab fa-instagram"></i> @Sumedh</a>
+      <a href="https://www.instagram.com/n_shaikh_n" target="_blank"><i class="fab fa-instagram"></i> @Nargis</a>
+    </div>
+  </div>
+  <div class="copyright">
+    <p>&copy; 2026 SnapHire. All rights reserved. | <i class="fas fa-camera"></i> Capturing your special moments</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ----- PARTICLES (static) -----
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `width:${Math.random()*4+1}px; height:${p.style.width}; left:${Math.random()*100}%; top:${Math.random()*100}%; opacity:${Math.random()*0.3}`;
+    document.body.appendChild(p);
+  }
+
+  // ----- GLOBAL VARIABLES -----
+  let packagesScrollPos = 0, reviewsScrollPos = 0;
+  const packagesSlider = document.getElementById('packagesSlider');
+  const reviewsSlider = document.getElementById('reviewsSlider');
+  const packagesWrapper = document.getElementById('packagesWrapper');
+  const reviewsWrapper = document.getElementById('reviewsWrapper');
+
+  // ----- SLIDER FUNCTIONS (with boundary fix) -----
+  window.slidePackages = function(direction) {
+    if (!packagesSlider || !packagesWrapper) return;
+    const visibleCards = Array.from(document.querySelectorAll('.package-card')).filter(c => c.style.display !== 'none');
+    if (visibleCards.length === 0) return;
+    const cardWidth = visibleCards[0].offsetWidth + 30; // includes gap
+    const maxScroll = packagesSlider.scrollWidth - packagesWrapper.clientWidth;
+    packagesScrollPos += direction * cardWidth;
+    packagesScrollPos = Math.max(0, Math.min(packagesScrollPos, maxScroll));
+    packagesSlider.style.transform = `translateX(-${packagesScrollPos}px)`;
+  };
+
+  window.slideReviews = function(direction) {
+    if (!reviewsSlider || !reviewsWrapper) return;
+    const card = document.querySelector('#reviewsSlider .slider-card');
+    if (!card) return;
+    const cardWidth = card.offsetWidth + 30;
+    const maxScroll = reviewsSlider.scrollWidth - reviewsWrapper.clientWidth;
+    reviewsScrollPos += direction * cardWidth;
+    reviewsScrollPos = Math.max(0, Math.min(reviewsScrollPos, maxScroll));
+    reviewsSlider.style.transform = `translateX(-${reviewsScrollPos}px)`;
+  };
+
+  // ----- SEARCH FILTER (reset scroll) -----
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function() {
+      const term = this.value.toLowerCase();
+      let visibleCount = 0;
+      document.querySelectorAll('.package-card').forEach(card => {
+        const name = card.dataset.packageName;
+        const visible = name.includes(term);
+        card.style.display = visible ? 'block' : 'none';
+        if (visible) visibleCount++;
+      });
+      // Reset scroll position
+      packagesScrollPos = 0;
+      if (packagesSlider) packagesSlider.style.transform = 'translateX(0px)';
+      // If no visible cards, we could show a message (optional)
+    });
+  }
+
+  // ----- PROFILE MENU TOGGLE -----
+  const profileBtn = document.getElementById('profileBtn');
+  const profileMenu = document.getElementById('profileMenu');
+  if (profileBtn && profileMenu) {
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+    });
+    profileMenu.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => profileMenu.style.display = 'none');
+    // Close on escape key
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileMenu.style.display = 'none'; });
+  }
+
+  // ----- NAVIGATION BUTTONS -----
+  document.getElementById('cartBtn')?.addEventListener('click', () => window.location.href = '/cart');
+  document.getElementById('ordersBtn')?.addEventListener('click', () => window.location.href = '/orders');
+
+  // ----- ADD TO CART (AJAX) -----
+  document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const packageId = this.dataset.id;
+      const packageName = this.dataset.name;
+      const originalHtml = this.innerHTML;
+      try {
+        const res = await fetch(`/add_package/${packageId}`, { method: 'POST' });
+        const data = await res.json();
+        if (data.status === 'success') {
+          showToast(`${packageName} added to cart!`, 'success');
+          this.innerHTML = '<i class="fas fa-check"></i> Added!';
+          this.style.background = '#28a745';
+          setTimeout(() => {
+            this.innerHTML = originalHtml;
+            this.style.background = '';
+          }, 2000);
+        } else {
+          showToast('Failed to add to cart', 'error');
+        }
+      } catch (err) {
+        showToast('Server error', 'error');
+      }
+    });
+  });
+
+  // ----- TOAST NOTIFICATION -----
+  function showToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i><span>${msg}</span>`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.animation = 'slideOutRight 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // Add slideOut keyframes if not present
+  if (!document.querySelector('#toast-keyframes')) {
+    const style = document.createElement('style');
+    style.id = 'toast-keyframes';
+    style.textContent = `@keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }`;
+    document.head.appendChild(style);
+  }
+
+  // ----- FETCH PORTFOLIO & VIDEOS (with placeholder if API missing) -----
+  async function fetchPortfolio() {
+    const grid = document.getElementById('portfolio-grid');
+    try {
+      const res = await fetch('/api/portfolio');
+      if (!res.ok) throw new Error('API not available');
+      const data = await res.json();
+      if (!data || data.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No portfolio images yet.</p>';
+        return;
+      }
+      grid.innerHTML = '';
+      let count = 0;
+      for (const photog of data) {
+        if (count >= 6) break;
+        if (!photog.images || photog.images.length === 0) continue;
+        const img = photog.images[0];
+        const card = document.createElement('div');
+        card.className = 'portfolio-card';
+        card.innerHTML = `
+          <img src="${img.url}" alt="${escapeHtml(photog.name)}" loading="lazy">
+          <div class="portfolio-card-body">
+            <div class="photographer-name">📷 ${escapeHtml(photog.name)}</div>
+            <div class="portfolio-meta">
+              <i class="fas fa-map-marker-alt"></i> ${escapeHtml(img.location || 'Unknown')}<br>
+              <i class="fas fa-calendar-alt"></i> ${escapeHtml(img.shoot_date || 'N/A')}
+            </div>
+            <p>${escapeHtml((img.description || '').substring(0, 80))}</p>
+            <a href="/portfolio" class="btn-sm">View more</a>
+          </div>
+        `;
+        grid.appendChild(card);
+        count++;
+      }
+      if (count === 0) grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No images to display.</p>';
+    } catch (err) {
+      console.warn('Portfolio API not available, showing placeholder');
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:20px;">
+          <i class="fas fa-image" style="font-size:48px; color:#ccc;"></i>
+          <p>Portfolio coming soon!</p>
+        </div>
+      `;
+    }
+  }
+
+  async function fetchVideos() {
+    const grid = document.getElementById('video-grid');
+    try {
+      const res = await fetch('/api/videos');
+      if (!res.ok) throw new Error('API not available');
+      const videos = await res.json();
+      if (!videos || videos.length === 0) {
+        grid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">No videos available yet.</p>';
+        return;
+      }
+      grid.innerHTML = '';
+      videos.forEach(v => {
+        const isLoop = v.is_short_loop;
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <video ${v.poster_image_url ? `poster="${v.poster_image_url}"` : ''} ${isLoop ? 'autoplay loop muted playsinline' : 'controls'} preload="metadata">
+            <source src="${v.video_url}" type="video/mp4">
+          </video>
+          <div class="video-card-body">
+            <div class="video-title">${escapeHtml(v.title)}</div>
+            <div class="video-meta">
+              <span><i class="fas fa-user"></i> ${escapeHtml(v.photographer_name)}</span>
+              <span><i class="fas fa-clock"></i> ${v.duration_seconds || 'Short'}</span>
+              ${isLoop ? '<span class="short-loop-badge"><i class="fas fa-sync-alt"></i> Short Loop</span>' : ''}
+            </div>
+            ${v.description ? `<p>${escapeHtml(v.description.substring(0, 100))}</p>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.warn('Video API not available, showing placeholder');
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:20px;">
+          <i class="fas fa-video" style="font-size:48px; color:#ccc;"></i>
+          <p>Featured videos coming soon!</p>
+        </div>
+      `;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]);
+  }
+
+  // Initialize
+  fetchPortfolio();
+  fetchVideos();
+
+  // Reset slider on window resize
+  window.addEventListener('resize', () => {
+    packagesScrollPos = 0;
+    reviewsScrollPos = 0;
+    if (packagesSlider) packagesSlider.style.transform = 'translateX(0px)';
+    if (reviewsSlider) reviewsSlider.style.transform = 'translateX(0px)';
+  });
+})();
+</script>
+</body>
+</html>
