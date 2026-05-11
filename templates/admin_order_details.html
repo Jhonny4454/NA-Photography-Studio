@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Admin - Order Details | SnapHire</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
@@ -639,10 +640,10 @@ tr:hover {
               <tr>
                 <td><strong>{{ item.package_name|default('N/A') }}</strong><br><small>{{ item.duration|default('') }}</small></td>
                 <td>{% if item.photographer_name %}<i class="fas fa-camera-retro"></i> {{ item.photographer_name }}{% if item.photographer_rating %} <br>⭐ {{ item.photographer_rating }}{% endif %}{% else %}<span style="color:#999;">Not assigned</span>{% endif %}</td>
-                <td>{{ item.location|default('Not specified') }}</td>
-                <td>₹{{ "%.2f"|format(item.price|float) }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>₹{{ "%.2f"|format(item_total|float) }}</td>
+                <td>{{ item.location|default('Not specified') }}</span>
+                <td>₹{{ "%.2f"|format(item.price|float) }}</span>
+                <td>{{ item.quantity }}</span>
+                <td>₹{{ "%.2f"|format(item_total|float) }}</span>
               </tr>
             {% endfor %}
           </tbody>
@@ -668,6 +669,7 @@ tr:hover {
     <!-- Status Update Form -->
     <div class="status-update">
       <form action="/admin/update_order_status/{{ order.order_id }}" method="POST" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <select name="status" class="status-select">
           <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
           <option value="Confirmed" {% if order.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
