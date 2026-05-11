@@ -326,17 +326,27 @@ button:active {
       Admin Login
     </h2>
 
-    {% if error %}
-      <div class="error">
-        <i class="fas fa-exclamation-circle"></i>
-        {{ error }}
-      </div>
-    {% endif %}
+    {# Display flashed messages (error/success) from Flask backend #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            <div class="error" role="alert">
+              <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
     <form method="POST">
+      <!-- CSRF protection - REQUIRED to prevent 403 errors -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
       <div class="input-group">
         <i class="fas fa-user"></i>
-        <input type="text" name="username" placeholder="Username" required>
+        <input type="text" name="username" placeholder="Username" required autofocus>
       </div>
 
       <div class="input-group">
