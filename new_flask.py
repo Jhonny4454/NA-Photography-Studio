@@ -978,6 +978,10 @@ def admin_add_portfolio_image(photographer_id):
     db = get_db()
     if request.method == "POST":
         image_url   = _safe_str(request.form.get("image_url", ""), 500)
+        # ----- FIX: remove accidental /static/ prefix from external URLs -----
+        if image_url.startswith('/static/http'):
+            image_url = image_url.replace('/static/', '', 1)
+        # ---------------------------------------------------------------------
         location    = _safe_str(request.form.get("location", ""), 255)
         shoot_date  = request.form.get("shoot_date") or None
         description = _safe_str(request.form.get("description", ""), 500)
@@ -1022,6 +1026,10 @@ def admin_edit_portfolio_image(image_id):
     try:
         if request.method == "POST":
             image_url   = _safe_str(request.form.get("image_url", ""), 500)
+            # ----- FIX: remove accidental /static/ prefix from external URLs -----
+            if image_url.startswith('/static/http'):
+                image_url = image_url.replace('/static/', '', 1)
+            # ---------------------------------------------------------------------
             location    = _safe_str(request.form.get("location", ""), 255)
             shoot_date  = request.form.get("shoot_date") or None
             description = _safe_str(request.form.get("description", ""), 500)
