@@ -162,9 +162,8 @@ h2 {
   letter-spacing: 0.2px;
 }
 
-/* 🔧 FIX: specific right padding for password field to avoid text mashing under eye icon */
 #password {
-  padding-right: 52px;        /* enough space for eye toggle icon */
+  padding-right: 52px;
 }
 
 .input-group input:focus {
@@ -176,7 +175,7 @@ h2 {
   color: #ff7f50;
 }
 
-/* eye toggle button styling — clean, no overlap, perfect click zone */
+/* eye toggle */
 .toggle-password {
   position: absolute;
   top: 50%;
@@ -352,7 +351,6 @@ h2 {
   }
 }
 
-/* extra small devices: keep icons clean */
 @media (max-width: 380px) {
   #password {
     padding-right: 44px;
@@ -368,7 +366,6 @@ h2 {
   }
 }
 
-/* landscape mode adjustments */
 @media (max-width: 850px) and (orientation: landscape) {
   .login-container {
     padding: 20px 30px;
@@ -384,7 +381,6 @@ h2 {
   }
 }
 
-/* print (no glitches) */
 @media print {
   body {
     background: white;
@@ -424,15 +420,20 @@ h2 {
   {% endif %}
 
   <form method="POST" action="/">
+    <!-- CSRF protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="input-group">
       <i class="fas fa-user-circle" aria-hidden="true"></i>
-      <input type="text" name="username" placeholder="Username or email" required autofocus>
+      <input type="text" name="username" placeholder="Username or email" required autofocus
+             autocomplete="username" maxlength="30">
     </div>
 
     <div class="input-group" id="passwordGroup">
       <i class="fas fa-lock" aria-hidden="true"></i>
-      <input type="password" id="password" name="password" placeholder="Password" required>
-      <!-- eye toggle will be inserted here via JS -->
+      <input type="password" id="password" name="password" placeholder="Password" required
+             autocomplete="current-password" maxlength="128">
+      <!-- eye toggle inserted by JS -->
     </div>
 
     <div class="forgot-link">
@@ -457,65 +458,49 @@ h2 {
 
 <script>
   (function() {
-    // ---------- PASSWORD TOGGLE (eye) - with proper spacing fix ----------
+    // ---------- PASSWORD TOGGLE (eye) ----------
     const passwordInput = document.getElementById('password');
     if (passwordInput) {
       const parentGroup = document.getElementById('passwordGroup');
-      
-      // Avoid duplicate toggles if script re-runs
+
       if (!parentGroup.querySelector('.toggle-password')) {
         const eyeIcon = document.createElement('i');
         eyeIcon.classList.add('fas', 'fa-eye', 'toggle-password');
         eyeIcon.setAttribute('aria-label', 'Show password');
         eyeIcon.setAttribute('role', 'button');
-        eyeIcon.setAttribute('tabindex', '0');  // make it focusable for keyboard users
-        
-        // Append the eye toggle to the input group (right side)
+        eyeIcon.setAttribute('tabindex', '0');
         parentGroup.appendChild(eyeIcon);
-        
-        // Toggle functionality (click + keyboard)
+
         const togglePassword = () => {
           const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
           passwordInput.setAttribute('type', type);
-          // toggle eye / eye-slash icons
           eyeIcon.classList.toggle('fa-eye');
           eyeIcon.classList.toggle('fa-eye-slash');
-          // update aria-label
           eyeIcon.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
-          // maintain focus on input after toggle
           passwordInput.focus();
         };
-        
+
         eyeIcon.addEventListener('click', (e) => {
           e.preventDefault();
           togglePassword();
         });
-        
+
         eyeIcon.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             togglePassword();
           }
         });
+
+        eyeIcon.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          eyeIcon.click();
+        }, { passive: false });
       }
     }
 
-    // Ensure no layout shifts & avoid text under eye icon (double check)
-    // Also handle when password input becomes type="text" — same padding remains.
-    
-    // Optional: small extra fix for touch devices to avoid accidental zoom on double tap eye
-    const toggleBtns = document.querySelectorAll('.toggle-password');
-    toggleBtns.forEach(btn => {
-      btn.addEventListener('touchstart', (e) => {
-        // Prevent default only if it's a direct touch on the icon, but allow click to fire
-        e.preventDefault();
-        btn.click();
-      }, { passive: false });
-    });
-
-    // ---------- floating particles (subtle background magic) ----------
+    // ---------- floating particles ----------
     function createParticles() {
-      // Reduce particle count on small devices for performance
       const particleCount = window.innerWidth < 500 ? 12 : Math.min(28, Math.floor(window.innerWidth / 35));
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
@@ -533,13 +518,11 @@ h2 {
     }
     createParticles();
 
-    // small improvement: ensure that when user interacts with password, no misalignment
-    // also fix for browsers that recalc on zoom
+    // enforce password padding
     const enforcePasswordPadding = () => {
       if (passwordInput) {
-        const computedRightPadding = window.getComputedStyle(passwordInput).paddingRight;
-        if (parseInt(computedRightPadding) < 38) {
-          // fallback in case of weird overrides
+        const computed = window.getComputedStyle(passwordInput).paddingRight;
+        if (parseInt(computed) < 38) {
           passwordInput.style.paddingRight = '52px';
         }
       }
@@ -547,7 +530,7 @@ h2 {
     window.addEventListener('resize', enforcePasswordPadding);
     enforcePasswordPadding();
 
-    // Prevent form resubmission on page refresh (if any)
+    // prevent form resubmission on refresh
     if (window.history.replaceState) {
       window.history.replaceState(null, null, window.location.href);
     }
