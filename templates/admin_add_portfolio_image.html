@@ -433,6 +433,9 @@ body::before {
   </h2>
   <!-- Explicit action: POST to the same URL -->
   <form method="POST" action="/admin/portfolio/add/{{ photographer.id }}">
+    <!-- CSRF protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="form-group">
       <label><i class="fas fa-link"></i> Image URL *</label>
       <input type="url" name="image_url" required placeholder="https://example.com/photo.jpg">

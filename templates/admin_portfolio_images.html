@@ -105,6 +105,8 @@ body::before { content: ""; position: absolute; top: 0; left: 0; right: 0; botto
           <div class="action-buttons">
             <a href="/admin/portfolio/edit/{{ img.id }}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
             <form action="/admin/portfolio/delete/{{ img.id }}" method="POST" style="display:inline;">
+              <!-- CSRF protection -->
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn-delete" onclick="return confirm('Delete this image?')"><i class="fas fa-trash-alt"></i> Delete</button>
             </form>
           </div>

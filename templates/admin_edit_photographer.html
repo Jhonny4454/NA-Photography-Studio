@@ -493,6 +493,9 @@ body::before {
 <!-- EDIT FORM -->
 <div class="form-card">
   <form method="POST" action="/admin/edit_photographer/{{ photographer.id }}">
+    <!-- CSRF protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="form-row">
       <div class="form-group">
         <label><i class="fas fa-user"></i> First Name</label>

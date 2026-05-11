@@ -399,6 +399,9 @@
 
     <div class="form-card">
         <form method="POST" enctype="multipart/form-data">
+            <!-- CSRF protection -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="form-group">
                 <label><i class="fas fa-user"></i> Photographer *</label>
                 <select name="photographer_id" id="photographerSelect" required>

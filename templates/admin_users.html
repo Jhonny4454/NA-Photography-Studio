@@ -660,32 +660,34 @@ createParticles();
       {% if users and users|length > 0 %}
         {% for u in users %}
         <tr>
-          <td>#{{ u.id }}</td>
+          <td>#{{ u.id }}</span>
           <td>
             <strong>{{ u.first_name }} {{ u.last_name }}</strong>
-          </td>
+          </span>
           <td>
             <i class="fas fa-envelope"></i> {{ u.email }}<br>
             <i class="fas fa-phone"></i> {{ u.mobile if u.mobile else 'N/A' }}
-          </td>
+          </span>
           <td>
             <i class="fas fa-user-circle"></i> {{ u.username }}
-          </td>
+          </span>
           <td>
             <span class="role-badge role-{{ u.role if u.role else 'user' }}">
               <i class="fas fa-{{ 'shield-alt' if u.role == 'admin' else 'user' }}"></i>
               {{ u.role|capitalize if u.role else 'User' }}
             </span>
-          </td>
+          </span>
           <td>
             <i class="fas fa-calendar-alt"></i> {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'N/A' }}
-          </td>
+          </span>
           <td class="action-buttons">
             <a href="/admin/view_user/{{ u.id }}" class="view-btn">
               <i class="fas fa-eye"></i> View
             </a>
             {% if u.role != 'admin' %}
             <form action="/admin/delete_user/{{ u.id }}" method="POST" style="display:inline;">
+              <!-- CSRF protection -->
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete user {{ u.first_name }} {{ u.last_name }}? This will also delete all their orders and data.')">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
@@ -693,7 +695,7 @@ createParticles();
             {% else %}
               <span style="color: #999; font-size: 12px;">Cannot delete admin</span>
             {% endif %}
-          </td>
+          </span>
         </tr>
         {% endfor %}
       {% else %}
@@ -701,13 +703,11 @@ createParticles();
           <td colspan="7" class="no-data">
             <i class="fas fa-users-slash"></i>
             <p>No users found</p>
-          </td>
+          </span>
         </tr>
       {% endif %}
     </tbody>
-  </table>
-</div>
-
+  </div>
 </div>
 
 </body>

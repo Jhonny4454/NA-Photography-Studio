@@ -337,6 +337,9 @@
 
   <!-- Main Form -->
   <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin_edit_video', video_id=video.id) }}">
+    <!-- CSRF protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="form-grid">
       <!-- Photographer (readonly display, can't change photographer here) -->
       <div class="form-group full-width">
@@ -434,9 +437,11 @@
     </div>
   </form>
 
-  <!-- Hidden Delete Form -->
+  <!-- Hidden Delete Form with CSRF token -->
   {% if video and video.id %}
-  <form id="deleteForm" action="{{ url_for('admin_delete_video', video_id=video.id) }}" method="POST" style="display: none;"></form>
+  <form id="deleteForm" action="{{ url_for('admin_delete_video', video_id=video.id) }}" method="POST" style="display: none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
   {% endif %}
 </div>
 

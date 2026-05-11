@@ -551,6 +551,18 @@ tr:hover {
     </div>
   </div>
 
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <!-- STATS CARDS -->
   <div class="cards">
     <div class="card">
@@ -608,30 +620,30 @@ tr:hover {
         <tr>
           <td>
             <i class="fas fa-hashtag"></i> {{ order.order_id|default('N/A') }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-user"></i> {{ order.first_name|default('') }} {{ order.last_name|default('') }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-rupee-sign"></i> {{ order.total_price|default(0) }}
-          </td>
+           </td>
           <td>
             <span class="status-badge status-{{ order.status|lower|default('pending') }}">
               {{ order.status|default('Pending') }}
             </span>
-          </td>
+           </td>
           <td>
             <i class="fas fa-calendar"></i> {{ order.created_at.strftime('%Y-%m-%d') if order.created_at else 'N/A' }}
-          </td>
+           </td>
           <td>
             <a href="/admin/order_details/{{ order.order_id }}" class="btn">
               <i class="fas fa-eye"></i> View
             </a>
-          </td>
+           </td>
         </tr>
         {% endfor %}
       </tbody>
-    </div>
+    </table>
   </div>
   {% else %}
   <div class="no-data">
@@ -668,32 +680,34 @@ tr:hover {
           <td>#{{ app.id|default('') }}</td>
           <td>
             <i class="fas fa-user"></i> {{ app.first_name|default('') }} {{ app.last_name|default('') }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-envelope"></i> {{ app.email|default('') }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-phone"></i> {{ app.phone|default('') }}
-          </td>
+           </td>
           <td>
             <i class="fas fa-calendar-alt"></i> {{ app.years_exp|default(0) }} years {{ app.months_exp|default(0) }} months
-          </td>
+           </td>
           <td>
             <form action="/admin/approve/{{ app.id }}" method="POST" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="action-btn approve">
                 <i class="fas fa-check"></i> Approve
               </button>
             </form>
             <form action="/admin/reject/{{ app.id }}" method="POST" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="action-btn reject">
                 <i class="fas fa-times"></i> Reject
               </button>
             </form>
-          </td>
+           </td>
         </tr>
         {% endfor %}
       </tbody>
-    </div>
+    </table>
   </div>
   {% else %}
   <div class="no-data">

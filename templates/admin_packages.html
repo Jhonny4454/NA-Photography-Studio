@@ -626,6 +626,9 @@ createParticles();
     Add New Package
   </h3>
   <form method="POST" action="/admin/packages">
+    <!-- CSRF protection -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
     <div class="form-grid">
       <div class="form-group">
         <label><i class="fas fa-tag"></i> Package Name</label>
@@ -678,7 +681,7 @@ createParticles();
                  onerror="this.onerror=null;this.src='/static/images/default.jpg';"
                  alt="{{ p.package_name }}">
             </td>
-          <td><strong>{{ p.package_name }}</strong></td>
+          <td><strong>{{ p.package_name }}</strong>--</td>
           <td><i class="fas fa-rupee-sign"></i> {{ "%.2f"|format(p.package_price) }}</td>
           <td><i class="fas fa-clock"></i> {{ p.duration }}</td>
           <td class="action-buttons">
@@ -686,7 +689,9 @@ createParticles();
               <i class="fas fa-edit"></i> Edit
             </a>
             <form action="/admin/delete_package/{{ p.package_id }}" method="POST" style="display:inline;">
-              <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete "{{ p.package_name }}"? This action cannot be undone.')">
+              <!-- CSRF protection for delete -->
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete &quot;{{ p.package_name }}&quot;? This action cannot be undone.')">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
             </form>

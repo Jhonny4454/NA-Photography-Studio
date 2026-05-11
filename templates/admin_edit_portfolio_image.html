@@ -392,6 +392,9 @@ body::before {
 
   <div class="form-card">
     <form method="POST">
+      <!-- CSRF protection -->
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
       <div class="form-group">
         <label><i class="fas fa-link"></i> Image URL</label>
         <input type="url" name="image_url" value="{{ image.image_url }}" required>

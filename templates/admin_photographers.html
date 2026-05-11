@@ -707,18 +707,18 @@ createParticles();
           <td>#{{ p.id }}</td>
           <td>
             <strong>{{ p.first_name }} {{ p.last_name }}</strong>
-          </td>
+           </td>
           <td>
             <i class="fas fa-envelope"></i> {{ p.email }}<br>
             <i class="fas fa-phone"></i> {{ p.phone if p.phone else 'N/A' }}
-          </td>
+           </td>
           <td>
             {% if p.experience %}
               <i class="fas fa-briefcase"></i> {{ p.experience }}
             {% else %}
               <span style="color: #999;">Not specified</span>
             {% endif %}
-          </td>
+           </td>
           <td class="rating">
             {% if p.rating and p.rating > 0 %}
               {% for i in range(1,6) %}
@@ -734,13 +734,13 @@ createParticles();
             {% else %}
               <span style="color: #999;">Not rated yet</span>
             {% endif %}
-          </td>
+           </td>
           <td>
             <span class="status-badge status-{{ p.status if p.status else 'inactive' }}">
               <i class="fas fa-{{ 'check-circle' if p.status == 'active' else 'times-circle' }}"></i>
               {{ p.status|capitalize if p.status else 'Inactive' }}
             </span>
-          </td>
+           </td>
           <td class="action-buttons">
             <a href="/admin/edit_photographer/{{ p.id }}" class="edit-btn">
               <i class="fas fa-edit"></i> Edit
@@ -753,23 +753,25 @@ createParticles();
               <i class="fas fa-video"></i> Videos
             </a>
             <form action="/admin/delete_photographer/{{ p.id }}" method="POST" style="display:inline;">
+              <!-- CSRF protection -->
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete photographer {{ p.first_name }} {{ p.last_name }}? This action cannot be undone.')">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
             </form>
-          </td>
-        </tr>
+           </td>
+         </tr>
         {% endfor %}
       {% else %}
-        <tr>
+         <tr>
           <td colspan="7" class="no-data">
             <i class="fas fa-camera-retro"></i>
             <p>No photographers found. Approve applications from the dashboard to add photographers.</p>
           </td>
-        </tr>
+         </tr>
       {% endif %}
     </tbody>
-  </table>
+   </table>
 </div>
 
 </div>
