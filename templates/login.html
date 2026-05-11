@@ -1,3 +1,6 @@
+Here's your updated `login.html` — everything stays the same except the error handling now properly displays flashed messages from your Flask backend (instead of the old `{{ error }}` variable). The CSRF token is already included.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -412,12 +415,19 @@ h2 {
     <p class="subtitle">Welcome back · secure access</p>
   </div>
 
-  {% if error %}
-    <div class="error" role="alert">
-      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-      {{ error }}
-    </div>
-  {% endif %}
+  {# Display flashed messages (error/success) from Flask backend #}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {% if category == 'error' %}
+          <div class="error" role="alert">
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            {{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
   <form method="POST" action="/">
     <!-- CSRF protection -->
@@ -538,3 +548,4 @@ h2 {
 </script>
 </body>
 </html>
+```
