@@ -96,12 +96,12 @@ def apply_security_headers(response):
     response.headers["Permissions-Policy"]       = "geolocation=(), microphone=(), camera=()"
     if ON_RENDER:
         response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
-    # Tight CSP – tighten further once you know your CDN origins
+    # Tight CSP – updated to allow FontAwesome and other CDN resources
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        "font-src 'self' https://fonts.gstatic.com; "
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://code.jquery.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
         "img-src 'self' data: https://res.cloudinary.com; "
         "media-src 'self' https://res.cloudinary.com; "
         "connect-src 'self';"
