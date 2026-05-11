@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Home - SnapHire</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
@@ -658,6 +659,9 @@ footer a:hover {
     document.body.appendChild(p);
   }
 
+  // ----- CSRF token from meta tag -----
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
   // ----- GLOBAL VARIABLES -----
   let packagesScrollPos = 0, reviewsScrollPos = 0;
   const packagesSlider = document.getElementById('packagesSlider');
@@ -703,7 +707,6 @@ footer a:hover {
       // Reset scroll position
       packagesScrollPos = 0;
       if (packagesSlider) packagesSlider.style.transform = 'translateX(0px)';
-      // If no visible cards, we could show a message (optional)
     });
   }
 
@@ -717,7 +720,6 @@ footer a:hover {
     });
     profileMenu.addEventListener('click', (e) => e.stopPropagation());
     document.addEventListener('click', () => profileMenu.style.display = 'none');
-    // Close on escape key
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileMenu.style.display = 'none'; });
   }
 
@@ -725,14 +727,20 @@ footer a:hover {
   document.getElementById('cartBtn')?.addEventListener('click', () => window.location.href = '/cart');
   document.getElementById('ordersBtn')?.addEventListener('click', () => window.location.href = '/orders');
 
-  // ----- ADD TO CART (AJAX) -----
+  // ----- ADD TO CART (AJAX with CSRF) -----
   document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
     btn.addEventListener('click', async function() {
       const packageId = this.dataset.id;
       const packageName = this.dataset.name;
       const originalHtml = this.innerHTML;
       try {
-        const res = await fetch(`/add_package/${packageId}`, { method: 'POST' });
+        const res = await fetch(`/add_package/${packageId}`, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-Token': csrfToken || '',
+            'Content-Type': 'application/json'
+          }
+        });
         const data = await res.json();
         if (data.status === 'success') {
           showToast(`${packageName} added to cart!`, 'success');
@@ -791,7 +799,7 @@ footer a:hover {
         const card = document.createElement('div');
         card.className = 'portfolio-card';
         card.innerHTML = `
-          <img src="${img.url}" alt="${escapeHtml(photog.name)}" loading="lazy">
+          <img src="${escapeHtml(img.url)}" alt="${escapeHtml(photog.name)}" loading="lazy">
           <div class="portfolio-card-body">
             <div class="photographer-name">📷 ${escapeHtml(photog.name)}</div>
             <div class="portfolio-meta">

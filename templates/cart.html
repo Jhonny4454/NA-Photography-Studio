@@ -665,6 +665,7 @@ footer {
             {{ item.package_name }}
           </div>
           <form method="POST" action="/remove/{{ item.id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to remove this item?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="remove-btn">
               <i class="fas fa-trash-alt"></i> Remove
             </button>
@@ -709,6 +710,7 @@ footer {
               Customize Your Package
             </h4>
             <form method="POST" action="/update_item/{{ item.id }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <div class="form-grid">
                 <div class="form-group">
                   <label>
@@ -774,6 +776,7 @@ footer {
             <i class="fas fa-credit-card"></i> Proceed to Checkout
           </a>
           <form method="POST" action="/empty_cart" style="display:inline;" onsubmit="return confirm('Are you sure you want to empty your cart?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="empty-cart-btn">
               <i class="fas fa-trash-alt"></i> Empty Cart
             </button>
